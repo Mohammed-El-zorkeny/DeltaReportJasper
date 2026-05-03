@@ -1,0 +1,432 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DBS_PLAN_REQUESTS" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="539fdbef-7607-4e4f-bb51-a9be3ab4fb46">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ERP_STOCK"/>
+	<style name="Col  Header" mode="Opaque" forecolor="#030303" backcolor="#DB9593"/>
+	<style name="Text" mode="Transparent" forecolor="#E60F0B"/>
+	<style name="Col  Header Value" mode="Transparent" forecolor="#030303" backcolor="#D4D0CF"/>
+	<parameter name="P_LANG" class="java.lang.String"/>
+	<parameter name="P_USERNAME" class="java.lang.String"/>
+	<parameter name="P_COMP_ID" class="java.lang.String"/>
+	<parameter name="P_ID" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT ID,
+       COMP_ID,
+       BRANCH_ID,
+       AUTO_NUMBER,
+       AUTO_NUMBER_BRA,
+       DBS_SAL_CUSTOMERS_LANG_NAME(DBS_SAL_CUSTOMERS_ID, $P{P_LANG}) AS CUST_NAME,
+       DBS_SAL_CUSTOMER_PHONE(DBS_SAL_CUSTOMERS_ID) AS CUST_PHONE,
+       DBS_SAL_SALES_MAN_LANG_NAME(DBS_SAL_SALES_ID, $P{P_LANG}) AS SALES_NAME,
+       DBS_SAL_SALES_MAN_PHONE(DBS_SAL_SALES_ID) AS SALES_PHONE,
+       DBS_STOCK_STORE_LANG_NAME(DBS_STOCK_STORE_ID, $P{P_LANG}) AS STORE_NAME,
+       DBS_STOCK_STORE_DTL_LANG_NAME(DBS_STOCK_SUB_STORE_ID, $P{P_LANG}) AS SUB_STORE_NAME,
+       DBS_PAYMENT_TYPE_LANG_NAME(PAYMENT_TYPE, $P{P_LANG}) AS PAYMENT_TYPE,
+       TO_CHAR(INV_DATE, 'YYYY-MM-DD') AS INV_DATE, 
+       CHECK_TAX,
+       INV_NUMBER_TAX,
+       BANK_ID,
+       NVL(AMOUNT_PAID, 0) AS AMOUNT_PAID,
+       NVL(AMOUNT_DUE, 0) AS AMOUNT_DUE,
+       NVL(TOTAL_VALUE, 0) AS TOTAL_VALUE,
+       NVL(DISCOUNT_VALUE, 0) AS DISCOUNT_VALUE,
+       NVL(TOTAL_NET_AF_DISCOUNT, 0) AS TOTAL_NET_AF_DISCOUNT,
+       NVL(TAX_VALUE, 0) AS TAX_VALUE,
+       NVL(TOTAL_NET_AF_TAX, 0) AS TOTAL_NET_AF_TAX,
+       NVL(DELIVERY_VALUE, 0) AS DELIVERY_VALUE,
+       DBS_PLAN_REQUESTS_DTL_FINAL_VALUE(ID) AS FINAL_VALUE,
+       NOTES,
+       STATUS,
+       CREATED,
+       CREATED_BY,
+       UPDATED,
+       UPDATED_BY,
+       GET_DBS_COMP_NAME_BY_ID($P{P_COMP_ID}) AS FOOT
+FROM "DBS_PLAN_REQUESTS" a
+WHERE ID = $P{P_ID}]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="ID"/>
+	</field>
+	<field name="COMP_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="COMP_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="COMP_ID"/>
+	</field>
+	<field name="BRANCH_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="BRANCH_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="BRANCH_ID"/>
+	</field>
+	<field name="AUTO_NUMBER" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="AUTO_NUMBER"/>
+		<property name="com.jaspersoft.studio.field.label" value="AUTO_NUMBER"/>
+	</field>
+	<field name="AUTO_NUMBER_BRA" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="AUTO_NUMBER_BRA"/>
+		<property name="com.jaspersoft.studio.field.label" value="AUTO_NUMBER_BRA"/>
+	</field>
+	<field name="CUST_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="CUST_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="CUST_NAME"/>
+	</field>
+	<field name="CUST_PHONE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="CUST_PHONE"/>
+		<property name="com.jaspersoft.studio.field.label" value="CUST_PHONE"/>
+	</field>
+	<field name="SALES_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SALES_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="SALES_NAME"/>
+	</field>
+	<field name="SALES_PHONE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SALES_PHONE"/>
+		<property name="com.jaspersoft.studio.field.label" value="SALES_PHONE"/>
+	</field>
+	<field name="STORE_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="STORE_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="STORE_NAME"/>
+	</field>
+	<field name="SUB_STORE_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SUB_STORE_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="SUB_STORE_NAME"/>
+	</field>
+	<field name="PAYMENT_TYPE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PAYMENT_TYPE"/>
+		<property name="com.jaspersoft.studio.field.label" value="PAYMENT_TYPE"/>
+	</field>
+	<field name="INV_DATE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="INV_DATE"/>
+		<property name="com.jaspersoft.studio.field.label" value="INV_DATE"/>
+	</field>
+	<field name="CHECK_TAX" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="CHECK_TAX"/>
+		<property name="com.jaspersoft.studio.field.label" value="CHECK_TAX"/>
+	</field>
+	<field name="INV_NUMBER_TAX" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="INV_NUMBER_TAX"/>
+		<property name="com.jaspersoft.studio.field.label" value="INV_NUMBER_TAX"/>
+	</field>
+	<field name="BANK_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="BANK_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="BANK_ID"/>
+	</field>
+	<field name="AMOUNT_PAID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="AMOUNT_PAID"/>
+		<property name="com.jaspersoft.studio.field.label" value="AMOUNT_PAID"/>
+	</field>
+	<field name="AMOUNT_DUE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="AMOUNT_DUE"/>
+		<property name="com.jaspersoft.studio.field.label" value="AMOUNT_DUE"/>
+	</field>
+	<field name="TOTAL_VALUE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="TOTAL_VALUE"/>
+		<property name="com.jaspersoft.studio.field.label" value="TOTAL_VALUE"/>
+	</field>
+	<field name="DISCOUNT_VALUE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="DISCOUNT_VALUE"/>
+		<property name="com.jaspersoft.studio.field.label" value="DISCOUNT_VALUE"/>
+	</field>
+	<field name="TOTAL_NET_AF_DISCOUNT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="TOTAL_NET_AF_DISCOUNT"/>
+		<property name="com.jaspersoft.studio.field.label" value="TOTAL_NET_AF_DISCOUNT"/>
+	</field>
+	<field name="TAX_VALUE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="TAX_VALUE"/>
+		<property name="com.jaspersoft.studio.field.label" value="TAX_VALUE"/>
+	</field>
+	<field name="TOTAL_NET_AF_TAX" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="TOTAL_NET_AF_TAX"/>
+		<property name="com.jaspersoft.studio.field.label" value="TOTAL_NET_AF_TAX"/>
+	</field>
+	<field name="DELIVERY_VALUE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="DELIVERY_VALUE"/>
+		<property name="com.jaspersoft.studio.field.label" value="DELIVERY_VALUE"/>
+	</field>
+	<field name="FINAL_VALUE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="FINAL_VALUE"/>
+		<property name="com.jaspersoft.studio.field.label" value="FINAL_VALUE"/>
+	</field>
+	<field name="NOTES" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NOTES"/>
+		<property name="com.jaspersoft.studio.field.label" value="NOTES"/>
+	</field>
+	<field name="STATUS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="STATUS"/>
+		<property name="com.jaspersoft.studio.field.label" value="STATUS"/>
+	</field>
+	<field name="CREATED" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="CREATED"/>
+		<property name="com.jaspersoft.studio.field.label" value="CREATED"/>
+	</field>
+	<field name="CREATED_BY" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="CREATED_BY"/>
+		<property name="com.jaspersoft.studio.field.label" value="CREATED_BY"/>
+	</field>
+	<field name="UPDATED" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="UPDATED"/>
+		<property name="com.jaspersoft.studio.field.label" value="UPDATED"/>
+	</field>
+	<field name="UPDATED_BY" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="UPDATED_BY"/>
+		<property name="com.jaspersoft.studio.field.label" value="UPDATED_BY"/>
+	</field>
+	<field name="FOOT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="FOOT"/>
+		<property name="com.jaspersoft.studio.field.label" value="FOOT"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="120" splitType="Stretch">
+			<staticText>
+				<reportElement style="Text" x="379" y="99" width="175" height="21" uuid="7ae83a4a-cfeb-4aaf-bf89-149b2e3f8ebc"/>
+				<box rightPadding="10"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="14"/>
+				</textElement>
+				<text><![CDATA[فاتورة مبدئية]]></text>
+			</staticText>
+			<subreport>
+				<reportElement x="-20" y="0" width="574" height="90" uuid="97b7f979-954f-4ff3-b931-0a18ffb8cd9e"/>
+				<subreportParameter name="P_COMP_ID">
+					<subreportParameterExpression><![CDATA[$P{P_COMP_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["head_titel_ar.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="42" splitType="Stretch">
+			<staticText>
+				<reportElement style="Col  Header" x="480" y="2" width="75" height="20" uuid="70230631-2477-4e66-a5a9-7cd83e355657"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="12"/>
+				</textElement>
+				<text><![CDATA[رقم الفاتورة]]></text>
+			</staticText>
+			<textField>
+				<reportElement style="Col  Header Value" x="380" y="2" width="100" height="20" uuid="a59d78be-3daa-4920-a30b-7fec6f992452"/>
+				<box>
+					<pen lineWidth="1.0" lineColor="#030303"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="IBM Plex Sans Arabic" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{AUTO_NUMBER_BRA}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Col  Header" x="480" y="22" width="75" height="20" uuid="1d682efd-5085-4dac-83c2-2bbae013286a"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="12"/>
+				</textElement>
+				<text><![CDATA[تاريخ الفاتورة]]></text>
+			</staticText>
+			<textField>
+				<reportElement style="Col  Header Value" x="380" y="22" width="100" height="20" uuid="acbc06c1-7e99-448f-aab8-1d6d2231e8cb"/>
+				<box>
+					<pen lineWidth="1.0" lineColor="#030303"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="IBM Plex Sans Arabic" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{INV_DATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Col  Header Value" x="0" y="2" width="310" height="20" uuid="22d2b2d4-490e-4c9c-b8ab-95e20f80eb00"/>
+				<box>
+					<pen lineWidth="1.0" lineColor="#030303"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="IBM Plex Sans Arabic" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CUST_NAME} + " ( 0"+$F{CUST_PHONE}+ " )"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Col  Header" x="310" y="2" width="75" height="20" uuid="d18435e0-5dec-4048-86c0-8b7ee5f78905"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="12"/>
+				</textElement>
+				<text><![CDATA[العميل]]></text>
+			</staticText>
+			<textField>
+				<reportElement style="Col  Header Value" x="0" y="22" width="310" height="20" uuid="9bd2badc-e04e-4fd7-a452-f248da4e3718"/>
+				<box>
+					<pen lineWidth="1.0" lineColor="#030303"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="IBM Plex Sans Arabic" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SALES_NAME}+" ( "+$F{SALES_PHONE}+" ) "]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Col  Header" x="310" y="22" width="75" height="20" backcolor="#DB9593" uuid="7ead8a13-5bfb-4064-8930-30fb09620ad7"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="12"/>
+				</textElement>
+				<text><![CDATA[البائع]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="50" splitType="Stretch">
+			<subreport>
+				<reportElement x="-20" y="0" width="575" height="50" uuid="0c154973-107d-4bc6-9d28-565c15cc0f38"/>
+				<subreportParameter name="P_LANG">
+					<subreportParameterExpression><![CDATA[$P{P_LANG}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="P_ID">
+					<subreportParameterExpression><![CDATA[$P{P_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["DBS_PLAN_REQUESTS_DTL.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="24">
+			<staticText>
+				<reportElement x="456" y="2" width="89" height="21" uuid="64c78774-fe4e-4163-9a5a-b7139cd3fb05"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+				</textElement>
+				<text><![CDATA[مستخدم الطباعة ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="336" y="3" width="119" height="20" uuid="0ccd38fe-b814-450c-89c3-bfda2762ac55"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{P_USERNAME}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="266" y="2" width="70" height="21" uuid="89cc3cb2-717e-4589-8941-eedd159143db"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+				</textElement>
+				<text><![CDATA[تاريخ الطباعة]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="146" y="2" width="119" height="19" uuid="736ce489-7ac5-415e-b876-0ae210c2f273"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.text.SimpleDateFormat("dd/MM/yyyy hh:mm:ss", new java.util.Locale("ar")).format(new java.util.Date()) + 
+(java.time.LocalTime.now().getHour() < 12 ? " صباحًا" : " مساءً")]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="76" y="1" width="70" height="21" uuid="3bc3f2a3-c7a1-4bc5-9271-b05ba7ff8ea8"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+				</textElement>
+				<text><![CDATA[رقم الصفحة]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="6" y="1" width="70" height="20" uuid="e8ada9b7-f675-4c8d-b3ee-cf024e4f3508"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement x="0" y="0" width="554" height="1" backcolor="#030303" uuid="07db5340-976d-456e-877d-e5cbb3b8e60a"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="-1" y="23" width="555" height="1" backcolor="#030303" uuid="0814de90-469a-4d7f-b2b4-54b53abddd32"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="554" y="0" width="1" height="23" uuid="fe3f9808-5470-43c4-a6c3-d32bfd2155c8"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="-1" y="0" width="1" height="23" uuid="527c180f-6bd4-4ff0-b3c6-5b2913a8d2cc"/>
+			</rectangle>
+		</band>
+	</columnFooter>
+	<summary>
+		<band height="154">
+			<staticText>
+				<reportElement x="400" y="0" width="155" height="26" uuid="cb1fb2b1-286e-4ae0-aee7-a9c90ea7f6b0"/>
+				<box rightPadding="10">
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="14"/>
+				</textElement>
+				<text><![CDATA[اجمالى الفاتورة :]]></text>
+			</staticText>
+			<textField pattern="#,##0.00">
+				<reportElement style="Text" mode="Opaque" x="-1" y="0" width="401" height="26" forecolor="#030303" backcolor="#DB9593" uuid="aee714b1-bdf5-46e1-b854-accad7459b03"/>
+				<box>
+					<pen lineWidth="1.0" lineColor="#030303"/>
+					<topPen lineWidth="0.0"/>
+					<leftPen lineWidth="0.0"/>
+					<bottomPen lineWidth="0.0"/>
+					<rightPen lineWidth="0.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FINAL_VALUE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="310" y="60" width="245" height="18" uuid="5cea1b32-154f-4ef9-80df-b4c8c1fb3e21"/>
+				<box rightPadding="10"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+				</textElement>
+				<text><![CDATA[عميلنا العزيز طريقة سداد الفاتورة كاش]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="279" y="80" width="275" height="18" uuid="cb761070-e089-4c07-8ef5-5fbd2bbc4f49"/>
+				<box rightPadding="10"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+				</textElement>
+				<text><![CDATA[*برجاء مراجعة الفاتورة و التأكيد لتحديد موعد الاستلام *]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="290" y="100" width="264" height="18" uuid="e25be788-194a-4aac-8e85-d8898b5985d3"/>
+				<box rightPadding="10"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+				</textElement>
+				<text><![CDATA[* يمكن السداد  انستا باي  *]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="279" y="136" width="275" height="18" uuid="55c0beba-0332-4890-9210-4405ce8a3621"/>
+				<box rightPadding="10"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+				</textElement>
+				<text><![CDATA[* في حالة الدفع فيزا  يتم اضافة % 1.5]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="280" y="118" width="275" height="18" uuid="d64fd7b1-dd6a-43da-be63-5a652e377f2c"/>
+				<box rightPadding="10"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+				</textElement>
+				<text><![CDATA[* في حالة الدفع فودافون كاش يتم اضافة  %1  *]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

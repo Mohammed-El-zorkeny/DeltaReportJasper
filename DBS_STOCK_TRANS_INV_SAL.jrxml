@@ -1,0 +1,830 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DBS_STOCK_TRANS_INV_SAL" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="539fdbef-7607-4e4f-bb51-a9be3ab4fb46">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ERP_STOCK"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w1" value="269"/>
+	<property name="com.jaspersoft.studio.data.sql.SQLQueryDesigner.sash.w2" value="731"/>
+	<style name="Col  Header" mode="Opaque" forecolor="#030303" backcolor="#DB9593"/>
+	<style name="Text" mode="Transparent" forecolor="#E60F0B"/>
+	<style name="Col  Header Value" mode="Transparent" forecolor="#030303" backcolor="#D4D0CF"/>
+	<parameter name="P_LANG" class="java.lang.String"/>
+	<parameter name="P_USERNAME" class="java.lang.String"/>
+	<parameter name="P_COMP_ID" class="java.lang.String"/>
+	<parameter name="P_ID" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT 
+    ID,
+    COMP_ID,
+    BRANCH_ID,
+    AUTO_NUMBER AS TRANS_NUMBER,
+    DBS_STOCK_STORE_ID_FROM AS ID_FROM_STORE,
+    DBS_STOCK_STORE_DTL_ID_FROM AS ID_SUB_FROM_STORE,
+    DBS_STOCK_STORE_ID_TO AS ID_TO_STORE,
+    DBS_STOCK_STORE_DTL_ID_TO AS ID_SUB_TO_STORE,
+    DBS_STOCK_STORE_LANG_NAME(DBS_STOCK_STORE_ID_FROM, $P{P_LANG}) AS FROM_STORE,
+    DBS_STOCK_STORE_DTL_LANG_NAME(DBS_STOCK_STORE_DTL_ID_FROM, $P{P_LANG}) AS FROM_SUB_STORE,
+    DBS_STOCK_STORE_LANG_NAME(DBS_STOCK_STORE_ID_TO, $P{P_LANG}) AS TO_STORE,
+    DBS_STOCK_STORE_DTL_LANG_NAME(DBS_STOCK_STORE_DTL_ID_TO, $P{P_LANG}) AS TO_SUB_STORE,
+    TRANS_TYPE,
+    TO_CHAR(TRANS_DATE, 'YYYY-MM-DD') AS TRANS_DATE,
+    DEPENDENT_ON_ID AS DEPENDENT_ID,
+    DEPENDENT_ON_TYPE AS DEPENDENT_TYPE,
+    STATUS,
+    
+    -- الحالة بدون أقواس
+    CASE
+        WHEN STATUS = 1 AND $P{P_LANG} = 'ar' 
+        THEN 'اعتماد مبدئي'
+        
+        WHEN STATUS = 1 AND $P{P_LANG} = 'en' 
+        THEN 'Preliminary Approval'
+        
+        WHEN STATUS = 2 AND $P{P_LANG} = 'ar' 
+        THEN 'اعتماد نهائي'
+        
+        WHEN STATUS = 2 AND $P{P_LANG} = 'en' 
+        THEN 'Final Approval'
+        
+        ELSE 
+            CASE 
+                WHEN $P{P_LANG} = 'ar' THEN 'غير محدد'
+                ELSE 'Unknown'
+            END
+    END AS STATUS_DISPLAY,
+    
+    -- نوع الحركة مع رقم الفاتورة الفعلي
+    CASE
+        WHEN DEPENDENT_ON_ID IS NOT NULL AND DEPENDENT_ON_TYPE = 'INV_PUR' AND $P{P_LANG} = 'ar' 
+        THEN 'فاتورة شراء رقم ' || DBS_STOCK_TRANS_GET_INVOICE_NUMBER(DEPENDENT_ON_ID, DEPENDENT_ON_TYPE)
+        
+        WHEN DEPENDENT_ON_ID IS NOT NULL AND DEPENDENT_ON_TYPE = 'INV_PUR' AND $P{P_LANG} = 'en' 
+        THEN 'Purchase Invoice No: ' || DBS_STOCK_TRANS_GET_INVOICE_NUMBER(DEPENDENT_ON_ID, DEPENDENT_ON_TYPE)
+        
+        WHEN DEPENDENT_ON_ID IS NOT NULL AND DEPENDENT_ON_TYPE = 'INV_SAL' AND $P{P_LANG} = 'ar' 
+        THEN 'فاتورة بيع رقم ' || DBS_STOCK_TRANS_GET_INVOICE_NUMBER(DEPENDENT_ON_ID, DEPENDENT_ON_TYPE)
+        
+        WHEN DEPENDENT_ON_ID IS NOT NULL AND DEPENDENT_ON_TYPE = 'INV_SAL' AND $P{P_LANG} = 'en' 
+        THEN 'Sales Invoice No: ' || DBS_STOCK_TRANS_GET_INVOICE_NUMBER(DEPENDENT_ON_ID, DEPENDENT_ON_TYPE)
+        
+        WHEN DEPENDENT_ON_ID IS NOT NULL AND DEPENDENT_ON_TYPE = 'INV_SAL_RET' AND $P{P_LANG} = 'ar' 
+        THEN 'فاتورة مرتجع بيع رقم ' || DBS_STOCK_TRANS_GET_INVOICE_NUMBER(DEPENDENT_ON_ID, DEPENDENT_ON_TYPE)
+        
+        WHEN DEPENDENT_ON_ID IS NOT NULL AND DEPENDENT_ON_TYPE = 'INV_SAL_RET' AND $P{P_LANG} = 'en' 
+        THEN 'Sales Return Invoice No: ' || DBS_STOCK_TRANS_GET_INVOICE_NUMBER(DEPENDENT_ON_ID, DEPENDENT_ON_TYPE)
+        
+        WHEN DEPENDENT_ON_ID IS NOT NULL AND DEPENDENT_ON_TYPE = 'INV_PUR_RET' AND $P{P_LANG} = 'ar' 
+        THEN 'فاتورة مرتجع شراء رقم ' || DBS_STOCK_TRANS_GET_INVOICE_NUMBER(DEPENDENT_ON_ID, DEPENDENT_ON_TYPE)
+        
+        WHEN DEPENDENT_ON_ID IS NOT NULL AND DEPENDENT_ON_TYPE = 'INV_PUR_RET' AND $P{P_LANG} = 'en' 
+        THEN 'Purchase Return Invoice No: ' || DBS_STOCK_TRANS_GET_INVOICE_NUMBER(DEPENDENT_ON_ID, DEPENDENT_ON_TYPE)
+        
+        WHEN DEPENDENT_ON_ID IS NULL AND TRANS_TYPE = 1 AND $P{P_LANG} = 'ar' 
+        THEN 'إذن اضافه'
+        
+        WHEN DEPENDENT_ON_ID IS NULL AND TRANS_TYPE = 1 AND $P{P_LANG} = 'en' 
+        THEN 'Add Permission'
+        
+        WHEN DEPENDENT_ON_ID IS NULL AND TRANS_TYPE = 2 AND $P{P_LANG} = 'ar' 
+        THEN 'إذن صرف فاتورة عميل'
+        
+        WHEN DEPENDENT_ON_ID IS NULL AND TRANS_TYPE = 2 AND $P{P_LANG} = 'en' 
+        THEN 'Issue for Customer Invoice'
+        
+        WHEN DEPENDENT_ON_ID IS NULL AND TRANS_TYPE = 3 AND $P{P_LANG} = 'ar' 
+        THEN 'وارد محول'
+        
+        WHEN DEPENDENT_ON_ID IS NULL AND TRANS_TYPE = 3 AND $P{P_LANG} = 'en' 
+        THEN 'Incoming Transfer'
+        
+        WHEN DEPENDENT_ON_ID IS NULL AND TRANS_TYPE = 4 AND $P{P_LANG} = 'ar' 
+        THEN 'منصرف محول'
+        
+        WHEN DEPENDENT_ON_ID IS NULL AND TRANS_TYPE = 4 AND $P{P_LANG} = 'en' 
+        THEN 'Outgoing Transfer'
+        
+        WHEN DEPENDENT_ON_ID IS NULL AND TRANS_TYPE = 5 AND $P{P_LANG} = 'ar' 
+        THEN 'إذن إضافه تسوية'
+        
+        WHEN DEPENDENT_ON_ID IS NULL AND TRANS_TYPE = 5 AND $P{P_LANG} = 'en' 
+        THEN 'Adjustment Add'
+        
+        WHEN DEPENDENT_ON_ID IS NULL AND TRANS_TYPE = 6 AND $P{P_LANG} = 'ar' 
+        THEN 'إذن صرف تسوية'
+        
+        WHEN DEPENDENT_ON_ID IS NULL AND TRANS_TYPE = 6 AND $P{P_LANG} = 'en' 
+        THEN 'Adjustment Issue'
+        
+        WHEN DEPENDENT_ON_ID IS NULL AND TRANS_TYPE = 7 AND $P{P_LANG} = 'ar' 
+        THEN 'مرتجع عميل'
+        
+        WHEN DEPENDENT_ON_ID IS NULL AND TRANS_TYPE = 7 AND $P{P_LANG} = 'en' 
+        THEN 'Customer Return'
+        
+        WHEN DEPENDENT_ON_ID IS NULL AND TRANS_TYPE = 8 AND $P{P_LANG} = 'ar' 
+        THEN 'مرتجع مورد'
+        
+        WHEN DEPENDENT_ON_ID IS NULL AND TRANS_TYPE = 8 AND $P{P_LANG} = 'en' 
+        THEN 'Supplier Return'
+        
+        WHEN DEPENDENT_ON_ID IS NULL AND TRANS_TYPE = 9 AND $P{P_LANG} = 'ar' 
+        THEN 'مرتجع انتاج'
+        
+        WHEN DEPENDENT_ON_ID IS NULL AND TRANS_TYPE = 9 AND $P{P_LANG} = 'en' 
+        THEN 'Production Return'
+        
+        WHEN DEPENDENT_ON_ID IS NULL AND TRANS_TYPE = 10 AND $P{P_LANG} = 'ar' 
+        THEN 'صرف انتاج'
+        
+        WHEN DEPENDENT_ON_ID IS NULL AND TRANS_TYPE = 10 AND $P{P_LANG} = 'en' 
+        THEN 'Production Issue'
+        
+        ELSE 'Unknown Transaction'
+    END AS DEPENDENT_TYPE_NAME,
+    
+    -- الكولوم الجديد: وصف الحركة + رقم الفاتورة + الحالة
+    CASE
+        -- فواتير الشراء
+        WHEN DEPENDENT_ON_ID IS NOT NULL AND DEPENDENT_ON_TYPE = 'INV_PUR' AND $P{P_LANG} = 'ar' 
+        THEN 'فاتورة شراء رقم ' || DBS_STOCK_TRANS_GET_INVOICE_NUMBER(DEPENDENT_ON_ID, DEPENDENT_ON_TYPE) || ' - ' ||
+             CASE WHEN STATUS = 1 THEN 'اعتماد مبدئي' WHEN STATUS = 2 THEN 'اعتماد نهائي' ELSE 'غير محدد' END
+        
+        WHEN DEPENDENT_ON_ID IS NOT NULL AND DEPENDENT_ON_TYPE = 'INV_PUR' AND $P{P_LANG} = 'en' 
+        THEN 'Purchase Invoice No: ' || DBS_STOCK_TRANS_GET_INVOICE_NUMBER(DEPENDENT_ON_ID, DEPENDENT_ON_TYPE) || ' - ' ||
+             CASE WHEN STATUS = 1 THEN 'Preliminary Approval' WHEN STATUS = 2 THEN 'Final Approval' ELSE 'Unknown' END
+        
+        -- فواتير البيع
+        WHEN DEPENDENT_ON_ID IS NOT NULL AND DEPENDENT_ON_TYPE = 'INV_SAL' AND $P{P_LANG} = 'ar' 
+        THEN 'فاتورة بيع رقم ' || DBS_STOCK_TRANS_GET_INVOICE_NUMBER(DEPENDENT_ON_ID, DEPENDENT_ON_TYPE) || ' - ' ||
+             CASE WHEN STATUS = 1 THEN 'اعتماد مبدئي' WHEN STATUS = 2 THEN 'اعتماد نهائي' ELSE 'غير محدد' END
+        
+        WHEN DEPENDENT_ON_ID IS NOT NULL AND DEPENDENT_ON_TYPE = 'INV_SAL' AND $P{P_LANG} = 'en' 
+        THEN 'Sales Invoice No: ' || DBS_STOCK_TRANS_GET_INVOICE_NUMBER(DEPENDENT_ON_ID, DEPENDENT_ON_TYPE) || ' - ' ||
+             CASE WHEN STATUS = 1 THEN 'Preliminary Approval' WHEN STATUS = 2 THEN 'Final Approval' ELSE 'Unknown' END
+        
+        -- مرتجع بيع
+        WHEN DEPENDENT_ON_ID IS NOT NULL AND DEPENDENT_ON_TYPE = 'INV_SAL_RET' AND $P{P_LANG} = 'ar' 
+        THEN 'فاتورة مرتجع بيع رقم ' || DBS_STOCK_TRANS_GET_INVOICE_NUMBER(DEPENDENT_ON_ID, DEPENDENT_ON_TYPE) || ' - ' ||
+             CASE WHEN STATUS = 1 THEN 'اعتماد مبدئي' WHEN STATUS = 2 THEN 'اعتماد نهائي' ELSE 'غير محدد' END
+        
+        WHEN DEPENDENT_ON_ID IS NOT NULL AND DEPENDENT_ON_TYPE = 'INV_SAL_RET' AND $P{P_LANG} = 'en' 
+        THEN 'Sales Return Invoice No: ' || DBS_STOCK_TRANS_GET_INVOICE_NUMBER(DEPENDENT_ON_ID, DEPENDENT_ON_TYPE) || ' - ' ||
+             CASE WHEN STATUS = 1 THEN 'Preliminary Approval' WHEN STATUS = 2 THEN 'Final Approval' ELSE 'Unknown' END
+        
+        -- مرتجع شراء
+        WHEN DEPENDENT_ON_ID IS NOT NULL AND DEPENDENT_ON_TYPE = 'INV_PUR_RET' AND $P{P_LANG} = 'ar' 
+        THEN 'فاتورة مرتجع شراء رقم ' || DBS_STOCK_TRANS_GET_INVOICE_NUMBER(DEPENDENT_ON_ID, DEPENDENT_ON_TYPE) || ' - ' ||
+             CASE WHEN STATUS = 1 THEN 'اعتماد مبدئي' WHEN STATUS = 2 THEN 'اعتماد نهائي' ELSE 'غير محدد' END
+        
+        WHEN DEPENDENT_ON_ID IS NOT NULL AND DEPENDENT_ON_TYPE = 'INV_PUR_RET' AND $P{P_LANG} = 'en' 
+        THEN 'Purchase Return Invoice No: ' || DBS_STOCK_TRANS_GET_INVOICE_NUMBER(DEPENDENT_ON_ID, DEPENDENT_ON_TYPE) || ' - ' ||
+             CASE WHEN STATUS = 1 THEN 'Preliminary Approval' WHEN STATUS = 2 THEN 'Final Approval' ELSE 'Unknown' END
+        
+        -- باقي الحركات بدون فاتورة
+        WHEN DEPENDENT_ON_ID IS NULL AND TRANS_TYPE = 1 AND $P{P_LANG} = 'ar' 
+        THEN 'إذن اضافه - ' || CASE WHEN STATUS = 1 THEN 'اعتماد مبدئي' WHEN STATUS = 2 THEN 'اعتماد نهائي' ELSE 'غير محدد' END
+        
+        WHEN DEPENDENT_ON_ID IS NULL AND TRANS_TYPE = 1 AND $P{P_LANG} = 'en' 
+        THEN 'Add Permission - ' || CASE WHEN STATUS = 1 THEN 'Preliminary Approval' WHEN STATUS = 2 THEN 'Final Approval' ELSE 'Unknown' END
+        
+        WHEN DEPENDENT_ON_ID IS NULL AND TRANS_TYPE = 2 AND $P{P_LANG} = 'ar' 
+        THEN 'إذن صرف فاتورة عميل - ' || CASE WHEN STATUS = 1 THEN 'اعتماد مبدئي' WHEN STATUS = 2 THEN 'اعتماد نهائي' ELSE 'غير محدد' END
+        
+        WHEN DEPENDENT_ON_ID IS NULL AND TRANS_TYPE = 2 AND $P{P_LANG} = 'en' 
+        THEN 'Issue for Customer Invoice - ' || CASE WHEN STATUS = 1 THEN 'Preliminary Approval' WHEN STATUS = 2 THEN 'Final Approval' ELSE 'Unknown' END
+        
+        WHEN DEPENDENT_ON_ID IS NULL AND TRANS_TYPE = 3 AND $P{P_LANG} = 'ar' 
+        THEN 'وارد محول - ' || CASE WHEN STATUS = 1 THEN 'اعتماد مبدئي' WHEN STATUS = 2 THEN 'اعتماد نهائي' ELSE 'غير محدد' END
+        
+        WHEN DEPENDENT_ON_ID IS NULL AND TRANS_TYPE = 3 AND $P{P_LANG} = 'en' 
+        THEN 'Incoming Transfer - ' || CASE WHEN STATUS = 1 THEN 'Preliminary Approval' WHEN STATUS = 2 THEN 'Final Approval' ELSE 'Unknown' END
+        
+        WHEN DEPENDENT_ON_ID IS NULL AND TRANS_TYPE = 4 AND $P{P_LANG} = 'ar' 
+        THEN 'منصرف محول - ' || CASE WHEN STATUS = 1 THEN 'اعتماد مبدئي' WHEN STATUS = 2 THEN 'اعتماد نهائي' ELSE 'غير محدد' END
+        
+        WHEN DEPENDENT_ON_ID IS NULL AND TRANS_TYPE = 4 AND $P{P_LANG} = 'en' 
+        THEN 'Outgoing Transfer - ' || CASE WHEN STATUS = 1 THEN 'Preliminary Approval' WHEN STATUS = 2 THEN 'Final Approval' ELSE 'Unknown' END
+        
+        WHEN DEPENDENT_ON_ID IS NULL AND TRANS_TYPE = 5 AND $P{P_LANG} = 'ar' 
+        THEN 'إذن إضافه تسوية - ' || CASE WHEN STATUS = 1 THEN 'اعتماد مبدئي' WHEN STATUS = 2 THEN 'اعتماد نهائي' ELSE 'غير محدد' END
+        
+        WHEN DEPENDENT_ON_ID IS NULL AND TRANS_TYPE = 5 AND $P{P_LANG} = 'en' 
+        THEN 'Adjustment Add - ' || CASE WHEN STATUS = 1 THEN 'Preliminary Approval' WHEN STATUS = 2 THEN 'Final Approval' ELSE 'Unknown' END
+        
+        WHEN DEPENDENT_ON_ID IS NULL AND TRANS_TYPE = 6 AND $P{P_LANG} = 'ar' 
+        THEN 'إذن صرف تسوية - ' || CASE WHEN STATUS = 1 THEN 'اعتماد مبدئي' WHEN STATUS = 2 THEN 'اعتماد نهائي' ELSE 'غير محدد' END
+        
+        WHEN DEPENDENT_ON_ID IS NULL AND TRANS_TYPE = 6 AND $P{P_LANG} = 'en' 
+        THEN 'Adjustment Issue - ' || CASE WHEN STATUS = 1 THEN 'Preliminary Approval' WHEN STATUS = 2 THEN 'Final Approval' ELSE 'Unknown' END
+        
+        WHEN DEPENDENT_ON_ID IS NULL AND TRANS_TYPE = 7 AND $P{P_LANG} = 'ar' 
+        THEN 'مرتجع عميل - ' || CASE WHEN STATUS = 1 THEN 'اعتماد مبدئي' WHEN STATUS = 2 THEN 'اعتماد نهائي' ELSE 'غير محدد' END
+        
+        WHEN DEPENDENT_ON_ID IS NULL AND TRANS_TYPE = 7 AND $P{P_LANG} = 'en' 
+        THEN 'Customer Return - ' || CASE WHEN STATUS = 1 THEN 'Preliminary Approval' WHEN STATUS = 2 THEN 'Final Approval' ELSE 'Unknown' END
+        
+        WHEN DEPENDENT_ON_ID IS NULL AND TRANS_TYPE = 8 AND $P{P_LANG} = 'ar' 
+        THEN 'مرتجع مورد - ' || CASE WHEN STATUS = 1 THEN 'اعتماد مبدئي' WHEN STATUS = 2 THEN 'اعتماد نهائي' ELSE 'غير محدد' END
+        
+        WHEN DEPENDENT_ON_ID IS NULL AND TRANS_TYPE = 8 AND $P{P_LANG} = 'en' 
+        THEN 'Supplier Return - ' || CASE WHEN STATUS = 1 THEN 'Preliminary Approval' WHEN STATUS = 2 THEN 'Final Approval' ELSE 'Unknown' END
+        
+        WHEN DEPENDENT_ON_ID IS NULL AND TRANS_TYPE = 9 AND $P{P_LANG} = 'ar' 
+        THEN 'مرتجع انتاج - ' || CASE WHEN STATUS = 1 THEN 'اعتماد مبدئي' WHEN STATUS = 2 THEN 'اعتماد نهائي' ELSE 'غير محدد' END
+        
+        WHEN DEPENDENT_ON_ID IS NULL AND TRANS_TYPE = 9 AND $P{P_LANG} = 'en' 
+        THEN 'Production Return - ' || CASE WHEN STATUS = 1 THEN 'Preliminary Approval' WHEN STATUS = 2 THEN 'Final Approval' ELSE 'Unknown' END
+        
+        WHEN DEPENDENT_ON_ID IS NULL AND TRANS_TYPE = 10 AND $P{P_LANG} = 'ar' 
+        THEN 'صرف انتاج - ' || CASE WHEN STATUS = 1 THEN 'اعتماد مبدئي' WHEN STATUS = 2 THEN 'اعتماد نهائي' ELSE 'غير محدد' END
+        
+        WHEN DEPENDENT_ON_ID IS NULL AND TRANS_TYPE = 10 AND $P{P_LANG} = 'en' 
+        THEN 'Production Issue - ' || CASE WHEN STATUS = 1 THEN 'Preliminary Approval' WHEN STATUS = 2 THEN 'Final Approval' ELSE 'Unknown' END
+        
+        ELSE 'Unknown Transaction'
+    END AS TRANS_FULL_DESC,
+    
+    -- بيانات العملاء (للفواتير والمرتجعات)
+    CASE
+        WHEN DEPENDENT_ON_ID IS NOT NULL AND DEPENDENT_ON_TYPE IN ('INV_SAL', 'INV_SAL_RET')
+        THEN DBS_SAL_CUSTOMERS_LANG_NAME(DBS_STOCK_TRANS_GET_CUSTOMER_ID(DEPENDENT_ON_ID, DEPENDENT_ON_TYPE), $P{P_LANG})
+    END AS CUST_NAME,
+    
+    CASE
+        WHEN DEPENDENT_ON_ID IS NOT NULL AND DEPENDENT_ON_TYPE IN ('INV_SAL', 'INV_SAL_RET')
+        THEN DBS_SAL_CUSTOMER_PHONE(DBS_STOCK_TRANS_GET_CUSTOMER_ID(DEPENDENT_ON_ID, DEPENDENT_ON_TYPE))
+    END AS CUST_PHONE,
+    
+    CASE
+        WHEN DEPENDENT_ON_ID IS NOT NULL AND DEPENDENT_ON_TYPE IN ('INV_SAL', 'INV_SAL_RET')
+        THEN DBS_SAL_CUSTOMERS_GOV_NAME(DBS_STOCK_TRANS_GET_CUSTOMER_ID(DEPENDENT_ON_ID, DEPENDENT_ON_TYPE))
+    END AS CUST_GOV,
+    
+    -- بيانات الموردين (لفواتير ومرتجعات الشراء)
+    CASE
+        WHEN DEPENDENT_ON_ID IS NOT NULL AND DEPENDENT_ON_TYPE IN ('INV_PUR', 'INV_PUR_RET')
+        THEN DBS_PUR_SUPPLIERS_LANG_NAME(DBS_STOCK_TRANS_GET_SUPPLIER_ID(DEPENDENT_ON_ID, DEPENDENT_ON_TYPE), $P{P_LANG})
+    END AS SUPP_NAME,
+    
+    CASE
+        WHEN DEPENDENT_ON_ID IS NOT NULL AND DEPENDENT_ON_TYPE IN ('INV_PUR', 'INV_PUR_RET')
+        THEN DBS_PUR_SUPPLIERS_PHONE(DBS_STOCK_TRANS_GET_SUPPLIER_ID(DEPENDENT_ON_ID, DEPENDENT_ON_TYPE))
+    END AS SUPP_PHONE,
+    
+    -- تاريخ التسليم
+    CASE
+        WHEN DEPENDENT_ON_ID IS NOT NULL AND DEPENDENT_ON_TYPE IN ('INV_SAL', 'INV_SAL_RET')
+        THEN (SELECT TO_CHAR(DELIVERY_DATE, 'YYYY-MM-DD')
+              FROM DBS_SAL_INVOICE x 
+              WHERE x.ID = DEPENDENT_ON_ID)
+    END AS DELIVERY_DATE,
+    
+    -- رقم الفاتورة
+    CASE
+        WHEN DEPENDENT_ON_ID IS NOT NULL AND DEPENDENT_ON_TYPE IN ('INV_SAL', 'INV_SAL_RET', 'INV_PUR', 'INV_PUR_RET')
+        THEN DBS_STOCK_TRANS_GET_INVOICE_NUMBER(DEPENDENT_ON_ID, DEPENDENT_ON_TYPE)
+    END AS INVOICE_NO,
+    
+    NOTES,
+    CREATED,
+    CREATED_BY,
+    UPDATED,
+    UPDATED_BY
+FROM DBS_STOCK_TRANS
+WHERE ID = $P{P_ID}]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="ID"/>
+	</field>
+	<field name="COMP_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="COMP_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="COMP_ID"/>
+	</field>
+	<field name="BRANCH_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="BRANCH_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="BRANCH_ID"/>
+	</field>
+	<field name="TRANS_NUMBER" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="TRANS_NUMBER"/>
+		<property name="com.jaspersoft.studio.field.label" value="TRANS_NUMBER"/>
+	</field>
+	<field name="ID_FROM_STORE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ID_FROM_STORE"/>
+		<property name="com.jaspersoft.studio.field.label" value="ID_FROM_STORE"/>
+	</field>
+	<field name="ID_SUB_FROM_STORE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ID_SUB_FROM_STORE"/>
+		<property name="com.jaspersoft.studio.field.label" value="ID_SUB_FROM_STORE"/>
+	</field>
+	<field name="ID_TO_STORE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ID_TO_STORE"/>
+		<property name="com.jaspersoft.studio.field.label" value="ID_TO_STORE"/>
+	</field>
+	<field name="ID_SUB_TO_STORE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ID_SUB_TO_STORE"/>
+		<property name="com.jaspersoft.studio.field.label" value="ID_SUB_TO_STORE"/>
+	</field>
+	<field name="FROM_STORE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="FROM_STORE"/>
+		<property name="com.jaspersoft.studio.field.label" value="FROM_STORE"/>
+	</field>
+	<field name="FROM_SUB_STORE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="FROM_SUB_STORE"/>
+		<property name="com.jaspersoft.studio.field.label" value="FROM_SUB_STORE"/>
+	</field>
+	<field name="TO_STORE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="TO_STORE"/>
+		<property name="com.jaspersoft.studio.field.label" value="TO_STORE"/>
+	</field>
+	<field name="TO_SUB_STORE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="TO_SUB_STORE"/>
+		<property name="com.jaspersoft.studio.field.label" value="TO_SUB_STORE"/>
+	</field>
+	<field name="TRANS_TYPE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="TRANS_TYPE"/>
+		<property name="com.jaspersoft.studio.field.label" value="TRANS_TYPE"/>
+	</field>
+	<field name="TRANS_DATE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="TRANS_DATE"/>
+		<property name="com.jaspersoft.studio.field.label" value="TRANS_DATE"/>
+	</field>
+	<field name="DEPENDENT_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="DEPENDENT_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="DEPENDENT_ID"/>
+	</field>
+	<field name="DEPENDENT_TYPE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DEPENDENT_TYPE"/>
+		<property name="com.jaspersoft.studio.field.label" value="DEPENDENT_TYPE"/>
+	</field>
+	<field name="STATUS" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="STATUS"/>
+		<property name="com.jaspersoft.studio.field.label" value="STATUS"/>
+	</field>
+	<field name="STATUS_DISPLAY" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="STATUS_DISPLAY"/>
+		<property name="com.jaspersoft.studio.field.label" value="STATUS_DISPLAY"/>
+	</field>
+	<field name="DEPENDENT_TYPE_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DEPENDENT_TYPE_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="DEPENDENT_TYPE_NAME"/>
+	</field>
+	<field name="TRANS_FULL_DESC" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="TRANS_FULL_DESC"/>
+		<property name="com.jaspersoft.studio.field.label" value="TRANS_FULL_DESC"/>
+	</field>
+	<field name="CUST_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="CUST_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="CUST_NAME"/>
+	</field>
+	<field name="CUST_PHONE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="CUST_PHONE"/>
+		<property name="com.jaspersoft.studio.field.label" value="CUST_PHONE"/>
+	</field>
+	<field name="CUST_GOV" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="CUST_GOV"/>
+		<property name="com.jaspersoft.studio.field.label" value="CUST_GOV"/>
+	</field>
+	<field name="SUPP_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SUPP_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="SUPP_NAME"/>
+	</field>
+	<field name="SUPP_PHONE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SUPP_PHONE"/>
+		<property name="com.jaspersoft.studio.field.label" value="SUPP_PHONE"/>
+	</field>
+	<field name="DELIVERY_DATE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DELIVERY_DATE"/>
+		<property name="com.jaspersoft.studio.field.label" value="DELIVERY_DATE"/>
+	</field>
+	<field name="INVOICE_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="INVOICE_NO"/>
+		<property name="com.jaspersoft.studio.field.label" value="INVOICE_NO"/>
+	</field>
+	<field name="NOTES" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NOTES"/>
+		<property name="com.jaspersoft.studio.field.label" value="NOTES"/>
+	</field>
+	<field name="CREATED" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="CREATED"/>
+		<property name="com.jaspersoft.studio.field.label" value="CREATED"/>
+	</field>
+	<field name="CREATED_BY" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="CREATED_BY"/>
+		<property name="com.jaspersoft.studio.field.label" value="CREATED_BY"/>
+	</field>
+	<field name="UPDATED" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="UPDATED"/>
+		<property name="com.jaspersoft.studio.field.label" value="UPDATED"/>
+	</field>
+	<field name="UPDATED_BY" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="UPDATED_BY"/>
+		<property name="com.jaspersoft.studio.field.label" value="UPDATED_BY"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="135" splitType="Stretch">
+			<subreport>
+				<reportElement x="-20" y="0" width="574" height="90" uuid="97b7f979-954f-4ff3-b931-0a18ffb8cd9e"/>
+				<subreportParameter name="P_COMP_ID">
+					<subreportParameterExpression><![CDATA[$P{P_COMP_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["head_titel_ar.jasper"]]></subreportExpression>
+			</subreport>
+			<textField>
+				<reportElement style="Text" x="0" y="110" width="555" height="20" uuid="f936a153-a5e7-410e-a616-45a20f26f2b0"/>
+				<box rightPadding="10">
+					<pen lineWidth="0.0" lineColor="#030303"/>
+				</box>
+				<textElement textAlignment="Right">
+					<font fontName="IBM Plex Sans Arabic" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TRANS_FULL_DESC}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="70" splitType="Stretch">
+			<staticText>
+				<reportElement style="Col  Header" x="480" y="2" width="75" height="20" uuid="70230631-2477-4e66-a5a9-7cd83e355657"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="12"/>
+				</textElement>
+				<text><![CDATA[رقم الحركة ]]></text>
+			</staticText>
+			<textField>
+				<reportElement style="Col  Header Value" x="381" y="2" width="100" height="20" uuid="a59d78be-3daa-4920-a30b-7fec6f992452"/>
+				<box>
+					<pen lineWidth="1.0" lineColor="#030303"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="IBM Plex Sans Arabic" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TRANS_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Col  Header" x="480" y="22" width="75" height="20" uuid="1d682efd-5085-4dac-83c2-2bbae013286a"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="12"/>
+				</textElement>
+				<text><![CDATA[تاريخ الحركة]]></text>
+			</staticText>
+			<textField>
+				<reportElement style="Col  Header Value" x="380" y="22" width="100" height="20" uuid="acbc06c1-7e99-448f-aab8-1d6d2231e8cb"/>
+				<box>
+					<pen lineWidth="1.0" lineColor="#030303"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="IBM Plex Sans Arabic" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TRANS_DATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Col  Header Value" x="0" y="2" width="310" height="20" uuid="22d2b2d4-490e-4c9c-b8ab-95e20f80eb00">
+					<printWhenExpression><![CDATA[$F{TRANS_TYPE}.compareTo(new BigDecimal("2")) == 0 || 
+$F{TRANS_TYPE}.compareTo(new BigDecimal("7")) == 0]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0" lineColor="#030303"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="IBM Plex Sans Arabic" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CUST_NAME}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Col  Header" x="310" y="2" width="75" height="20" uuid="d18435e0-5dec-4048-86c0-8b7ee5f78905">
+					<printWhenExpression><![CDATA[$F{TRANS_TYPE}.compareTo(new BigDecimal("2")) == 0 || 
+$F{TRANS_TYPE}.compareTo(new BigDecimal("7")) == 0]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="12"/>
+				</textElement>
+				<text><![CDATA[العميل]]></text>
+			</staticText>
+			<textField>
+				<reportElement style="Col  Header Value" x="0" y="22" width="310" height="20" uuid="9bd2badc-e04e-4fd7-a452-f248da4e3718">
+					<printWhenExpression><![CDATA[$F{TRANS_TYPE}.compareTo(new BigDecimal("2")) == 0 || 
+$F{TRANS_TYPE}.compareTo(new BigDecimal("7")) == 0]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0" lineColor="#030303"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="IBM Plex Sans Arabic" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["0"+ $F{CUST_PHONE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Col  Header" x="310" y="22" width="75" height="20" backcolor="#DB9593" uuid="7ead8a13-5bfb-4064-8930-30fb09620ad7">
+					<printWhenExpression><![CDATA[$F{TRANS_TYPE}.compareTo(new BigDecimal("2")) == 0 || 
+$F{TRANS_TYPE}.compareTo(new BigDecimal("7")) == 0]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="12"/>
+				</textElement>
+				<text><![CDATA[الهاتف]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Col  Header" x="480" y="42" width="75" height="20" uuid="7cb4c3d4-8d44-444d-91e6-5f81222a0645">
+					<printWhenExpression><![CDATA[$F{TRANS_TYPE}.compareTo(new BigDecimal("2")) == 0 || 
+$F{TRANS_TYPE}.compareTo(new BigDecimal("7")) == 0]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="12"/>
+				</textElement>
+				<text><![CDATA[تاريخ الاستلام]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement style="Col  Header Value" mode="Opaque" x="385" y="42" width="95" height="20" uuid="07804558-af1f-4054-b385-5ddc3ddc6333">
+					<printWhenExpression><![CDATA[$F{TRANS_TYPE}.compareTo(new BigDecimal("2")) == 0 || 
+$F{TRANS_TYPE}.compareTo(new BigDecimal("7")) == 0]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0" lineColor="#030303"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DELIVERY_DATE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Col  Header" x="310" y="42" width="75" height="20" uuid="0728f166-c272-44af-a538-a7856bc06d8c">
+					<printWhenExpression><![CDATA[$F{TRANS_TYPE}.compareTo(new BigDecimal("2")) == 0 || 
+$F{TRANS_TYPE}.compareTo(new BigDecimal("7")) == 0]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="12"/>
+				</textElement>
+				<text><![CDATA[المنظفة ]]></text>
+			</staticText>
+			<textField>
+				<reportElement style="Col  Header Value" x="210" y="42" width="100" height="20" uuid="8da690bf-05ae-4a8d-a64d-67b82ba78bcf">
+					<printWhenExpression><![CDATA[$F{TRANS_TYPE}.compareTo(new BigDecimal("2")) == 0 || 
+$F{TRANS_TYPE}.compareTo(new BigDecimal("7")) == 0]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0" lineColor="#030303"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="IBM Plex Sans Arabic" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CUST_GOV}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Col  Header Value" x="0" y="42" width="210" height="20" uuid="f6bc3500-955a-44f3-9833-848d9ae93200">
+					<printWhenExpression><![CDATA[$F{TRANS_TYPE}.compareTo(new BigDecimal("2")) == 0 || 
+$F{TRANS_TYPE}.compareTo(new BigDecimal("7")) == 0]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0" lineColor="#030303"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="IBM Plex Sans Arabic" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NOTES}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Col  Header" x="310" y="2" width="75" height="20" uuid="0d87041f-3e4f-433f-bf92-ae506dd63330">
+					<printWhenExpression><![CDATA[$F{TRANS_TYPE} != null && 
+($F{TRANS_TYPE}.compareTo(new BigDecimal("1")) == 0 || 
+ $F{TRANS_TYPE}.compareTo(new BigDecimal("8")) == 0) && 
+$F{DEPENDENT_TYPE} != null && 
+$F{DEPENDENT_TYPE}.equals("INV_PUR")]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="12"/>
+				</textElement>
+				<text><![CDATA[المورد]]></text>
+			</staticText>
+			<textField>
+				<reportElement style="Col  Header Value" x="0" y="2" width="310" height="20" uuid="034d5158-e5fb-4fe8-919d-40b5a2e8d83e">
+					<printWhenExpression><![CDATA[$F{TRANS_TYPE} != null && 
+($F{TRANS_TYPE}.compareTo(new BigDecimal("1")) == 0 || 
+ $F{TRANS_TYPE}.compareTo(new BigDecimal("8")) == 0) && 
+$F{DEPENDENT_TYPE} != null && 
+$F{DEPENDENT_TYPE}.equals("INV_PUR")]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0" lineColor="#030303"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="IBM Plex Sans Arabic" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SUPP_PHONE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Col  Header Value" x="0" y="22" width="310" height="20" uuid="b5257355-c266-4734-ac04-55761f6b5a68">
+					<printWhenExpression><![CDATA[$F{TRANS_TYPE} != null && 
+($F{TRANS_TYPE}.compareTo(new BigDecimal("1")) == 0 || 
+ $F{TRANS_TYPE}.compareTo(new BigDecimal("8")) == 0) && 
+$F{DEPENDENT_TYPE} != null && 
+$F{DEPENDENT_TYPE}.equals("INV_PUR")]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0" lineColor="#030303"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="IBM Plex Sans Arabic" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["0"+$F{SUPP_PHONE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Col  Header" x="310" y="22" width="75" height="20" backcolor="#DB9593" uuid="deae9829-d0d2-4f37-8c00-7bf2d20e75bc">
+					<printWhenExpression><![CDATA[$F{TRANS_TYPE} != null && 
+($F{TRANS_TYPE}.compareTo(new BigDecimal("1")) == 0 || 
+ $F{TRANS_TYPE}.compareTo(new BigDecimal("8")) == 0) && 
+$F{DEPENDENT_TYPE} != null && 
+$F{DEPENDENT_TYPE}.equals("INV_PUR")]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="12"/>
+				</textElement>
+				<text><![CDATA[الهاتف]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Col  Header" x="310" y="42" width="75" height="20" uuid="0565220a-1b80-4bcd-9bd6-645522842848">
+					<printWhenExpression><![CDATA[$F{TRANS_TYPE} != null && 
+($F{TRANS_TYPE}.compareTo(new BigDecimal("1")) == 0 || 
+ $F{TRANS_TYPE}.compareTo(new BigDecimal("8")) == 0) && 
+$F{DEPENDENT_TYPE} != null && 
+$F{DEPENDENT_TYPE}.equals("INV_PUR")]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="12"/>
+				</textElement>
+				<text><![CDATA[الملاحظات]]></text>
+			</staticText>
+			<textField>
+				<reportElement style="Col  Header Value" x="0" y="42" width="310" height="20" uuid="9ebff976-9095-4a12-90c4-a12d18a382f3">
+					<printWhenExpression><![CDATA[$F{TRANS_TYPE} != null && 
+($F{TRANS_TYPE}.compareTo(new BigDecimal("1")) == 0 || 
+ $F{TRANS_TYPE}.compareTo(new BigDecimal("8")) == 0) && 
+$F{DEPENDENT_TYPE} != null && 
+$F{DEPENDENT_TYPE}.equals("INV_PUR")]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0" lineColor="#030303"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font fontName="IBM Plex Sans Arabic" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NOTES}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement style="Col  Header" x="310" y="0" width="75" height="41" uuid="baaebf42-31dd-4d25-9bc5-323d3cd18093">
+					<printWhenExpression><![CDATA[$F{TRANS_TYPE} != null && 
+$F{TRANS_TYPE}.compareTo(new BigDecimal("1")) == 0 && 
+$F{DEPENDENT_TYPE} == null]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="12"/>
+				</textElement>
+				<text><![CDATA[الملاحظات]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement style="Col  Header Value" x="0" y="0" width="310" height="41" uuid="5277dd0e-d699-4985-9962-3703de018646">
+					<printWhenExpression><![CDATA[$F{TRANS_TYPE} != null && 
+$F{TRANS_TYPE}.compareTo(new BigDecimal("1")) == 0 && 
+$F{DEPENDENT_TYPE} == null
+]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0" lineColor="#030303"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NOTES}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="50" splitType="Stretch">
+			<subreport>
+				<reportElement x="-20" y="0" width="575" height="50" uuid="cc9b0d97-24ef-4a7c-abd0-28729c22d36d"/>
+				<subreportParameter name="P_LANG">
+					<subreportParameterExpression><![CDATA[$P{P_LANG}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="P_ID">
+					<subreportParameterExpression><![CDATA[$P{P_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA["DBS_STOCK_TRANS_INV_SAL_DTL.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="28">
+			<staticText>
+				<reportElement x="456" y="2" width="89" height="21" uuid="64c78774-fe4e-4163-9a5a-b7139cd3fb05"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+				</textElement>
+				<text><![CDATA[مستخدم الطباعة ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="336" y="3" width="119" height="20" uuid="0ccd38fe-b814-450c-89c3-bfda2762ac55"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{P_USERNAME}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="266" y="2" width="70" height="21" uuid="89cc3cb2-717e-4589-8941-eedd159143db"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+				</textElement>
+				<text><![CDATA[تاريخ الطباعة]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="146" y="2" width="119" height="19" uuid="736ce489-7ac5-415e-b876-0ae210c2f273"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.text.SimpleDateFormat("dd/MM/yyyy hh:mm:ss", new java.util.Locale("ar")).format(new java.util.Date()) + 
+(java.time.LocalTime.now().getHour() < 12 ? " صباحًا" : " مساءً")]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="76" y="1" width="70" height="21" uuid="3bc3f2a3-c7a1-4bc5-9271-b05ba7ff8ea8"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+				</textElement>
+				<text><![CDATA[رقم الصفحة]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="6" y="1" width="70" height="20" uuid="e8ada9b7-f675-4c8d-b3ee-cf024e4f3508"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement x="0" y="0" width="554" height="1" backcolor="#030303" uuid="07db5340-976d-456e-877d-e5cbb3b8e60a"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="-1" y="23" width="555" height="1" backcolor="#030303" uuid="0814de90-469a-4d7f-b2b4-54b53abddd32"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="554" y="0" width="1" height="23" uuid="fe3f9808-5470-43c4-a6c3-d32bfd2155c8"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="-1" y="0" width="1" height="23" uuid="527c180f-6bd4-4ff0-b3c6-5b2913a8d2cc"/>
+			</rectangle>
+		</band>
+	</columnFooter>
+	<summary>
+		<band height="50">
+			<staticText>
+				<reportElement x="450" y="0" width="89" height="21" uuid="ff91ca66-61b4-4d6f-b41d-38bc70827afa"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Medium" size="13" isBold="false"/>
+				</textElement>
+				<text><![CDATA[التجهيز ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="40" y="0" width="89" height="21" uuid="358d5a8c-a603-4ce4-b932-971e5813fa62"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Medium" size="13" isBold="false"/>
+				</textElement>
+				<text><![CDATA[المراجعة]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

@@ -1,0 +1,572 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.6.final using JasperReports Library version 6.20.6-5c96b6aa8a39ac1dc6b6bea4b81168e16dd39231  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SAL_CUSTOMER_BALANCE" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="a1b2c3d4-e5f6-7890-abcd-ef1234567890">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="erp"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<parameter name="P_LANG" class="java.lang.String"/>
+	<parameter name="P_FROM_DATE" class="java.lang.String"/>
+	<parameter name="P_TO_DATE" class="java.lang.String"/>
+	<parameter name="P_ENTITY_ID" class="java.lang.String"/>
+	<parameter name="P_COMP_ID" class="java.lang.String"/>
+	<parameter name="P_BRANCH_ID" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[WITH ACCOUNT_DETAILS AS (
+    SELECT 
+        E.ID AS ENTITY_ID,
+        E.ENTITY_TYPE,
+        E.ACCOUNT_ID,
+        E.NAME_AR,
+        E.NAME AS NAME_EN
+    FROM GNL_ENTITY E
+    WHERE E.ID = $P{P_ENTITY_ID}
+),
+ALL_TRANSACTIONS AS (
+    -- 1. الرصيد الافتتاحي
+    SELECT 
+        AD.ENTITY_ID AS CUSTOMER_ID,
+        0 AS SORT_ORDER,
+        MS.TRANS_DATE,
+        MS.CODE AS TRANS_NUMBER,
+        'رصيد افتتاحي' AS DESCRIPTION_AR,
+        'Opening Balance' AS DESCRIPTION_EN,
+        NVL(DT.DEBIT_BALANCE, 0) AS DEBIT_AMOUNT,
+        NVL(DT.CREDIT_BALANCE, 0) AS CREDIT_AMOUNT,
+        NULL AS INVOICE_ID,
+        NULL AS VOUCHER_ID
+    FROM ACC_OPENING_BALANCE MS
+    INNER JOIN ACC_OPENING_BALANCE_DTL DT ON DT.OPENING_BALANCE_ID = MS.ID
+    INNER JOIN ACCOUNT_DETAILS AD ON AD.ACCOUNT_ID = DT.ACCOUNT_ID
+    WHERE MS.COMPANY_ID = $P{P_COMP_ID}
+      AND MS.BRANCH_ID = $P{P_BRANCH_ID}
+    
+    UNION ALL
+    
+    -- 2. فواتير المبيعات (للعملاء)
+    SELECT 
+        I.ENTITY_ID AS CUSTOMER_ID,
+        1 AS SORT_ORDER,
+        I.INV_DATE AS TRANS_DATE,
+        I.AUTO_NUMBER_BRA AS TRANS_NUMBER,
+        CASE 
+            WHEN T.ENTRY_SETTING = 'INV_SAL' THEN 'فاتورة بيع رقم: ' || I.AUTO_NUMBER_BRA
+            WHEN T.ENTRY_SETTING = 'INV_SAL_RET' THEN 'مرتجع بيع رقم: ' || I.AUTO_NUMBER_BRA
+        END AS DESCRIPTION_AR,
+        CASE 
+            WHEN T.ENTRY_SETTING = 'INV_SAL' THEN 'Sales Invoice No: ' || I.AUTO_NUMBER_BRA
+            WHEN T.ENTRY_SETTING = 'INV_SAL_RET' THEN 'Sales Return No: ' || I.AUTO_NUMBER_BRA
+        END AS DESCRIPTION_EN,
+        CASE WHEN T.ENTRY_SETTING = 'INV_SAL' THEN NVL(I.FINAL_VALUE, 0) ELSE 0 END AS DEBIT_AMOUNT,
+        CASE WHEN T.ENTRY_SETTING = 'INV_SAL_RET' THEN NVL(I.FINAL_VALUE, 0) ELSE 0 END AS CREDIT_AMOUNT,
+        I.ID AS INVOICE_ID,
+        NULL AS VOUCHER_ID
+    FROM DBS_SAL_INVOICE I
+    INNER JOIN SAL_INVOICE_TYPE T ON T.ID = I.INVOICE_TYPE_ID
+    INNER JOIN ACCOUNT_DETAILS AD ON AD.ENTITY_ID = I.ENTITY_ID
+    WHERE I.COMP_ID = $P{P_COMP_ID}
+      AND I.BRANCH_ID = $P{P_BRANCH_ID}
+      AND I.ENTITY_ID = $P{P_ENTITY_ID}
+      AND T.ENTRY_SETTING IN ('INV_SAL', 'INV_SAL_RET')
+      AND AD.ENTITY_TYPE = 'CUSTOMER'
+      AND I.INV_DATE BETWEEN TO_DATE($P{P_FROM_DATE}, 'DD-MM-YYYY') 
+                         AND TO_DATE($P{P_TO_DATE}, 'DD-MM-YYYY')
+    
+    UNION ALL
+    
+    -- 3. فواتير المشتريات (للموردين)
+    SELECT 
+        I.ENTITY_ID AS CUSTOMER_ID,
+        1 AS SORT_ORDER,
+        I.INV_DATE AS TRANS_DATE,
+        I.AUTO_NUMBER_BRA AS TRANS_NUMBER,
+        CASE 
+            WHEN T.ENTRY_SETTING = 'INV_PUR' THEN 'فاتورة شراء رقم: ' || I.AUTO_NUMBER_BRA
+            WHEN T.ENTRY_SETTING = 'INV_PUR_RET' THEN 'مرتجع شراء رقم: ' || I.AUTO_NUMBER_BRA
+        END AS DESCRIPTION_AR,
+        CASE 
+            WHEN T.ENTRY_SETTING = 'INV_PUR' THEN 'Purchase Invoice No: ' || I.AUTO_NUMBER_BRA
+            WHEN T.ENTRY_SETTING = 'INV_PUR_RET' THEN 'Purchase Return No: ' || I.AUTO_NUMBER_BRA
+        END AS DESCRIPTION_EN,
+        CASE WHEN T.ENTRY_SETTING = 'INV_PUR_RET' THEN NVL(I.FINAL_VALUE, 0) ELSE 0 END AS DEBIT_AMOUNT,
+        CASE WHEN T.ENTRY_SETTING = 'INV_PUR' THEN NVL(I.FINAL_VALUE, 0) ELSE 0 END AS CREDIT_AMOUNT,
+        I.ID AS INVOICE_ID,
+        NULL AS VOUCHER_ID
+    FROM DBS_SAL_INVOICE I
+    INNER JOIN SAL_INVOICE_TYPE T ON T.ID = I.INVOICE_TYPE_ID
+    INNER JOIN ACCOUNT_DETAILS AD ON AD.ENTITY_ID = I.ENTITY_ID
+    WHERE I.COMP_ID = $P{P_COMP_ID}
+      AND I.BRANCH_ID = $P{P_BRANCH_ID}
+      AND I.ENTITY_ID = $P{P_ENTITY_ID}
+      AND T.ENTRY_SETTING IN ('INV_PUR', 'INV_PUR_RET')
+      AND AD.ENTITY_TYPE = 'SUPPLIER'
+      AND I.INV_DATE BETWEEN TO_DATE($P{P_FROM_DATE}, 'DD-MM-YYYY') 
+                         AND TO_DATE($P{P_TO_DATE}, 'DD-MM-YYYY')
+    
+    UNION ALL
+    
+    -- 4. سندات القبض والصرف
+    SELECT 
+        ACC.FK_ID AS CUSTOMER_ID,
+        1 AS SORT_ORDER,
+        MS.TRANS_DATE,
+        TO_CHAR(MS.AUTO_NUMBER) AS TRANS_NUMBER,
+        CASE 
+            WHEN DBS_TRE_DOCUMENT_TYPES_VALUE_TYPE(MS.TRANS_TYPE) = 1 
+            THEN 'سند قبض رقم ' || MS.AUTO_NUMBER || CASE WHEN DTL.NOTES IS NOT NULL THEN ' - ' || DTL.NOTES ELSE '' END
+            ELSE 'سند صرف رقم ' || MS.AUTO_NUMBER || CASE WHEN DTL.NOTES IS NOT NULL THEN ' - ' || DTL.NOTES ELSE '' END
+        END AS DESCRIPTION_AR,
+        CASE 
+            WHEN DBS_TRE_DOCUMENT_TYPES_VALUE_TYPE(MS.TRANS_TYPE) = 1 
+            THEN 'Receipt Voucher No. ' || MS.AUTO_NUMBER || CASE WHEN DTL.NOTES IS NOT NULL THEN ' - ' || DTL.NOTES ELSE '' END
+            ELSE 'Payment Voucher No. ' || MS.AUTO_NUMBER || CASE WHEN DTL.NOTES IS NOT NULL THEN ' - ' || DTL.NOTES ELSE '' END
+        END AS DESCRIPTION_EN,
+        CASE WHEN DBS_TRE_DOCUMENT_TYPES_VALUE_TYPE(MS.TRANS_TYPE) = 2 THEN NVL(DTL.VALUE, 0) ELSE 0 END AS DEBIT_AMOUNT,
+        CASE WHEN DBS_TRE_DOCUMENT_TYPES_VALUE_TYPE(MS.TRANS_TYPE) = 1 THEN NVL(DTL.VALUE, 0) ELSE 0 END AS CREDIT_AMOUNT,
+        NULL AS INVOICE_ID,
+        MS.ID AS VOUCHER_ID
+    FROM DBS_TRE_PAYMENT MS 
+    INNER JOIN DBS_TRE_PAYMENT_DTL DTL ON MS.ID = DTL.DBS_TRE_PAYMENT_ID
+    INNER JOIN DBS_ACC_CHART_OF_ACCOUNTS ACC ON ACC.ID = DTL.DBS_ACC_CHART_OF_ACCOUNTS_ID
+    INNER JOIN ACCOUNT_DETAILS AD ON AD.ENTITY_ID = ACC.FK_ID
+    WHERE MS.TRANS_DATE IS NOT NULL
+      AND MS.TRANS_DATE BETWEEN TO_DATE($P{P_FROM_DATE}, 'DD-MM-YYYY') 
+                            AND TO_DATE($P{P_TO_DATE}, 'DD-MM-YYYY')
+      AND ACC.FK_ID = $P{P_ENTITY_ID}
+)
+SELECT 
+    CUSTOMER_ID,
+    ROW_NUMBER() OVER (ORDER BY SORT_ORDER, TRANS_DATE, TRANS_NUMBER) AS ROW_NUM,
+    TRANS_DATE,
+    TRANS_NUMBER,
+    DESCRIPTION_AR,
+    DESCRIPTION_EN,
+    DEBIT_AMOUNT,
+    CREDIT_AMOUNT,
+    CASE WHEN CUMULATIVE_BALANCE > 0 THEN CUMULATIVE_BALANCE ELSE 0 END AS BALANCE_DEBIT,
+    CASE WHEN CUMULATIVE_BALANCE < 0 THEN ABS(CUMULATIVE_BALANCE) ELSE 0 END AS BALANCE_CREDIT,
+    CUMULATIVE_BALANCE AS NET_BALANCE,
+    (SELECT CODE FROM GNL_ENTITY WHERE ID = CUSTOMER_ID) AS CUST_CODE,
+    (SELECT NAME_AR FROM GNL_ENTITY WHERE ID = CUSTOMER_ID) AS CUST_NAME,
+    INVOICE_ID,
+    VOUCHER_ID
+FROM (
+    SELECT 
+        CUSTOMER_ID,
+        SORT_ORDER,
+        TRANS_DATE,
+        TRANS_NUMBER,
+        DESCRIPTION_AR,
+        DESCRIPTION_EN,
+        DEBIT_AMOUNT,
+        CREDIT_AMOUNT,
+        INVOICE_ID,
+        VOUCHER_ID,
+        SUM(DEBIT_AMOUNT - CREDIT_AMOUNT) OVER (
+            ORDER BY SORT_ORDER, TRANS_DATE, TRANS_NUMBER 
+            ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+        ) AS CUMULATIVE_BALANCE
+    FROM ALL_TRANSACTIONS
+)
+ORDER BY SORT_ORDER, TRANS_DATE, TRANS_NUMBER]]>
+	</queryString>
+	<field name="CUSTOMER_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="CUSTOMER_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="CUSTOMER_ID"/>
+	</field>
+	<field name="ROW_NUM" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ROW_NUM"/>
+		<property name="com.jaspersoft.studio.field.label" value="ROW_NUM"/>
+	</field>
+	<field name="TRANS_DATE" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="TRANS_DATE"/>
+		<property name="com.jaspersoft.studio.field.label" value="TRANS_DATE"/>
+	</field>
+	<field name="TRANS_NUMBER" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="TRANS_NUMBER"/>
+		<property name="com.jaspersoft.studio.field.label" value="TRANS_NUMBER"/>
+	</field>
+	<field name="DESCRIPTION_AR" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DESCRIPTION_AR"/>
+		<property name="com.jaspersoft.studio.field.label" value="DESCRIPTION_AR"/>
+	</field>
+	<field name="DESCRIPTION_EN" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DESCRIPTION_EN"/>
+		<property name="com.jaspersoft.studio.field.label" value="DESCRIPTION_EN"/>
+	</field>
+	<field name="DEBIT_AMOUNT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="DEBIT_AMOUNT"/>
+		<property name="com.jaspersoft.studio.field.label" value="DEBIT_AMOUNT"/>
+	</field>
+	<field name="CREDIT_AMOUNT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="CREDIT_AMOUNT"/>
+		<property name="com.jaspersoft.studio.field.label" value="CREDIT_AMOUNT"/>
+	</field>
+	<field name="BALANCE_DEBIT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="BALANCE_DEBIT"/>
+		<property name="com.jaspersoft.studio.field.label" value="BALANCE_DEBIT"/>
+	</field>
+	<field name="BALANCE_CREDIT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="BALANCE_CREDIT"/>
+		<property name="com.jaspersoft.studio.field.label" value="BALANCE_CREDIT"/>
+	</field>
+	<field name="NET_BALANCE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="NET_BALANCE"/>
+		<property name="com.jaspersoft.studio.field.label" value="NET_BALANCE"/>
+	</field>
+	<field name="CUST_CODE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="CUST_CODE"/>
+		<property name="com.jaspersoft.studio.field.label" value="CUST_CODE"/>
+	</field>
+	<field name="CUST_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="CUST_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="CUST_NAME"/>
+	</field>
+	<field name="INVOICE_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="INVOICE_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="INVOICE_ID"/>
+	</field>
+	<field name="VOUCHER_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="VOUCHER_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="VOUCHER_ID"/>
+	</field>
+	<variable name="TOTAL_DEBIT" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{DEBIT_AMOUNT}]]></variableExpression>
+	</variable>
+	<variable name="TOTAL_CREDIT" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{CREDIT_AMOUNT}]]></variableExpression>
+	</variable>
+	<columnHeader>
+		<band height="110" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="712" y="90" width="90" height="20" backcolor="#EEEEEE" uuid="e5f6a7b8-c9d0-1234-ef12-345678901234"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Light" size="10" isBold="true"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<text><![CDATA[التاريخ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="622" y="90" width="90" height="20" backcolor="#EEEEEE" uuid="f6a7b8c9-d0e1-2345-f123-456789012345"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Light" size="10" isBold="true"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<text><![CDATA[رقم الحركة]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="322" y="90" width="300" height="20" backcolor="#EEEEEE" uuid="a7b8c9d0-e1f2-3456-1234-567890123456"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Light" size="10" isBold="true"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<text><![CDATA[البيان]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="242" y="90" width="80" height="20" backcolor="#EEEEEE" uuid="b8c9d0e1-f2a3-4567-2345-678901234567"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Light" size="10" isBold="true"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<text><![CDATA[مدين]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="162" y="90" width="80" height="20" backcolor="#EEEEEE" uuid="c9d0e1f2-a3b4-5678-3456-789012345678"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Light" size="10" isBold="true"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<text><![CDATA[دائن]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="82" y="90" width="80" height="20" backcolor="#EEEEEE" uuid="d0e1f2a3-b4c5-6789-4567-890123456789"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Light" size="10" isBold="true"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<text><![CDATA[رصيد مدين]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="90" width="82" height="20" backcolor="#EEEEEE" uuid="e1f2a3b4-c5d6-7890-5678-901234567890"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Light" size="10" isBold="true"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<text><![CDATA[رصيد دائن]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="5" y="15" width="802" height="30" uuid="c2a7bd55-2d1e-4589-8971-3c7c5c4d4dd6"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Light" size="18" isBold="true"/>
+				</textElement>
+				<text><![CDATA[كشف حساب عميل]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="620" y="60" width="131" height="20" uuid="f0b68ff4-abd7-4b31-a34a-f6a1f2839a17"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Light" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" كود العميل " + $F{CUST_CODE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="400" y="60" width="229" height="20" uuid="48a02b85-59bb-4ae5-865f-5e4f36f9311c"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Light" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[" العميل " + $F{CUST_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="200" y="60" width="200" height="20" uuid="6d7ed576-30f5-4036-ae24-4f57e94358df"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Light" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA["من تاريخ: " + $P{P_FROM_DATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="60" width="200" height="20" uuid="c911c8f5-a681-4e8b-b97e-9688df888428"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Light" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA["إلى تاريخ: " + $P{P_TO_DATE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="25" splitType="Stretch">
+			<textField pattern="MM-dd-yyyy" isBlankWhenNull="true">
+				<reportElement x="712" y="0" width="90" height="25" uuid="a9b0c1d2-e3f4-5678-3456-789012345678"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Light" size="9"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TRANS_DATE}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="622" y="0" width="90" height="25" uuid="f8a9b0c1-d2e3-4567-2345-678901234567"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Light" size="9"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TRANS_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement x="322" y="0" width="300" height="25" uuid="e7f8a9b0-c1d2-3456-1234-567890123456"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Light" size="9"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DESCRIPTION_AR}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="242" y="0" width="80" height="25" uuid="d6e7f8a9-b0c1-2345-0123-456789012345"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Light" size="9"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DEBIT_AMOUNT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="162" y="0" width="80" height="25" uuid="c5d6e7f8-a9b0-1234-9012-345678901234"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Light" size="9"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CREDIT_AMOUNT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="82" y="0" width="80" height="25" uuid="b4c5d6e7-f8a9-0123-8901-234567890123"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Light" size="9"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{BALANCE_DEBIT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00" isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="82" height="25" uuid="a3b4c5d6-e7f8-9012-7890-123456789012"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Light" size="9"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{BALANCE_CREDIT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="30" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="322" y="0" width="480" height="30" backcolor="#CBCBCB" uuid="c1d2e3f4-a5b6-7890-5678-901234567890"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Light" size="10" isBold="true"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<text><![CDATA[الإجمالي]]></text>
+			</staticText>
+			<textField pattern="#,##0.00">
+				<reportElement mode="Opaque" x="242" y="0" width="80" height="30" backcolor="#CBCBCB" uuid="d2e3f4a5-b6c7-8901-6789-012345678901"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Light" size="10" isBold="true"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{TOTAL_DEBIT}]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.00">
+				<reportElement mode="Opaque" x="162" y="0" width="80" height="30" backcolor="#CBCBCB" uuid="e3f4a5b6-c7d8-9012-7890-123456789012"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Light" size="10" isBold="true"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{TOTAL_CREDIT}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Opaque" x="82" y="0" width="80" height="30" backcolor="#CBCBCB" uuid="f4a5b6c7-d8e9-0123-8901-234567890123"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Light" size="10"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="0" width="82" height="30" backcolor="#CBCBCB" uuid="a5b6c7d8-e9f0-1234-9012-345678901234"/>
+				<box>
+					<pen lineWidth="0.5"/>
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Light" size="10"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<text><![CDATA[]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

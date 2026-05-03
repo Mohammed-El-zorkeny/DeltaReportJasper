@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.0.final using JasperReports Library version 6.20.0-2bc7ab61c56f459e8176eb05c7705e145cd400ad  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PLAN_PRICE_LIST_DTL" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="539fdbef-7607-4e4f-bb51-a9be3ab4fb46">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="ERP_STOCK"/>
+	<style name="Col  Header" mode="Opaque" forecolor="#030303" backcolor="#DB9593"/>
+	<style name="Text" mode="Transparent" forecolor="#E60F0B"/>
+	<style name="Col  Header Value" mode="Opaque" forecolor="#030303" backcolor="#D4D0CF"/>
+	<parameter name="P_LANG" class="java.lang.String"/>
+	<parameter name="P_ID" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT 
+    DTL.ID,
+    DTL.PRICE_LIST_ID,
+    ITEM_ID,   
+    ITEM_CODE,
+   nvl( ITEM_SIDE,' - ') as ITEM_SIDE, 
+    ITEM_NAME,
+    GROUP_NAME,
+    UOM,
+    PRICELIST,
+    nvl(QTY_OFFER,0) as QTY_OFFER,
+    MS.TYPE_ID
+    
+FROM VW_PLAN_PRICE_LIST_DTL DTL ,VW_PLAN_PRICE_LIST MS
+where  DTL.PRICE_LIST_ID = $P{P_ID}
+AND MS.ID =  DTL.PRICE_LIST_ID
+order by SEQ]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="ID"/>
+	</field>
+	<field name="PRICE_LIST_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="PRICE_LIST_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="PRICE_LIST_ID"/>
+	</field>
+	<field name="ITEM_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ITEM_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="ITEM_ID"/>
+	</field>
+	<field name="ITEM_CODE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ITEM_CODE"/>
+		<property name="com.jaspersoft.studio.field.label" value="ITEM_CODE"/>
+	</field>
+	<field name="ITEM_SIDE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ITEM_SIDE"/>
+		<property name="com.jaspersoft.studio.field.label" value="ITEM_SIDE"/>
+	</field>
+	<field name="ITEM_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ITEM_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="ITEM_NAME"/>
+	</field>
+	<field name="GROUP_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="GROUP_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="GROUP_NAME"/>
+	</field>
+	<field name="UOM" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="UOM"/>
+		<property name="com.jaspersoft.studio.field.label" value="UOM"/>
+	</field>
+	<field name="PRICELIST" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="PRICELIST"/>
+		<property name="com.jaspersoft.studio.field.label" value="PRICELIST"/>
+	</field>
+	<field name="QTY_OFFER" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="QTY_OFFER"/>
+		<property name="com.jaspersoft.studio.field.label" value="QTY_OFFER"/>
+	</field>
+	<field name="TYPE_ID" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="TYPE_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="TYPE_ID"/>
+	</field>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
+	<columnHeader>
+		<band height="47" splitType="Stretch">
+			<staticText>
+				<reportElement style="Text" x="380" y="3" width="175" height="21" uuid="0dab6b6f-53e4-4219-a60f-ae5f91a5ace1"/>
+				<box rightPadding="10"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Medium" size="14"/>
+				</textElement>
+				<text><![CDATA[اصناف قائمة الأسعار]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Col  Header" x="120" y="27" width="270" height="20" uuid="7c29133a-5246-4742-872a-6f5c221624fa"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Medium" size="12"/>
+				</textElement>
+				<text><![CDATA[الصنف]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Col  Header" x="0" y="27" width="60" height="20" uuid="ccb72daf-5e9f-42b7-90ee-52a3f2fd1159">
+					<printWhenExpression><![CDATA[$F{TYPE_ID}.equals( "INQTY" )]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Medium" size="12"/>
+				</textElement>
+				<text><![CDATA[السعر]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Col  Header" x="60" y="27" width="60" height="20" uuid="dfd51628-5773-4a51-8d8e-236aeb60e288">
+					<printWhenExpression><![CDATA[$F{TYPE_ID}.equals( "INQTY" )]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Medium" size="12"/>
+				</textElement>
+				<text><![CDATA[كمية العرض]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Col  Header" x="500" y="27" width="55" height="20" uuid="324cccee-e291-4923-89f1-414d2514bed8"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Medium" size="12"/>
+				</textElement>
+				<text><![CDATA[كود]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Col  Header" x="460" y="27" width="40" height="20" uuid="82cd639c-5159-4197-aff8-b78d53b6433c"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Medium" size="12"/>
+				</textElement>
+				<text><![CDATA[Side]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Col  Header" x="390" y="27" width="70" height="20" uuid="cdc17609-136e-40e1-8d2f-0409d690ed07"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Medium" size="12"/>
+				</textElement>
+				<text><![CDATA[المجموعة]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Col  Header" x="0" y="27" width="120" height="20" uuid="15f6228c-72c8-44c0-87ce-7d0841056c16">
+					<printWhenExpression><![CDATA[$F{TYPE_ID}.equals( "OUTQTY" )]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Medium" size="12"/>
+				</textElement>
+				<text><![CDATA[السعر]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement positionType="Float" x="120" y="0" width="270" height="20" uuid="ed84e204-1006-46e2-a789-6829783b2272">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c6246b77-c44b-48f1-a41f-6187e1d609d2"/>
+				</reportElement>
+				<box rightPadding="15">
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Medium" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ITEM_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="60" y="0" width="60" height="20" uuid="1b201698-5d91-4638-aa51-7710043fa498">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c6246b77-c44b-48f1-a41f-6187e1d609d2"/>
+					<printWhenExpression><![CDATA[$F{TYPE_ID}.equals( "INQTY" )]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Medium" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{QTY_OFFER}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="60" height="20" uuid="bb736b5e-3ffb-4ad3-8ffc-506bc36cd342">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c6246b77-c44b-48f1-a41f-6187e1d609d2"/>
+					<printWhenExpression><![CDATA[$F{TYPE_ID}.equals( "INQTY" )]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Medium" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PRICELIST}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="500" y="0" width="55" height="20" uuid="5305d863-0d1c-466c-b92d-2f7205585e5d">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c6246b77-c44b-48f1-a41f-6187e1d609d2"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Medium" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ITEM_CODE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="460" y="0" width="40" height="20" uuid="285b306d-f660-46de-a89d-9be80b2fcc02">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c6246b77-c44b-48f1-a41f-6187e1d609d2"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Medium" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ITEM_SIDE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="390" y="0" width="70" height="20" uuid="dd716216-ed18-4951-9b2f-3ca7d3811822">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c6246b77-c44b-48f1-a41f-6187e1d609d2"/>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Medium" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{GROUP_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="0" width="120" height="20" uuid="662844e0-a2ef-40d9-9f8e-087c7240e240">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="c6246b77-c44b-48f1-a41f-6187e1d609d2"/>
+					<printWhenExpression><![CDATA[$F{TYPE_ID}.equals( "OUTQTY" )]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Medium" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PRICELIST}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

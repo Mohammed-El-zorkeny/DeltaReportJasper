@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.6.final using JasperReports Library version 6.20.6-5c96b6aa8a39ac1dc6b6bea4b81168e16dd39231  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SAL_INVOICE_DTL" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="2c1c10a0-edea-451a-a4d3-b6b9274a9b6c">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="erp"/>
+	<parameter name="P_COMP_ID" class="java.lang.String"/>
+	<parameter name="P_ID" class="java.lang.String"/>
+	<parameter name="P_LANG" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT 
+    DBS_STOCK_ITEMS_LANG_NAME(DBS_STOCK_ITEMS_ID, $P{P_LANG}) AS ITEM_NAME,
+    QTY,
+    PRICE,
+    TOTAL_VALUE,
+    TAX_VALUE,
+    TAX_PERCENTAGE,
+    FINAL_VALUE,
+    NOTES
+FROM DBS_SAL_INVOICE_DTL
+WHERE DBS_SAL_INVOICE_ID = $P{P_ID}]]>
+	</queryString>
+	<field name="ITEM_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ITEM_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="ITEM_NAME"/>
+	</field>
+	<field name="QTY" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="QTY"/>
+		<property name="com.jaspersoft.studio.field.label" value="QTY"/>
+	</field>
+	<field name="PRICE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="PRICE"/>
+		<property name="com.jaspersoft.studio.field.label" value="PRICE"/>
+	</field>
+	<field name="TOTAL_VALUE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="TOTAL_VALUE"/>
+		<property name="com.jaspersoft.studio.field.label" value="TOTAL_VALUE"/>
+	</field>
+	<field name="TAX_VALUE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="TAX_VALUE"/>
+		<property name="com.jaspersoft.studio.field.label" value="TAX_VALUE"/>
+	</field>
+	<field name="TAX_PERCENTAGE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="TAX_PERCENTAGE"/>
+		<property name="com.jaspersoft.studio.field.label" value="TAX_PERCENTAGE"/>
+	</field>
+	<field name="FINAL_VALUE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="FINAL_VALUE"/>
+		<property name="com.jaspersoft.studio.field.label" value="FINAL_VALUE"/>
+	</field>
+	<field name="NOTES" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NOTES"/>
+		<property name="com.jaspersoft.studio.field.label" value="NOTES"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="77" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="376" y="20" width="180" height="57" backcolor="#CBCBCB" uuid="4a9575d7-6cee-48ac-beb1-eca6212d2c80"/>
+				<box leftPadding="0" rightPadding="5">
+					<pen lineWidth="0.5" lineColor="#030303"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Medium" size="12" isBold="false"/>
+				</textElement>
+				<text><![CDATA[السلع أو الخدمات
+Goods or Services]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="340" y="20" width="36" height="57" backcolor="#CBCBCB" uuid="e46f5030-9cd6-44a3-9272-69b4c3f1ece2"/>
+				<box leftPadding="0" rightPadding="5">
+					<pen lineWidth="0.5" lineColor="#030303"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Medium" size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[الكمية
+Qty]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="280" y="20" width="60" height="57" backcolor="#CBCBCB" uuid="1336041a-0d9e-4503-8310-441d1acd3ed0"/>
+				<box leftPadding="0" rightPadding="5">
+					<pen lineWidth="0.5" lineColor="#030303"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Medium" size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[سعر الوحدة
+Unit Price]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="190" y="20" width="90" height="57" backcolor="#CBCBCB" uuid="94fa4d4c-9c26-48a3-a511-83d1e6de026f"/>
+				<box leftPadding="0" rightPadding="5">
+					<pen lineWidth="0.5" lineColor="#030303"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Medium" size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[المبلغ الخاضع للضريبة
+Taxable Amount]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="140" y="20" width="50" height="57" backcolor="#CBCBCB" uuid="6e3e5147-e9c2-42c4-9526-ca4fa5b2433b"/>
+				<box leftPadding="0" rightPadding="5">
+					<pen lineWidth="0.5" lineColor="#030303"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Medium" size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[نسبة الضريبة
+Tax Rate	]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="80" y="20" width="60" height="57" backcolor="#CBCBCB" uuid="532fffff-99a8-4d4d-ae51-09f9558317e7"/>
+				<box leftPadding="0" rightPadding="5">
+					<pen lineWidth="0.5" lineColor="#030303"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Medium" size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[مبلغ الضريبة
+Tax Amount]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="20" width="80" height="57" backcolor="#CBCBCB" uuid="ef87921f-8fb3-4b72-92cb-0752524592dc"/>
+				<box leftPadding="0" rightPadding="5">
+					<pen lineWidth="0.5" lineColor="#030303"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Medium" size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[المجموع
+Subtotal]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="40" splitType="Stretch">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="376" y="0" width="180" height="40" uuid="9f412fbd-9e05-40da-a5d4-219de7be7b8a">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="19df076d-761b-46b1-9765-1df94c724e54"/>
+				</reportElement>
+				<box topPadding="5" bottomPadding="5" rightPadding="5">
+					<pen lineWidth="0.5" lineColor="#030303"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Top">
+					<font fontName="IBM Plex Sans Arabic Medium"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ITEM_NAME} + ($F{NOTES} != null && !$F{NOTES}.isEmpty() ? "\n" + $F{NOTES} : "")]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="340" y="0" width="36" height="40" uuid="99afe585-23cf-4121-9681-f42cffbf8b7b">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="19df076d-761b-46b1-9765-1df94c724e54"/>
+				</reportElement>
+				<box rightPadding="5">
+					<pen lineWidth="0.5" lineColor="#030303"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Medium"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{QTY}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="280" y="0" width="60" height="40" uuid="a62e97d7-5455-4e0b-88fb-5fba4fe312e9">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="19df076d-761b-46b1-9765-1df94c724e54"/>
+				</reportElement>
+				<box rightPadding="5">
+					<pen lineWidth="0.5" lineColor="#030303"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Medium"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{PRICE}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="190" y="0" width="90" height="40" uuid="bae29efa-5321-4692-90c0-b87b50200815">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="19df076d-761b-46b1-9765-1df94c724e54"/>
+				</reportElement>
+				<box rightPadding="5">
+					<pen lineWidth="0.5" lineColor="#030303"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Medium"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TOTAL_VALUE}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="140" y="0" width="50" height="40" uuid="19935e57-ae12-4650-8942-f24d72944ba1">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="19df076d-761b-46b1-9765-1df94c724e54"/>
+				</reportElement>
+				<box rightPadding="5">
+					<pen lineWidth="0.5" lineColor="#030303"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Medium"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TAX_PERCENTAGE}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="80" y="0" width="60" height="40" uuid="1228c411-cb4c-4810-9f1a-0d56b82c44a7">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="19df076d-761b-46b1-9765-1df94c724e54"/>
+				</reportElement>
+				<box rightPadding="5">
+					<pen lineWidth="0.5" lineColor="#030303"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Medium"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TAX_VALUE}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight">
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="80" height="40" uuid="9634bb3a-b582-4917-894d-c85d067e3626">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="19df076d-761b-46b1-9765-1df94c724e54"/>
+				</reportElement>
+				<box rightPadding="5">
+					<pen lineWidth="0.5" lineColor="#030303"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Medium"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{FINAL_VALUE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

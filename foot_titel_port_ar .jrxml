@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.5.final using JasperReports Library version 6.1.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="foot_titel_port_ar" columnDirection="RTL" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="a152926c-8240-4ad7-82e4-dc6d0e7a5242">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="HOST ACC"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<parameter name="P_COMP_ID" class="java.lang.String"/>
+	<parameter name="P_USERNAME" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[select * from DBS_COMP]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="ID"/>
+	</field>
+	<field name="AUTO_NUMBER" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="AUTO_NUMBER"/>
+		<property name="com.jaspersoft.studio.field.label" value="AUTO_NUMBER"/>
+	</field>
+	<field name="COUNTRY_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="COUNTRY_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="COUNTRY_ID"/>
+	</field>
+	<field name="NAME_AR" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NAME_AR"/>
+		<property name="com.jaspersoft.studio.field.label" value="NAME_AR"/>
+	</field>
+	<field name="NAME_EN" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NAME_EN"/>
+		<property name="com.jaspersoft.studio.field.label" value="NAME_EN"/>
+	</field>
+	<field name="NAME_APP_AR" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NAME_APP_AR"/>
+		<property name="com.jaspersoft.studio.field.label" value="NAME_APP_AR"/>
+	</field>
+	<field name="NAME_APP_EN" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NAME_APP_EN"/>
+		<property name="com.jaspersoft.studio.field.label" value="NAME_APP_EN"/>
+	</field>
+	<field name="PHONE_ONE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PHONE_ONE"/>
+		<property name="com.jaspersoft.studio.field.label" value="PHONE_ONE"/>
+	</field>
+	<field name="PHONE_TWO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PHONE_TWO"/>
+		<property name="com.jaspersoft.studio.field.label" value="PHONE_TWO"/>
+	</field>
+	<field name="EMAIL" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="EMAIL"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMAIL"/>
+	</field>
+	<field name="LOCATION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="LOCATION"/>
+		<property name="com.jaspersoft.studio.field.label" value="LOCATION"/>
+	</field>
+	<field name="LOGO" class="java.awt.Image">
+		<property name="com.jaspersoft.studio.field.name" value="LOGO"/>
+		<property name="com.jaspersoft.studio.field.label" value="LOGO"/>
+	</field>
+	<field name="VISION" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="VISION"/>
+		<property name="com.jaspersoft.studio.field.label" value="VISION"/>
+	</field>
+	<field name="WHO_ARE_WE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="WHO_ARE_WE"/>
+		<property name="com.jaspersoft.studio.field.label" value="WHO_ARE_WE"/>
+	</field>
+	<field name="RESPONSIBLE_NAME_AR" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="RESPONSIBLE_NAME_AR"/>
+		<property name="com.jaspersoft.studio.field.label" value="RESPONSIBLE_NAME_AR"/>
+	</field>
+	<field name="RESPONSIBLE_NAME_EN" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="RESPONSIBLE_NAME_EN"/>
+		<property name="com.jaspersoft.studio.field.label" value="RESPONSIBLE_NAME_EN"/>
+	</field>
+	<field name="RESPONSIBLE_PHONE_ONE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="RESPONSIBLE_PHONE_ONE"/>
+		<property name="com.jaspersoft.studio.field.label" value="RESPONSIBLE_PHONE_ONE"/>
+	</field>
+	<field name="RESPONSIBLE_PHONE_TWO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="RESPONSIBLE_PHONE_TWO"/>
+		<property name="com.jaspersoft.studio.field.label" value="RESPONSIBLE_PHONE_TWO"/>
+	</field>
+	<field name="SPECIALIZATION_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="SPECIALIZATION_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="SPECIALIZATION_ID"/>
+	</field>
+	<field name="STATUS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="STATUS"/>
+		<property name="com.jaspersoft.studio.field.label" value="STATUS"/>
+	</field>
+	<field name="THE_DESC" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="THE_DESC"/>
+		<property name="com.jaspersoft.studio.field.label" value="THE_DESC"/>
+	</field>
+	<field name="CREATED" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="CREATED"/>
+		<property name="com.jaspersoft.studio.field.label" value="CREATED"/>
+	</field>
+	<field name="CREATED_BY" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="CREATED_BY"/>
+		<property name="com.jaspersoft.studio.field.label" value="CREATED_BY"/>
+	</field>
+	<field name="UPDATED" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="UPDATED"/>
+		<property name="com.jaspersoft.studio.field.label" value="UPDATED"/>
+	</field>
+	<field name="UPDATED_BY" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="UPDATED_BY"/>
+		<property name="com.jaspersoft.studio.field.label" value="UPDATED_BY"/>
+	</field>
+	<field name="FOUNDATION_DATE" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="FOUNDATION_DATE"/>
+		<property name="com.jaspersoft.studio.field.label" value="FOUNDATION_DATE"/>
+	</field>
+	<field name="TAX_ID" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="TAX_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="TAX_ID"/>
+	</field>
+	<field name="REGISTRATION_NUMBER" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="REGISTRATION_NUMBER"/>
+		<property name="com.jaspersoft.studio.field.label" value="REGISTRATION_NUMBER"/>
+	</field>
+	<field name="FAX_NUMBER" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="FAX_NUMBER"/>
+		<property name="com.jaspersoft.studio.field.label" value="FAX_NUMBER"/>
+	</field>
+	<field name="PHONE_CODE_ONE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="PHONE_CODE_ONE"/>
+		<property name="com.jaspersoft.studio.field.label" value="PHONE_CODE_ONE"/>
+	</field>
+	<field name="PHONE_CODE_TWO" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="PHONE_CODE_TWO"/>
+		<property name="com.jaspersoft.studio.field.label" value="PHONE_CODE_TWO"/>
+	</field>
+	<field name="RESPONSIBLE_PHONE_CODE_ONE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="RESPONSIBLE_PHONE_CODE_ONE"/>
+		<property name="com.jaspersoft.studio.field.label" value="RESPONSIBLE_PHONE_CODE_ONE"/>
+	</field>
+	<field name="RESPONSIBLE_PHONE_CODE_TWO" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="RESPONSIBLE_PHONE_CODE_TWO"/>
+		<property name="com.jaspersoft.studio.field.label" value="RESPONSIBLE_PHONE_CODE_TWO"/>
+	</field>
+	<field name="LOGE_FILE_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="LOGE_FILE_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="LOGE_FILE_NAME"/>
+	</field>
+	<field name="LOGE_FILE_TYPE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="LOGE_FILE_TYPE"/>
+		<property name="com.jaspersoft.studio.field.label" value="LOGE_FILE_TYPE"/>
+	</field>
+	<field name="LOGE_FILE_CHAR" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="LOGE_FILE_CHAR"/>
+		<property name="com.jaspersoft.studio.field.label" value="LOGE_FILE_CHAR"/>
+	</field>
+	<field name="LOGE_FILE_LAST_UPDATE" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="LOGE_FILE_LAST_UPDATE"/>
+		<property name="com.jaspersoft.studio.field.label" value="LOGE_FILE_LAST_UPDATE"/>
+	</field>
+	<columnFooter>
+		<band height="42">
+			<staticText>
+				<reportElement x="454" y="9" width="85" height="21" uuid="6a7e22a7-85e0-4b5d-bef8-19a8142a143f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Medium" size="10"/>
+				</textElement>
+				<text><![CDATA[مستخدم الطباعة ]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="334" y="9" width="119" height="20" uuid="32bfd20e-40dd-48ce-adea-5ff1d42b19ac"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Medium"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{P_USERNAME}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="264" y="8" width="70" height="21" uuid="62163019-154c-4130-a4cd-93ef2460fb19"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Medium" size="10"/>
+				</textElement>
+				<text><![CDATA[تاريخ الطباعة]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="144" y="8" width="119" height="20" uuid="da5b9300-fa4f-447d-985b-46c925703d53"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Medium"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.text.SimpleDateFormat("dd/MM/yyyy hh:mm:ss", new java.util.Locale("ar")).format(new java.util.Date()) + 
+(java.time.LocalTime.now().getHour() < 12 ? " صباحًا" : " مساءً")]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="74" y="7" width="70" height="21" uuid="4cf30a13-01bd-4cda-8b4e-ef38fe3e3525"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Medium" size="10"/>
+				</textElement>
+				<text><![CDATA[رقم الصفحة]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="4" y="7" width="70" height="20" uuid="3f0af9d8-4422-460e-80bf-0117a3fcce8a"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Medium"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<rectangle>
+				<reportElement x="2" y="4" width="545" height="1" backcolor="#030303" uuid="b876aa45-7e97-4f9a-9a28-95ab3b10941c"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="2" y="34" width="545" height="1" backcolor="#030303" uuid="2f5f53c8-613e-42a0-9f75-c51c3b245b59"/>
+			</rectangle>
+		</band>
+	</columnFooter>
+</jasperReport>

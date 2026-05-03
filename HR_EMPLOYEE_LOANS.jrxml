@@ -1,0 +1,405 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.5.final using JasperReports Library version 6.1.1  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="advance_request_form" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="24d755f4-238f-4a89-bc73-5fda92ef057e">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Click APP"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<parameter name="P_LANG" class="java.lang.String"/>
+	<parameter name="P_LOAN_ID" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT 
+    L.ID AS LOAN_ID,
+    L.REQUEST_NO,
+    TO_CHAR(L.REQUEST_DATE, 'DD/MM/YYYY') AS REQUEST_DATE,
+    L.AMOUNT,
+    L.REASON,
+    L.REPAYMENT_AMOUNT AS MONTHLY_DEDUCTION,
+    TO_CHAR(L.START_DATE, 'DD-MM-YYYY') AS START_DATE,
+    TO_CHAR(L.END_DATE, 'DD-MM-YYYY') AS END_DATE,
+    L.EMPLOYEE_ID,
+    NVL(DECODE($P{P_LANG}, 'ar', NVL(E.FULL_NAME_AR, E.FULL_NAME_EN), NVL(E.FULL_NAME_EN, E.FULL_NAME_AR)), '-') AS EMPLOYEE_NAME,
+    NVL(DECODE($P{P_LANG}, 'ar', NVL(J.ARABIC_NAME, J.NAME), NVL(J.NAME, J.ARABIC_NAME)), '-') AS JOB_TITLE,
+    NVL(DECODE($P{P_LANG}, 'ar', NVL(D.ARABIC_NAME, D.NAME), NVL(D.NAME, D.ARABIC_NAME)), '-') AS DEPARTMENT,
+    NVL(TO_CHAR(E.HIRE_DATE, 'DD-MM-YYYY'), '-') AS HIRE_DATE,
+    NVL(TO_CHAR(E.BASIC_SALARY), '-') AS BASIC_SALARY,
+    NVL(DECODE($P{P_LANG}, 'ar', NVL(C.NAME_AR, C.NAME_EN), NVL(C.NAME_EN, C.NAME_AR)), '-') AS COMPANY_NAME,
+    (SELECT COUNT(*) 
+     FROM HR_EMPLOYEE_LOANS 
+     WHERE EMPLOYEE_ID = L.EMPLOYEE_ID 
+       AND STATUS_ID = 2 
+      ) AS COUNT_EMPLOYEE_LOANS
+FROM HR_EMPLOYEE_LOANS L
+JOIN HR_EMPLOYEES E ON L.EMPLOYEE_ID = E.EMPLOYEE_ID
+LEFT JOIN HR_JOB_TITLE J ON E.JOB_ID = J.ID   
+LEFT JOIN HR_DEPARTMENT D ON E.DEPARTMENT_ID = D.ID
+LEFT JOIN DBS_COMP C ON E.COMPANY_ID = C.ID
+WHERE L.ID = $P{P_LOAN_ID}]]>
+	</queryString>
+	<field name="LOAN_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="LOAN_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="LOAN_ID"/>
+	</field>
+	<field name="REQUEST_NO" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="REQUEST_NO"/>
+		<property name="com.jaspersoft.studio.field.label" value="REQUEST_NO"/>
+	</field>
+	<field name="REQUEST_DATE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="REQUEST_DATE"/>
+		<property name="com.jaspersoft.studio.field.label" value="REQUEST_DATE"/>
+	</field>
+	<field name="AMOUNT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="AMOUNT"/>
+		<property name="com.jaspersoft.studio.field.label" value="AMOUNT"/>
+	</field>
+	<field name="REASON" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="REASON"/>
+		<property name="com.jaspersoft.studio.field.label" value="REASON"/>
+	</field>
+	<field name="MONTHLY_DEDUCTION" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="MONTHLY_DEDUCTION"/>
+		<property name="com.jaspersoft.studio.field.label" value="MONTHLY_DEDUCTION"/>
+	</field>
+	<field name="START_DATE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="START_DATE"/>
+		<property name="com.jaspersoft.studio.field.label" value="START_DATE"/>
+	</field>
+	<field name="END_DATE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="END_DATE"/>
+		<property name="com.jaspersoft.studio.field.label" value="END_DATE"/>
+	</field>
+	<field name="EMPLOYEE_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMPLOYEE_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYEE_ID"/>
+	</field>
+	<field name="EMPLOYEE_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="EMPLOYEE_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYEE_NAME"/>
+	</field>
+	<field name="JOB_TITLE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="JOB_TITLE"/>
+		<property name="com.jaspersoft.studio.field.label" value="JOB_TITLE"/>
+	</field>
+	<field name="DEPARTMENT" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DEPARTMENT"/>
+		<property name="com.jaspersoft.studio.field.label" value="DEPARTMENT"/>
+	</field>
+	<field name="HIRE_DATE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="HIRE_DATE"/>
+		<property name="com.jaspersoft.studio.field.label" value="HIRE_DATE"/>
+	</field>
+	<field name="BASIC_SALARY" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="BASIC_SALARY"/>
+		<property name="com.jaspersoft.studio.field.label" value="BASIC_SALARY"/>
+	</field>
+	<field name="COMPANY_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="COMPANY_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="COMPANY_NAME"/>
+	</field>
+	<field name="COUNT_EMPLOYEE_LOANS" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="COUNT_EMPLOYEE_LOANS"/>
+		<property name="com.jaspersoft.studio.field.label" value="COUNT_EMPLOYEE_LOANS"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="80" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="210" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="555" height="25" uuid="2b2fe614-39a7-4345-b227-e749af575ffd"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="14" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{COMPANY_NAME}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="480" y="30" width="50" height="20" uuid="eaa34bc2-a60b-4862-b72f-0b720b4ef54e"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[التاريخ:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="350" y="30" width="125" height="20" uuid="80c8e7f3-7fc5-4000-a5a8-169d9780cd51"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{REQUEST_DATE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="200" y="30" width="80" height="20" uuid="a9babfd8-c0f1-4b31-a97b-ee7e3e147837"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[رقم الطلب:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="80" y="30" width="115" height="20" uuid="57ce782a-a8f0-407b-88c7-c6ad4a69c5c7"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{REQUEST_NO}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="60" width="555" height="25" uuid="5de8e929-6f4b-4d70-b7f7-d6218fe97757"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[السادة إدارة الشركة                                          المحترمين]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="90" width="555" height="20" uuid="f5a10584-a948-4e2e-81df-2a416fd55670"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="11"/>
+				</textElement>
+				<text><![CDATA[تحية طيبة وبعد،،،]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="115" width="555" height="25" uuid="74cf6dce-1435-4111-93a9-639fd27790f7"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[الموضوع : طلب سلفة على الراتب]]></text>
+			</staticText>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="0" y="145" width="555" height="25" uuid="5afc6290-5f68-40b4-b7e7-575d8f1eaf1f"/>
+				<textElement textAlignment="Right" verticalAlignment="Top">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA["يرجى من سيادتكم الموافقة على منحي سلفة نقديه قدرها (" + $F{AMOUNT} + " د.ك)"]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="0" y="170" width="555" height="20" uuid="08257127-d049-4231-bea8-ed3928248f65"/>
+				<textElement textAlignment="Right" verticalAlignment="Top">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA["وذلك بسبب : (" + $F{REASON} + ")"]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true">
+				<reportElement x="0" y="190" width="555" height="20" uuid="e8eb7f77-adfa-4a60-bb96-611d96cf690e"/>
+				<textElement textAlignment="Right" verticalAlignment="Top">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA["على ان يتم سدادها دفعة من الراتب بخصم " + $F{MONTHLY_DEDUCTION} + " د.ك شهرياً بداية من راتب شهر " + $F{START_DATE} + "."]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="200" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="155" width="555" height="20" uuid="c5018e23-238f-42c7-aed1-25c4e6fda04c"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+				</textElement>
+				<text><![CDATA[تحية طيبة وبعد ،،،]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="-1" y="130" width="555" height="25" uuid="f0aadb0c-79d5-4ad8-bd9f-28c5271ac972"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="11" isBold="false"/>
+				</textElement>
+				<text><![CDATA[السيد / المدير المالى                                                         المحترم]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="-1" y="175" width="555" height="25" uuid="10dfe2a9-9ead-48cb-a671-0836f92d4a6c"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+				</textElement>
+				<text><![CDATA[برجاء الإفادة عن مستحقات طالب السلفة كما هو موضح بالجدول التالى وأعتمادها من طرفكم]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="10" width="555" height="20" uuid="ca0e33ad-cd66-475d-b316-ede7e99e2740"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+				</textElement>
+				<text><![CDATA[هذا وتفضلو بقبول فائق الاحترام ،،،،]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="35" width="555" height="20" uuid="f21ebb5c-35ac-48dd-99f2-a33c50058a57"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+					<paragraph rightIndent="150"/>
+				</textElement>
+				<text><![CDATA[اسم طالب السلفة :]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="60" width="555" height="20" uuid="f3bf46dc-f2ce-495e-980e-155c99eadd94"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+					<paragraph rightIndent="150"/>
+				</textElement>
+				<text><![CDATA[التـوقيــع :]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="90" width="555" height="1" uuid="e61e482b-f5d3-420b-9e96-0f112fbe332d"/>
+			</line>
+			<staticText>
+				<reportElement x="0" y="100" width="555" height="25" uuid="5ab2f6f5-64e6-4fc9-b3c8-6c09b54a0cca"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[الإدارة المالية]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="85" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="400" y="10" width="155" height="25" backcolor="#E8E8E8" uuid="caed13d8-9d46-4cb3-8adc-539bb57a4256"/>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="12" isBold="false"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<text><![CDATA[الأســـــــم]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="200" y="10" width="200" height="25" uuid="a722ecf4-be59-4ab0-b637-353c13b5d7cb"/>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMPLOYEE_NAME}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Opaque" x="400" y="35" width="155" height="25" backcolor="#E8E8E8" uuid="9bd04d5b-394c-4386-8e25-14bb33c85f47"/>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="12" isBold="false"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<text><![CDATA[الوظيفــــة]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="200" y="35" width="200" height="25" uuid="98742eb2-839f-46a7-a23e-8345a7f8e81f"/>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{JOB_TITLE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Opaque" x="115" y="10" width="85" height="25" backcolor="#E8E8E8" uuid="73f8bcca-2ff7-425e-a633-b43abb9bfbac"/>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="12" isBold="false"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<text><![CDATA[السلفة رقم]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="10" width="115" height="25" uuid="c302a3cc-9d3d-433d-bc15-1cd5d470dc12"/>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{COUNT_EMPLOYEE_LOANS}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Opaque" x="115" y="35" width="85" height="25" backcolor="#E8E8E8" uuid="5b35f3dd-6310-4a5d-bba0-e80b9d4181d8"/>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="12" isBold="false"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<text><![CDATA[الراتب الأساسى]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="0" y="35" width="115" height="25" uuid="d287527a-bbd3-47da-8f26-e238b2b5a167"/>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{BASIC_SALARY} + " د.ك"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Opaque" x="400" y="60" width="155" height="25" backcolor="#E8E8E8" uuid="d8d5a07c-8a26-4420-b001-d26e722e538c"/>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="12" isBold="false"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<text><![CDATA[تاريخ التعيين]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="200" y="60" width="200" height="25" uuid="f7d78136-d7ae-4ea6-a0e3-8a121facab9a"/>
+				<box>
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+					<paragraph rightIndent="5"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{HIRE_DATE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="173" splitType="Stretch">
+			<staticText>
+				<reportElement x="350" y="113" width="200" height="20" uuid="3fd4e543-51db-44ba-a0be-3474fa8116e8"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+				</textElement>
+				<text><![CDATA[المحاسب]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="350" y="138" width="200" height="20" uuid="b255bb8b-f947-4e67-838c-16abfc4409a2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+				</textElement>
+				<text><![CDATA[قـــــــرار الإدارة]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2" y="113" width="200" height="20" uuid="7117c9ff-cb0a-49c1-b1d5-fc2d5691cb09"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+				</textElement>
+				<text><![CDATA[اعتماد الإدارة المالية]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2" y="138" width="200" height="20" uuid="75edbe5d-c7c7-432e-974a-e0005f445acb"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+				</textElement>
+				<text><![CDATA[إعتماد الرئيس التنفيذي]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="490" y="9" width="60" height="20" uuid="3e2c060e-206f-49ff-a2b2-80f296be98cc"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10" isBold="false"/>
+				</textElement>
+				<text><![CDATA[ملاحظات :]]></text>
+			</staticText>
+			<line>
+				<reportElement x="2" y="90" width="555" height="1" uuid="a9711707-bfb8-4fc5-8add-2989199b40bf"/>
+				<graphicElement>
+					<pen lineStyle="Dotted"/>
+				</graphicElement>
+			</line>
+		</band>
+	</summary>
+</jasperReport>

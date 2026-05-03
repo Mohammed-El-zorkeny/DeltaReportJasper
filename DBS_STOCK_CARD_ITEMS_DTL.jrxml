@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.5.final using JasperReports Library version 6.20.5-3efcf2e67f959db3888d79f73dde2dbd7acb4f8e  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="DBS_STOCK_CARD_ITEMS_DTL" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="b090d40f-70f4-4523-a2ec-567078774903">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="New Data Adapter"/>
+	<style name="Col  Header" mode="Opaque" forecolor="#030303" backcolor="#DB9593"/>
+	<style name="Text" mode="Transparent" forecolor="#E60F0B" hTextAlign="Right" vTextAlign="Middle" fontName="IBM Plex Sans Arabic">
+		<box rightPadding="10"/>
+	</style>
+	<style name="Col  Header Value" mode="Transparent" forecolor="#030303" backcolor="#D4D0CF">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{TRANS_TYPE}.equals("إجمالي")]]></conditionExpression>
+			<style mode="Opaque" forecolor="#030303" backcolor="#D6D4D5" markup="none" fontSize="12" isBold="true" isItalic="false"/>
+		</conditionalStyle>
+	</style>
+	<parameter name="P_LANG" class="java.lang.String"/>
+	<parameter name="P_USERNAME" class="java.lang.String"/>
+	<parameter name="P_COMP_ID" class="java.lang.String"/>
+	<parameter name="P_ID" class="java.lang.String"/>
+	<parameter name="P_START_DATE" class="java.lang.String"/>
+	<parameter name="P_END_DATE" class="java.lang.String"/>
+	<parameter name="P_TRANS_TYPE" class="java.lang.String"/>
+	<parameter name="P_ITEM_ID" class="java.lang.String"/>
+	<parameter name="P_SUB_STORE" class="java.lang.String"/>
+	<parameter name="P_STORE_ID" class="java.lang.String"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT 
+    ROW_NUMBER() OVER (ORDER BY ITEM_CODE, SERIAL_NO NULLS LAST) AS SERIAL_NO,
+    ID,
+    AUTO_NUMBER_BRA,
+    TRANS_DATE,
+    TRANS_TYPE,
+    ITEM_NAME,
+    ITEM_CODE,
+    QTY,
+    VALUE_TYPE,
+    QTY_IN,
+    QTY_OUT,
+    BALANCE
+FROM (
+    SELECT 
+        SERIAL_NO,
+        ID,
+        AUTO_NUMBER_BRA,
+        TO_CHAR(TRANS_DATE, 'YYYY-MM-DD') AS TRANS_DATE,
+        TRANS_TYPE,
+        ITEM_NAME,
+        ITEM_CODE,
+        QTY,
+        VALUE_TYPE,
+        QTY_IN,
+        QTY_OUT,
+        SUM(QTY_IN - QTY_OUT) OVER (
+            PARTITION BY ITEM_CODE 
+            ORDER BY SERIAL_NO
+        ) AS BALANCE
+    FROM V_DBS_STOCK_TRANS_DTL
+    WHERE ($P{P_ITEM_ID} IS NULL OR ITEM_CODE = $P{P_ITEM_ID})
+      AND (TO_CHAR(TRANS_DATE, 'YYYY-MM-DD') BETWEEN $P{P_START_DATE} AND $P{P_END_DATE}
+           OR ($P{P_START_DATE} IS NULL AND $P{P_END_DATE} IS NULL))
+      AND ($P{P_STORE_ID} IS NULL OR STORE_ID = $P{P_STORE_ID})
+      AND ($P{P_SUB_STORE} IS NULL OR SUB_STORE_ID = $P{P_SUB_STORE})
+
+    UNION ALL
+
+    SELECT 
+        NULL AS SERIAL_NO,
+        NULL AS ID,
+        '-' AS AUTO_NUMBER_BRA,
+        '-' AS TRANS_DATE,
+        'إجمالي' AS TRANS_TYPE,
+        ITEM_NAME,
+        ITEM_CODE,
+        NULL AS QTY,
+        NULL AS VALUE_TYPE,
+        SUM(QTY_IN) AS QTY_IN,
+        SUM(QTY_OUT) AS QTY_OUT,
+        SUM(QTY_IN - QTY_OUT) AS BALANCE
+    FROM V_DBS_STOCK_TRANS_DTL
+    WHERE ($P{P_ITEM_ID} IS NULL OR ITEM_CODE = $P{P_ITEM_ID})
+      AND (TO_CHAR(TRANS_DATE, 'YYYY-MM-DD') BETWEEN $P{P_START_DATE} AND $P{P_END_DATE}
+           OR ($P{P_START_DATE} IS NULL AND $P{P_END_DATE} IS NULL))
+      AND ($P{P_STORE_ID} IS NULL OR STORE_ID = $P{P_STORE_ID})
+      AND ($P{P_SUB_STORE} IS NULL OR SUB_STORE_ID = $P{P_SUB_STORE})
+    GROUP BY ITEM_NAME, ITEM_CODE
+)
+ORDER BY ITEM_CODE NULLS LAST, SERIAL_NO NULLS LAST]]>
+	</queryString>
+	<field name="SERIAL_NO" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="SERIAL_NO"/>
+		<property name="com.jaspersoft.studio.field.label" value="SERIAL_NO"/>
+	</field>
+	<field name="ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="ID"/>
+	</field>
+	<field name="AUTO_NUMBER_BRA" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="AUTO_NUMBER_BRA"/>
+		<property name="com.jaspersoft.studio.field.label" value="AUTO_NUMBER_BRA"/>
+	</field>
+	<field name="TRANS_DATE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="TRANS_DATE"/>
+		<property name="com.jaspersoft.studio.field.label" value="TRANS_DATE"/>
+	</field>
+	<field name="TRANS_TYPE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="TRANS_TYPE"/>
+		<property name="com.jaspersoft.studio.field.label" value="TRANS_TYPE"/>
+	</field>
+	<field name="ITEM_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ITEM_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="ITEM_NAME"/>
+	</field>
+	<field name="ITEM_CODE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ITEM_CODE"/>
+		<property name="com.jaspersoft.studio.field.label" value="ITEM_CODE"/>
+	</field>
+	<field name="QTY" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="QTY"/>
+		<property name="com.jaspersoft.studio.field.label" value="QTY"/>
+	</field>
+	<field name="VALUE_TYPE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="VALUE_TYPE"/>
+		<property name="com.jaspersoft.studio.field.label" value="VALUE_TYPE"/>
+	</field>
+	<field name="QTY_IN" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="QTY_IN"/>
+		<property name="com.jaspersoft.studio.field.label" value="QTY_IN"/>
+	</field>
+	<field name="QTY_OUT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="QTY_OUT"/>
+		<property name="com.jaspersoft.studio.field.label" value="QTY_OUT"/>
+	</field>
+	<field name="BALANCE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="BALANCE"/>
+		<property name="com.jaspersoft.studio.field.label" value="BALANCE"/>
+	</field>
+	<columnHeader>
+		<band height="60" splitType="Stretch">
+			<staticText>
+				<reportElement style="Col  Header" x="510" y="40" width="45" height="20" uuid="95823c51-35ee-4b55-bb98-b684332edbed"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic Medium" size="12"/>
+				</textElement>
+				<text><![CDATA[#]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Text" x="460" y="10" width="94" height="20" uuid="97c3891a-32c2-4c00-a1c4-71cc06e3f278"/>
+				<textElement textAlignment="Center">
+					<font size="13"/>
+				</textElement>
+				<text><![CDATA[حركات الصنف ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Col  Header" x="440" y="40" width="70" height="20" uuid="48dd033a-2852-496b-bb53-8505a2874d0f"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="12"/>
+				</textElement>
+				<text><![CDATA[رقم المستند ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Col  Header" x="350" y="40" width="90" height="20" uuid="7d9800d0-17ad-41eb-8bbc-c07ff38660d4"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="12"/>
+				</textElement>
+				<text><![CDATA[تاريخ الحركة]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Col  Header" x="220" y="40" width="130" height="20" uuid="971c40f9-2e93-4db8-8c94-1e0502d4528d"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="12"/>
+				</textElement>
+				<text><![CDATA[نوع الحركة ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Col  Header" x="160" y="40" width="60" height="20" uuid="00927b62-f011-4372-a373-a12b021ef395"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="12"/>
+				</textElement>
+				<text><![CDATA[الوارد]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Col  Header" x="90" y="40" width="70" height="20" uuid="2c63c1df-599d-45df-9cd9-cdc2ca33b5c6"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="12"/>
+				</textElement>
+				<text><![CDATA[المنصرف]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="Col  Header" x="0" y="40" width="90" height="20" uuid="7e0e3e1f-b33b-4fcf-a7a4-22f6b8365ace"/>
+				<box>
+					<pen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="12"/>
+				</textElement>
+				<text><![CDATA[الرصيد]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement style="Col  Header Value" x="510" y="0" width="45" height="20" uuid="3ba20fc6-bc82-4d52-9f35-1305578ce2b4"/>
+				<box>
+					<pen lineWidth="1.0" lineColor="#030303"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SERIAL_NO}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Col  Header Value" x="440" y="0" width="70" height="20" uuid="3b064aa1-3c77-47f0-8846-4320739284b2"/>
+				<box rightPadding="3">
+					<pen lineWidth="1.0" lineColor="#030303"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{AUTO_NUMBER_BRA}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Col  Header Value" x="350" y="0" width="90" height="20" uuid="f4dad0a7-2de8-49de-b60d-e2ea45a892c1"/>
+				<box rightPadding="3">
+					<pen lineWidth="1.0" lineColor="#030303"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TRANS_DATE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Col  Header Value" x="220" y="0" width="130" height="20" uuid="9e0bb52e-0411-44ac-a841-c5df66ef3d13"/>
+				<box rightPadding="3">
+					<pen lineWidth="1.0" lineColor="#030303"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TRANS_TYPE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Col  Header Value" x="160" y="0" width="60" height="20" uuid="a66f78ba-ba59-45f9-a5e9-37c27f099431"/>
+				<box>
+					<pen lineWidth="1.0" lineColor="#030303"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{QTY_IN}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Col  Header Value" x="90" y="0" width="70" height="20" uuid="483d63ab-c6b5-4ee7-aecb-256291559240"/>
+				<box>
+					<pen lineWidth="1.0" lineColor="#030303"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{QTY_OUT}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="Col  Header Value" x="0" y="0" width="90" height="20" uuid="accbd668-8e0a-4ca5-bb13-abd63d66caf0"/>
+				<box>
+					<pen lineWidth="1.0" lineColor="#030303"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{BALANCE}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
