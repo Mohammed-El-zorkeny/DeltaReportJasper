@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.5.final using JasperReports Library version 6.20.5-3efcf2e67f959db3888d79f73dde2dbd7acb4f8e  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HEAD_TITEL_PA" columnDirection="RTL" pageWidth="595" pageHeight="842" columnWidth="595" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="a152926c-8240-4ad7-82e4-dc6d0e7a5242">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Delta"/>
+	<parameter name="P_COMP_ID" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT 
+    COMP.NAME_AR AS NAME_AR,
+    COMP.NAME_EN AS NAME_EN,
+    COMP.COMMERCIAL_REGISTER_NUMBER AS CR_NUMBER,
+    COMP.TAX_ID AS VAT_NUMBER,
+    COMP.PHONE_NUMBER_1 AS PHONE,
+    COMP.EMAIL AS EMAIL,
+    COMP.LOCATION AS WEB_SITE,
+    COMP.ADDREES AS ADDREES,
+    COMP.FAX_NUMBER AS FAX_NUMBER,
+    COMP.POSTAL_CODE AS POSTAL_CODE,
+    application_settings_pkg.get_company_logo_url(COMP.ID) AS COMPANY_LOGO_FILE_PATH
+FROM DBS_COMP COMP
+WHERE COMP.ID = $P{P_COMP_ID}]]>
+	</queryString>
+	<field name="NAME_AR" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NAME_AR"/>
+		<property name="com.jaspersoft.studio.field.label" value="NAME_AR"/>
+	</field>
+	<field name="NAME_EN" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NAME_EN"/>
+		<property name="com.jaspersoft.studio.field.label" value="NAME_EN"/>
+	</field>
+	<field name="CR_NUMBER" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="CR_NUMBER"/>
+		<property name="com.jaspersoft.studio.field.label" value="CR_NUMBER"/>
+	</field>
+	<field name="VAT_NUMBER" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="VAT_NUMBER"/>
+		<property name="com.jaspersoft.studio.field.label" value="VAT_NUMBER"/>
+	</field>
+	<field name="PHONE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="PHONE"/>
+		<property name="com.jaspersoft.studio.field.label" value="PHONE"/>
+	</field>
+	<field name="EMAIL" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="EMAIL"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMAIL"/>
+	</field>
+	<field name="WEB_SITE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="WEB_SITE"/>
+		<property name="com.jaspersoft.studio.field.label" value="WEB_SITE"/>
+	</field>
+	<field name="ADDREES" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ADDREES"/>
+		<property name="com.jaspersoft.studio.field.label" value="ADDREES"/>
+	</field>
+	<field name="FAX_NUMBER" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="FAX_NUMBER"/>
+		<property name="com.jaspersoft.studio.field.label" value="FAX_NUMBER"/>
+	</field>
+	<field name="POSTAL_CODE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="POSTAL_CODE"/>
+		<property name="com.jaspersoft.studio.field.label" value="POSTAL_CODE"/>
+	</field>
+	<field name="COMPANY_LOGO_FILE_PATH" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="COMPANY_LOGO_FILE_PATH"/>
+		<property name="com.jaspersoft.studio.field.label" value="COMPANY_LOGO_FILE_PATH"/>
+	</field>
+	<columnHeader>
+		<band height="155" splitType="Stretch">
+			<image hAlign="Center" vAlign="Middle" isUsingCache="true" onErrorType="Blank">
+				<reportElement x="240" y="10" width="115" height="100" uuid="e9f4dc77-a1df-404e-ab60-366b8301c4c4"/>
+				<imageExpression><![CDATA[$F{COMPANY_LOGO_FILE_PATH}]]></imageExpression>
+			</image>
+			<textField isBlankWhenNull="true">
+				<reportElement x="10" y="5" width="225" height="22" uuid="3739aa55-7113-4def-a971-8817cbf859b5"/>
+				<box leftPadding="5"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NAME_EN}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="10" y="29" width="225" height="16" uuid="b1570ab8-4d71-4b39-8ae2-62bcaf55de61"/>
+				<box leftPadding="5"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["CR Number: " + ($F{CR_NUMBER} == null ? "" : $F{CR_NUMBER})]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="10" y="46" width="225" height="16" uuid="b06c7c60-763a-4774-8d8e-117e8f5f2144"/>
+				<box leftPadding="5"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["VAT Number: " + ($F{VAT_NUMBER} == null ? "" : $F{VAT_NUMBER})]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="10" y="63" width="225" height="16" uuid="a1111111-0001-0001-0001-000000000001"/>
+				<box leftPadding="5"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Address: " + ($F{ADDREES} == null ? "" : $F{ADDREES})]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="10" y="80" width="225" height="16" uuid="a1111111-0002-0002-0002-000000000002"/>
+				<box leftPadding="5"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Postal Code: " + ($F{POSTAL_CODE} == null ? "" : $F{POSTAL_CODE})]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="10" y="97" width="225" height="16" uuid="b4282b34-c95e-4851-ad7a-dd4b3439b588"/>
+				<box leftPadding="5"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Tel: " + ($F{PHONE} == null ? "" : $F{PHONE})]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="10" y="114" width="225" height="16" uuid="a1111111-0003-0003-0003-000000000003"/>
+				<box leftPadding="5"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Fax: " + ($F{FAX_NUMBER} == null ? "" : $F{FAX_NUMBER})]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="10" y="131" width="225" height="16" uuid="f4dfb0a0-e211-41fc-9e12-43ab0c122b73"/>
+				<box leftPadding="5"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{EMAIL} == null ? "" : $F{EMAIL}) + "  |  " + ($F{WEB_SITE} == null ? "" : $F{WEB_SITE})]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="360" y="5" width="225" height="22" uuid="dcc97e20-3589-49ec-8a9b-b3362b8f19a7"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
+					<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["\u202B" + ($F{NAME_AR} == null ? "" : $F{NAME_AR}) + "\u202C"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="360" y="29" width="225" height="16" uuid="c46e3159-7dba-4b1d-91c7-271bb418c16a"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
+					<font fontName="IBM Plex Sans Arabic" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["\u202B" + "السجل التجارى : " + ($F{CR_NUMBER} == null ? "" : $F{CR_NUMBER}) + "\u202C"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="360" y="46" width="225" height="16" uuid="5d6ee565-e73e-4a0a-9212-5a6cf69abc5a"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
+					<font fontName="IBM Plex Sans Arabic" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["\u202B" + "الرقم الضريبى : " + ($F{VAT_NUMBER} == null ? "" : $F{VAT_NUMBER}) + "\u202C"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="360" y="63" width="225" height="16" uuid="a2222222-0001-0001-0001-000000000001"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
+					<font fontName="IBM Plex Sans Arabic" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["\u202B" + "العنوان : " + ($F{ADDREES} == null ? "" : $F{ADDREES}) + "\u202C"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="360" y="80" width="225" height="16" uuid="a2222222-0002-0002-0002-000000000002"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
+					<font fontName="IBM Plex Sans Arabic" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["\u202B" + "الرمز البريدى : " + ($F{POSTAL_CODE} == null ? "" : $F{POSTAL_CODE}) + "\u202C"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="360" y="97" width="225" height="16" uuid="53485055-497a-4d9d-b6ea-88218690b236"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
+					<font fontName="IBM Plex Sans Arabic" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["\u202B" + "تليفون : " + ($F{PHONE} == null ? "" : $F{PHONE}) + "\u202C"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="360" y="114" width="225" height="16" uuid="a2222222-0003-0003-0003-000000000003"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
+					<font fontName="IBM Plex Sans Arabic" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["\u202B" + "فاكس : " + ($F{FAX_NUMBER} == null ? "" : $F{FAX_NUMBER}) + "\u202C"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="360" y="131" width="225" height="16" uuid="9596eada-8950-4fb6-90d2-3ecad86fd74c"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
+					<font fontName="IBM Plex Sans Arabic" size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($F{EMAIL} == null ? "" : $F{EMAIL}) + "  |  " + ($F{WEB_SITE} == null ? "" : $F{WEB_SITE})]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="10" y="152" width="575" height="1" uuid="7e23301f-21cd-4450-98ea-56d06e845d00"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineColor="#333333"/>
+				</graphicElement>
+			</line>
+		</band>
+	</columnHeader>
+</jasperReport>
