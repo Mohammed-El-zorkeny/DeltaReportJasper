@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.5.final using JasperReports Library version 6.20.5-3efcf2e67f959db3888d79f73dde2dbd7acb4f8e  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PUR_REQUISITION" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="cc33dd44-ee55-ff66-7788-990102030405">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Delta"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<parameter name="P_REQUEST_ID" class="java.lang.Long"/>
+	<parameter name="P_COMP_ID" class="java.lang.String"/>
+	<parameter name="P_USERPRINT" class="java.lang.String">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_TITLE_REPORT" class="java.lang.String">
+		<defaultValueExpression><![CDATA["طلب احتياج"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+    R.ID,
+    R.CODE                                              AS REQ_CODE,
+    R.NAME                                              AS REQ_NAME,
+    TO_CHAR(R.REQUEST_DATE,           'DD/MM/YYYY')     AS REQUEST_DATE,
+    TO_CHAR(R.EXPECTED_DELIVERY_DATE, 'DD/MM/YYYY')     AS EXPECTED_DATE,
+    HR_DEPARTMENT_NAME_LANG(R.DEPARTMENT_ID, 'AR')      AS DEPT_NAME,
+    HR_EMPLOYEES_NAME_LANG(R.EMPLOYEE_ID,    'AR')      AS EMP_NAME,
+    GNL_STATUS_NAME_LANG  (R.STATUS_ID,      'AR')      AS STATUS_NAME,
+    R.NOTES                                             AS REQ_NOTES
+FROM PUR_REQUISITION R
+WHERE R.ID = $P{P_REQUEST_ID}]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal"/>
+	<field name="REQ_CODE" class="java.lang.String"/>
+	<field name="REQ_NAME" class="java.lang.String"/>
+	<field name="REQUEST_DATE" class="java.lang.String"/>
+	<field name="EXPECTED_DATE" class="java.lang.String"/>
+	<field name="DEPT_NAME" class="java.lang.String"/>
+	<field name="EMP_NAME" class="java.lang.String"/>
+	<field name="STATUS_NAME" class="java.lang.String"/>
+	<field name="REQ_NOTES" class="java.lang.String"/>
+	<pageHeader>
+		<band height="50" splitType="Stretch">
+			<subreport>
+				<reportElement positionType="Float" x="-20" y="0" width="575" height="50" uuid="cc33dd44-0001-0001-0001-000000000001"/>
+				<subreportParameter name="P_COMP_ID">
+					<subreportParameterExpression><![CDATA[$P{P_COMP_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="P_TITLE_REPORT">
+					<subreportParameterExpression><![CDATA[$P{P_TITLE_REPORT}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "HEAD_TITEL_PA.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="110" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="430" y="0" width="125" height="22" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0002-0002-000000000001"/>
+				<box>
+					<pen lineWidth="0.5" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[تاريخ الطلب]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement mode="Opaque" x="280" y="0" width="150" height="22" backcolor="#F0F4FA" uuid="cc33dd44-0002-0002-0002-000000000002"/>
+				<box leftPadding="8" rightPadding="8">
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{REQUEST_DATE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Opaque" x="150" y="0" width="130" height="22" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0002-0002-000000000003"/>
+				<box>
+					<pen lineWidth="0.5" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[رقم الطلب]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement mode="Opaque" x="0" y="0" width="150" height="22" backcolor="#F0F4FA" uuid="cc33dd44-0002-0002-0002-000000000004"/>
+				<box leftPadding="8" rightPadding="8">
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{REQ_CODE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Opaque" x="430" y="22" width="125" height="22" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0002-0002-000000000005"/>
+				<box>
+					<pen lineWidth="0.5" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[بيان الطلب]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement mode="Opaque" x="0" y="22" width="430" height="22" backcolor="#F0F4FA" uuid="cc33dd44-0002-0002-0002-000000000006"/>
+				<box leftPadding="8" rightPadding="8">
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA["\u202B" + ($F{REQ_NAME} == null ? "" : $F{REQ_NAME}) + "\u202C"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Opaque" x="430" y="44" width="125" height="22" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0002-0002-000000000007"/>
+				<box>
+					<pen lineWidth="0.5" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[القسم الطالب]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement mode="Opaque" x="280" y="44" width="150" height="22" backcolor="#F0F4FA" uuid="cc33dd44-0002-0002-0002-000000000008"/>
+				<box leftPadding="8" rightPadding="8">
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA["\u202B" + ($F{DEPT_NAME} == null ? "" : $F{DEPT_NAME}) + "\u202C"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Opaque" x="150" y="44" width="130" height="22" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0002-0002-000000000009"/>
+				<box>
+					<pen lineWidth="0.5" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[الموظف]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement mode="Opaque" x="0" y="44" width="150" height="22" backcolor="#F0F4FA" uuid="cc33dd44-0002-0002-0002-000000000010"/>
+				<box leftPadding="8" rightPadding="8">
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA["\u202B" + ($F{EMP_NAME} == null ? "" : $F{EMP_NAME}) + "\u202C"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Opaque" x="430" y="66" width="125" height="22" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0002-0002-000000000011"/>
+				<box>
+					<pen lineWidth="0.5" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[تاريخ التسليم المتوقع]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement mode="Opaque" x="280" y="66" width="150" height="22" backcolor="#F0F4FA" uuid="cc33dd44-0002-0002-0002-000000000012"/>
+				<box leftPadding="8" rightPadding="8">
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EXPECTED_DATE} == null ? "—" : $F{EXPECTED_DATE}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Opaque" x="150" y="66" width="130" height="22" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0002-0002-000000000013"/>
+				<box>
+					<pen lineWidth="0.5" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[حالة الطلب]]></text>
+			</staticText>
+			<textField isBlankWhenNull="true">
+				<reportElement mode="Opaque" x="0" y="66" width="150" height="22" backcolor="#F0F4FA" uuid="cc33dd44-0002-0002-0002-000000000014"/>
+				<box leftPadding="8" rightPadding="8">
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="IBM Plex Sans Arabic" size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["\u202B" + ($F{STATUS_NAME} == null ? "" : $F{STATUS_NAME}) + "\u202C"]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement mode="Opaque" x="430" y="88" width="125" height="22" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0002-0002-000000000015">
+					<printWhenExpression><![CDATA[$F{REQ_NOTES} != null && $F{REQ_NOTES}.trim().length() > 0]]></printWhenExpression>
+				</reportElement>
+				<box>
+					<pen lineWidth="0.5" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ملاحظات]]></text>
+			</staticText>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement stretchType="ContainerHeight" mode="Opaque" x="0" y="88" width="430" height="22" backcolor="#F0F4FA" uuid="cc33dd44-0002-0002-0002-000000000016">
+					<printWhenExpression><![CDATA[$F{REQ_NOTES} != null && $F{REQ_NOTES}.trim().length() > 0]]></printWhenExpression>
+				</reportElement>
+				<box topPadding="3" leftPadding="8" rightPadding="8">
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Top" markup="none">
+					<font fontName="IBM Plex Sans Arabic" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["\u202B" + ($F{REQ_NOTES} == null ? "" : $F{REQ_NOTES}) + "\u202C"]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="40" splitType="Stretch">
+			<subreport>
+				<reportElement positionType="Float" stretchType="ContainerHeight" x="0" y="0" width="555" height="40" uuid="cc33dd44-0003-0003-0003-000000000001"/>
+				<subreportParameter name="P_REQUEST_ID">
+					<subreportParameterExpression><![CDATA[$P{P_REQUEST_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="SUBREPORT_DIR">
+					<subreportParameterExpression><![CDATA[$P{SUBREPORT_DIR}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "PUR_REQUISITION_DTL_SUB.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="40" splitType="Stretch">
+			<subreport>
+				<reportElement positionType="Float" x="-20" y="0" width="575" height="40" uuid="cc33dd44-0004-0004-0004-000000000001"/>
+				<subreportParameter name="P_USERPRINT">
+					<subreportParameterExpression><![CDATA[$P{P_USERPRINT}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="PAGE_NUMBER">
+					<subreportParameterExpression><![CDATA[$V{PAGE_NUMBER}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "FOOTER_TITEL_PA.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</pageFooter>
+</jasperReport>

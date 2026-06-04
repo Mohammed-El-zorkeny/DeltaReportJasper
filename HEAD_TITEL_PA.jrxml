@@ -13,6 +13,7 @@
 	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Delta"/>
 	<parameter name="P_COMP_ID" class="java.lang.String"/>
+	<parameter name="P_TITLE_REPORT" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[SELECT 
     COMP.NAME_AR AS NAME_AR,
@@ -74,7 +75,7 @@ WHERE COMP.ID = $P{P_COMP_ID}]]>
 		<property name="com.jaspersoft.studio.field.label" value="COMPANY_LOGO_FILE_PATH"/>
 	</field>
 	<columnHeader>
-		<band height="155" splitType="Stretch">
+		<band height="174" splitType="Stretch">
 			<image hAlign="Center" vAlign="Middle" isUsingCache="true" onErrorType="Blank">
 				<reportElement x="240" y="10" width="115" height="100" uuid="e9f4dc77-a1df-404e-ab60-366b8301c4c4"/>
 				<imageExpression><![CDATA[$F{COMPANY_LOGO_FILE_PATH}]]></imageExpression>
@@ -208,11 +209,18 @@ WHERE COMP.ID = $P{P_COMP_ID}]]>
 				<textFieldExpression><![CDATA[($F{EMAIL} == null ? "" : $F{EMAIL}) + "  |  " + ($F{WEB_SITE} == null ? "" : $F{WEB_SITE})]]></textFieldExpression>
 			</textField>
 			<line>
-				<reportElement x="10" y="152" width="575" height="1" uuid="7e23301f-21cd-4450-98ea-56d06e845d00"/>
+				<reportElement x="0" y="173" width="595" height="1" uuid="7e23301f-21cd-4450-98ea-56d06e845d00"/>
 				<graphicElement>
 					<pen lineWidth="1.0" lineColor="#333333"/>
 				</graphicElement>
 			</line>
+			<textField>
+				<reportElement x="97" y="153" width="400" height="20" uuid="26383656-8ed3-41a6-ad4a-2337b008a23a"/>
+				<textElement textAlignment="Center">
+					<font fontName="IBM Plex Sans Arabic" size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{P_TITLE_REPORT}]]></textFieldExpression>
+			</textField>
 		</band>
 	</columnHeader>
 </jasperReport>

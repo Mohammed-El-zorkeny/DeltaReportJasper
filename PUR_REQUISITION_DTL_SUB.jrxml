@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.5.final using JasperReports Library version 6.20.5-3efcf2e67f959db3888d79f73dde2dbd7acb4f8e  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PUR_REQUISITION_DTL_SUB" pageWidth="555" pageHeight="842" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="bb22cc33-dd44-ee55-ff66-778899010203">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Delta"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<parameter name="P_REQUEST_ID" class="java.lang.Long"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT
+    D.ID,
+    D.ITEM_ID,
+    CASE
+        WHEN D.ITEM_ID IS NOT NULL THEN
+            (SELECT ITEM_CODE FROM DBS_STOCK_ITEMS WHERE ID = D.ITEM_ID)
+        ELSE NULL
+    END AS ITEM_CODE,
+    CASE
+        WHEN D.ITEM_ID IS NOT NULL THEN DBS_STOCK_ITEMS_LANG_NAME(D.ITEM_ID, 'AR')
+        ELSE D.NAME
+    END AS ITEM_NAME,
+    D.QTY,
+    SAL_CATEGORY_NAME_LANG(D.CAT_ID, 'AR') AS CAT_NAME,
+    D.NOTES AS DTL_NOTES,
+    (SELECT COUNT(*) FROM STOCK_ITEM_SPECS S
+     WHERE S.TABLE_NAME = 'PUR_REQUISITION_DTL'
+       AND S.ID_FK = D.ID
+       AND S.STATUS = '1') AS SPECS_COUNT
+FROM PUR_REQUISITION_DTL D
+WHERE D.REQUEST_ID = $P{P_REQUEST_ID}
+ORDER BY D.ID]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="ID"/>
+	</field>
+	<field name="ITEM_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="ITEM_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="ITEM_ID"/>
+	</field>
+	<field name="ITEM_CODE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ITEM_CODE"/>
+		<property name="com.jaspersoft.studio.field.label" value="ITEM_CODE"/>
+	</field>
+	<field name="ITEM_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ITEM_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="ITEM_NAME"/>
+	</field>
+	<field name="QTY" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="QTY"/>
+		<property name="com.jaspersoft.studio.field.label" value="QTY"/>
+	</field>
+	<field name="CAT_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="CAT_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="CAT_NAME"/>
+	</field>
+	<field name="DTL_NOTES" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DTL_NOTES"/>
+		<property name="com.jaspersoft.studio.field.label" value="DTL_NOTES"/>
+	</field>
+	<field name="SPECS_COUNT" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="SPECS_COUNT"/>
+		<property name="com.jaspersoft.studio.field.label" value="SPECS_COUNT"/>
+	</field>
+	<variable name="ROW_NUM" class="java.lang.Integer" calculation="Count">
+		<variableExpression><![CDATA[$F{ID}]]></variableExpression>
+	</variable>
+	<columnHeader>
+		<band height="22" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="510" y="0" width="45" height="22" forecolor="#FFFFFF" backcolor="#333333" uuid="bb22cc33-0001-0001-0001-000000000001"/>
+				<box>
+					<pen lineWidth="0.5" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[م]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="430" y="0" width="80" height="22" forecolor="#FFFFFF" backcolor="#333333" uuid="bb22cc33-0001-0001-0001-000000000002"/>
+				<box>
+					<pen lineWidth="0.5" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[الكود]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="200" y="0" width="230" height="22" forecolor="#FFFFFF" backcolor="#333333" uuid="bb22cc33-0001-0001-0001-000000000003"/>
+				<box>
+					<pen lineWidth="0.5" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[الصنف]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="140" y="0" width="60" height="22" forecolor="#FFFFFF" backcolor="#333333" uuid="bb22cc33-0001-0001-0001-000000000004"/>
+				<box>
+					<pen lineWidth="0.5" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[الكمية]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="0" width="140" height="22" forecolor="#FFFFFF" backcolor="#333333" uuid="bb22cc33-0001-0001-0001-000000000005"/>
+				<box>
+					<pen lineWidth="0.5" lineColor="#000000"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10" isBold="true"/>
+				</textElement>
+				<text><![CDATA[التصنيف]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="28" splitType="Stretch">
+			<textField>
+				<reportElement x="510" y="0" width="45" height="28" uuid="bb22cc33-0002-0002-0002-000000000001"/>
+				<box>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{ROW_NUM}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="430" y="0" width="80" height="28" uuid="bb22cc33-0002-0002-0002-000000000002"/>
+				<box>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ITEM_CODE} == null ? "—" : $F{ITEM_CODE}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement stretchType="ContainerHeight" x="200" y="0" width="230" height="28" uuid="bb22cc33-0002-0002-0002-000000000003"/>
+				<box topPadding="3" leftPadding="8" rightPadding="8">
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Top" markup="none">
+					<font fontName="IBM Plex Sans Arabic" size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["\u202B" + ($F{ITEM_NAME} == null ? "" : $F{ITEM_NAME}) + 
+($F{DTL_NOTES} == null || $F{DTL_NOTES}.trim().length() == 0 ? "" : "\n(" + $F{DTL_NOTES} + ")") + "\u202C"]]></textFieldExpression>
+			</textField>
+			<textField pattern="#,##0.##" isBlankWhenNull="true">
+				<reportElement x="140" y="0" width="60" height="28" uuid="bb22cc33-0002-0002-0002-000000000004"/>
+				<box>
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{QTY}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="0" width="140" height="28" uuid="bb22cc33-0002-0002-0002-000000000005"/>
+				<box leftPadding="6" rightPadding="6">
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="IBM Plex Sans Arabic" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["\u202B" + ($F{CAT_NAME} == null ? "" : $F{CAT_NAME}) + "\u202C"]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="16" splitType="Prevent">
+			<printWhenExpression><![CDATA[$F{SPECS_COUNT} != null && $F{SPECS_COUNT}.intValue() > 0]]></printWhenExpression>
+			<staticText>
+				<reportElement mode="Opaque" x="0" y="0" width="555" height="16" backcolor="#F0F4FA" uuid="bb22cc33-0003-0003-0003-000000000001"/>
+				<box leftPadding="10" rightPadding="10">
+					<pen lineWidth="0.5" lineColor="#999999"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[المواصفات الفنية :]]></text>
+			</staticText>
+		</band>
+		<band height="20" splitType="Prevent">
+			<printWhenExpression><![CDATA[$F{SPECS_COUNT} != null && $F{SPECS_COUNT}.intValue() > 0]]></printWhenExpression>
+			<subreport>
+				<reportElement positionType="Float" stretchType="ContainerHeight" x="0" y="0" width="555" height="20" uuid="bb22cc33-0004-0004-0004-000000000001"/>
+				<subreportParameter name="P_DTL_ID">
+					<subreportParameterExpression><![CDATA[$F{ID}.longValue()]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "STOCK_ITEM_SPECS_SUB.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+		<band height="8" splitType="Stretch">
+			<line>
+				<reportElement x="0" y="6" width="555" height="1" uuid="bb22cc33-0005-0005-0005-000000000001"/>
+				<graphicElement>
+					<pen lineWidth="0.5" lineStyle="Dashed" lineColor="#CCCCCC"/>
+				</graphicElement>
+			</line>
+		</band>
+	</detail>
+</jasperReport>

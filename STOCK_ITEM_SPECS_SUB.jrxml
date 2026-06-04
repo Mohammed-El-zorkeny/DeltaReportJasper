@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.5.final using JasperReports Library version 6.20.5-3efcf2e67f959db3888d79f73dde2dbd7acb4f8e  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="STOCK_ITEM_SPECS_SUB" pageWidth="555" pageHeight="842" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="aa11bb22-cc33-dd44-ee55-ff6677889901">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Delta"/>
+
+	<parameter name="P_DTL_ID" class="java.lang.Long"/>
+
+	<queryString>
+		<![CDATA[SELECT
+    CASE WHEN UPPER('AR') = 'AR'
+         THEN NVL(S.ARABIC_NAME, S.NAME)
+         ELSE NVL(S.NAME, S.ARABIC_NAME)
+    END AS SPEC_NAME,
+    S.NOTES AS SPEC_NOTES
+FROM STOCK_ITEM_SPECS S
+WHERE S.TABLE_NAME = 'PUR_REQUISITION_DTL'
+  AND S.ID_FK      = $P{P_DTL_ID}
+  AND S.STATUS     = '1'
+ORDER BY NVL(S.SORT_ORDER, 999), S.ID]]>
+	</queryString>
+
+	<field name="SPEC_NAME" class="java.lang.String"/>
+	<field name="SPEC_NOTES" class="java.lang.String"/>
+
+	<detail>
+		<band height="18" splitType="Stretch">
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement positionType="Float" stretchType="ContainerHeight" x="0" y="0" width="555" height="18" uuid="aa11bb22-0001-0001-0001-000000000001"/>
+				<box leftPadding="25" rightPadding="10"/>
+				<textElement textAlignment="Right" verticalAlignment="Top" markup="none">
+					<font fontName="IBM Plex Sans Arabic" size="9" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA["\u202B" + "• " + ($F{SPEC_NAME} == null ? "" : $F{SPEC_NAME}) + 
+($F{SPEC_NOTES} == null || $F{SPEC_NOTES}.trim().length() == 0 ? "" : " : " + $F{SPEC_NOTES}) + "\u202C"]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+
+</jasperReport>
