@@ -222,47 +222,7 @@ ORDER BY A.ATTENDANCE_DATE DESC, E.FULL_NAME_AR ASC]]>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "م" : "Seq"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement mode="Opaque" x="652" y="1" width="150" height="18" backcolor="#EAF2F8" uuid="cc33dd44-0001-0002-0001-000000000001"/>
-				<box>
-					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "الموقع" : "Site"]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement x="652" y="19" width="150" height="18" uuid="cc33dd44-0001-0003-0001-000000000001"/>
-				<box>
-					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{P_SITE_ID} != null ? String.valueOf($P{P_SITE_ID}) : ("ar".equals($P{P_LANG}) ? "الكل" : "All")]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement x="502" y="19" width="150" height="18" uuid="cc33dd44-0001-0003-0001-000000000002"/>
-				<box>
-					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{P_SHIFT_ID} != null ? String.valueOf($P{P_SHIFT_ID}) : ("ar".equals($P{P_LANG}) ? "الكل" : "All")]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement mode="Opaque" x="502" y="1" width="150" height="18" backcolor="#EAF2F8" uuid="cc33dd44-0001-0002-0001-000000000002"/>
-				<box>
-					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "الوردية" : "Shift"]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement mode="Opaque" x="352" y="1" width="150" height="18" backcolor="#EAF2F8" uuid="cc33dd44-0001-0002-0001-000000000003"/>
+				<reportElement mode="Opaque" x="552" y="1" width="250" height="18" backcolor="#EAF2F8" uuid="cc33dd44-0001-0002-0001-000000000003"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 				</box>
@@ -272,27 +232,27 @@ ORDER BY A.ATTENDANCE_DATE DESC, E.FULL_NAME_AR ASC]]>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "الموظف" : "Employee"]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="352" y="19" width="150" height="18" uuid="cc33dd44-0001-0003-0001-000000000003"/>
+				<reportElement x="552" y="19" width="250" height="18" uuid="cc33dd44-0001-0003-0001-000000000003"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{P_EMPLOYEE_ID} != null ? String.valueOf($P{P_EMPLOYEE_ID}) : ("ar".equals($P{P_LANG}) ? "الكل" : "All")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{P_EMPLOYEE_ID} != null ? String.valueOf($P{P_EMPLOYEE_ID}) : ("ar".equals($P{P_LANG}) ? "الجميع" : "All")]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="202" y="19" width="150" height="18" uuid="cc33dd44-0001-0003-0001-000000000004"/>
+				<reportElement x="302" y="19" width="250" height="18" uuid="cc33dd44-0001-0003-0001-000000000004"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{P_DEPARTMENT_ID} != null ? String.valueOf($P{P_DEPARTMENT_ID}) : ("ar".equals($P{P_LANG}) ? "الكل" : "All")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{P_DEPARTMENT_ID} != null ? String.valueOf($P{P_DEPARTMENT_ID}) : ("ar".equals($P{P_LANG}) ? "الجميع" : "All")]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement mode="Opaque" x="202" y="1" width="150" height="18" backcolor="#EAF2F8" uuid="cc33dd44-0001-0002-0001-000000000004"/>
+				<reportElement mode="Opaque" x="302" y="1" width="250" height="18" backcolor="#EAF2F8" uuid="cc33dd44-0001-0002-0001-000000000004"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 				</box>
@@ -302,21 +262,21 @@ ORDER BY A.ATTENDANCE_DATE DESC, E.FULL_NAME_AR ASC]]>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "القسم" : "Department"]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="0" y="19" width="202" height="18" uuid="cc33dd44-0001-0003-0001-000000000005"/>
+				<reportElement x="0" y="19" width="302" height="18" uuid="cc33dd44-0001-0003-0001-000000000005"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[($P{P_FROM_DATE} == null && $P{P_TO_DATE} == null) ? ("ar".equals($P{P_LANG}) ? "الكل" : "All") : 
+				<textFieldExpression><![CDATA[($P{P_FROM_DATE} == null && $P{P_TO_DATE} == null) ? ("ar".equals($P{P_LANG}) ? "الجميع" : "All") : 
 (
   ($P{P_FROM_DATE} != null ? ("ar".equals($P{P_LANG}) ? "من " : "From ") + $P{P_FROM_DATE} : "") + 
   ($P{P_TO_DATE} != null ? ("ar".equals($P{P_LANG}) ? " إلى " : " to ") + $P{P_TO_DATE} : "")
 )]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement mode="Opaque" x="0" y="1" width="202" height="18" backcolor="#EAF2F8" uuid="cc33dd44-0001-0002-0001-000000000005"/>
+				<reportElement mode="Opaque" x="0" y="1" width="302" height="18" backcolor="#EAF2F8" uuid="cc33dd44-0001-0002-0001-000000000005"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 				</box>
