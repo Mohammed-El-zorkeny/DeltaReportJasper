@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.5.final using JasperReports Library version 6.20.5-3efcf2e67f959db3888d79f73dde2dbd7acb4f8e  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="FOOTER_TITEL_PA_LAND" columnDirection="RTL" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="842" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="b252926c-8240-4ad7-82e4-dc6d0e7a5333">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<parameter name="P_USERPRINT" class="java.lang.String">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_LANG" class="java.lang.String">
+		<defaultValueExpression><![CDATA["ar"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT 1 AS DUMMY FROM DUAL]]>
+	</queryString>
+	<field name="DUMMY" class="java.math.BigDecimal"/>
+	<pageFooter>
+		<band height="30" splitType="Stretch">
+			<!-- Top horizontal divider line spanning 842 -->
+			<line>
+				<reportElement x="10" y="2" width="822" height="1" uuid="7e23301f-21cd-4450-98ea-56d06e845e01"/>
+				<graphicElement>
+					<pen lineWidth="1.0" lineColor="#333333"/>
+				</graphicElement>
+			</line>
+			<!-- Center: Dynamic Date & Time based on P_LANG (width 350, centered at x=246) -->
+			<textField isBlankWhenNull="true">
+				<reportElement x="246" y="10" width="350" height="20" uuid="c1111111-0002-0002-0002-000000000020"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="IBM Plex Sans Arabic" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["\u202B" + ("ar".equals($P{P_LANG}) ? new java.text.SimpleDateFormat("EEEE  dd/MM/yyyy  -  hh:mm a", new java.util.Locale("ar")).format(new java.util.Date()) : new java.text.SimpleDateFormat("EEEE  dd/MM/yyyy  -  hh:mm a", java.util.Locale.ENGLISH).format(new java.util.Date())) + "\u202C"]]></textFieldExpression>
+			</textField>
+			<!-- Right side: Print User (width 226, x=606) -->
+			<textField isBlankWhenNull="true">
+				<reportElement x="606" y="10" width="226" height="20" uuid="c1111111-0003-0003-0003-000000000030"/>
+				<box rightPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
+					<font fontName="IBM Plex Sans Arabic" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["\u202B" + ("ar".equals($P{P_LANG}) ? "مستخدم الطباعة : " : "Printed By: ") + ($P{P_USERPRINT} == null ? "" : $P{P_USERPRINT}) + "\u202C"]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>
