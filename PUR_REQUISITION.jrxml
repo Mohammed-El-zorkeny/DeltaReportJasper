@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.20.5.final using JasperReports Library version 6.20.5-3efcf2e67f959db3888d79f73dde2dbd7acb4f8e  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PUR_REQUISITION" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="cc33dd44-ee55-ff66-7788-990102030405">
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Delta"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GSPLUS"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
-	<parameter name="P_REQUEST_ID" class="java.lang.Long"/>
+	<parameter name="P_REQUEST_ID" class="java.lang.String"/>
 	<parameter name="P_COMP_ID" class="java.lang.String"/>
 	<parameter name="P_USERPRINT" class="java.lang.String">
 		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
@@ -50,7 +50,7 @@ WHERE R.ID = $P{P_REQUEST_ID}]]>
 					<subreportParameterExpression><![CDATA[$P{P_TITLE_REPORT}]]></subreportParameterExpression>
 				</subreportParameter>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "HEAD_TITEL_PA.jasper"]]></subreportExpression>
+				<subreportExpression><![CDATA["HEAD_TITEL_PA.jasper"]]></subreportExpression>
 			</subreport>
 		</band>
 	</pageHeader>
@@ -231,7 +231,7 @@ WHERE R.ID = $P{P_REQUEST_ID}]]>
 					<subreportParameterExpression><![CDATA[$P{SUBREPORT_DIR}]]></subreportParameterExpression>
 				</subreportParameter>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "PUR_REQUISITION_DTL_SUB.jasper"]]></subreportExpression>
+				<subreportExpression><![CDATA["PUR_REQUISITION_DTL_SUB.jasper"]]></subreportExpression>
 			</subreport>
 		</band>
 	</detail>
@@ -246,7 +246,7 @@ WHERE R.ID = $P{P_REQUEST_ID}]]>
 					<subreportParameterExpression><![CDATA[$V{PAGE_NUMBER}]]></subreportParameterExpression>
 				</subreportParameter>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "FOOTER_TITEL_PA.jasper"]]></subreportExpression>
+				<subreportExpression><![CDATA["FOOTER_TITEL_PA.jasper"]]></subreportExpression>
 			</subreport>
 		</band>
 	</pageFooter>

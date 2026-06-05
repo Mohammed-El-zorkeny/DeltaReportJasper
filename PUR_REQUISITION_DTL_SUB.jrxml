@@ -3,10 +3,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PUR_REQUISITION_DTL_SUB" pageWidth="555" pageHeight="842" columnWidth="555" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="bb22cc33-dd44-ee55-ff66-778899010203">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Delta"/>
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<parameter name="P_REQUEST_ID" class="java.lang.Long"/>
-	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
-		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
-	</parameter>
+	<parameter name="P_REQUEST_ID" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[SELECT
     D.ID,
@@ -195,7 +192,7 @@ ORDER BY D.ID]]>
 					<subreportParameterExpression><![CDATA[$F{ID}.longValue()]]></subreportParameterExpression>
 				</subreportParameter>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "STOCK_ITEM_SPECS_SUB.jasper"]]></subreportExpression>
+				<subreportExpression><![CDATA["STOCK_ITEM_SPECS_SUB.jasper"]]></subreportExpression>
 			</subreport>
 		</band>
 		<band height="8" splitType="Stretch">
