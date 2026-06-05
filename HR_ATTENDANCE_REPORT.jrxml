@@ -16,11 +16,11 @@
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
 	</parameter>
-	<parameter name="P_EMPLOYEE_ID" class="java.lang.Long"/>
-	<parameter name="P_DEPARTMENT_ID" class="java.lang.Long"/>
-	<parameter name="P_SHIFT_ID" class="java.lang.Long"/>
-	<parameter name="P_SITE_ID" class="java.lang.Long"/>
-	<parameter name="P_EMPLOYEE_CATEGORY_ID" class="java.lang.Long"/>
+	<parameter name="P_EMPLOYEE_ID" class="java.lang.String"/>
+	<parameter name="P_DEPARTMENT_ID" class="java.lang.String"/>
+	<parameter name="P_SHIFT_ID" class="java.lang.String"/>
+	<parameter name="P_SITE_ID" class="java.lang.String"/>
+	<parameter name="P_EMPLOYEE_CATEGORY_ID" class="java.lang.String"/>
 	<parameter name="P_FROM_DATE" class="java.lang.String"/>
 	<parameter name="P_TO_DATE" class="java.lang.String"/>
 	<parameter name="P_CHECK_TIME" class="java.lang.String"/>
