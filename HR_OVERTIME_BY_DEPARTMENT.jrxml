@@ -1,0 +1,391 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.5.final using JasperReports Library version 6.20.5-3efcf2e67f959db3888d79f73dde2dbd7acb4f8e  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HR_OVERTIME_BY_DEPARTMENT" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="15" bottomMargin="15" uuid="e2f3a4b5-c6d7-4e8f-90ab-1234567890cd">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Delta"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<parameter name="P_LANG" class="java.lang.String">
+		<defaultValueExpression><![CDATA["ar"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_COMP_ID" class="java.lang.String"/>
+	<parameter name="P_USERPRINT" class="java.lang.String">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_EMPLOYEE_ID" class="java.lang.String"/>
+	<parameter name="P_DEPARTMENT_ID" class="java.lang.String"/>
+	<parameter name="P_SHIFT_ID" class="java.lang.String"/>
+	<parameter name="P_SITE_ID" class="java.lang.String"/>
+	<parameter name="P_FROM_DATE" class="java.lang.String"/>
+	<parameter name="P_TO_DATE" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[SELECT
+    A.EMPLOYEE_CODE,
+    A.EMPLOYEE_ID,
+    A.DEPARTMENT_ID,
+    A.ATTENDANCE_DATE,
+    TO_CHAR(A.CHECK_IN_TIME,  'HH12:MI PM')    AS CHECK_IN_TIME,
+    TO_CHAR(A.CHECK_OUT_TIME, 'HH12:MI PM')    AS CHECK_OUT_TIME,
+    A.OT_DAYS_250_CALCULATED,
+    A.OT_DAYS_400_CALCULATED,
+    A.OVERTIME_DAYS_CALCULATED,
+    DECODE($P{P_LANG}, 'ar', E.FULL_NAME_AR, E.FULL_NAME_EN) AS EMPLOYEE_NAME,
+    DECODE($P{P_LANG}, 'ar', D.ARABIC_NAME, D.NAME) AS DEPARTMENT_NAME
+FROM VW_OVERTIME_LOG A
+LEFT JOIN HR_EMPLOYEES E ON E.EMPLOYEE_ID = A.EMPLOYEE_ID
+LEFT JOIN HR_DEPARTMENT D ON D.ID = A.DEPARTMENT_ID
+WHERE A.WORK_SHIFT_TYPE_ID = 2
+  AND NVL(A.OVERTIME_HOURS_ACTUAL, 0)     > 0
+  AND ($P{P_EMPLOYEE_ID}          IS NULL OR A.EMPLOYEE_ID          = $P{P_EMPLOYEE_ID})
+  AND ($P{P_DEPARTMENT_ID}        IS NULL OR A.DEPARTMENT_ID        = $P{P_DEPARTMENT_ID})
+  AND ($P{P_SHIFT_ID}             IS NULL OR A.SHIFT_ID             = $P{P_SHIFT_ID})
+  AND ($P{P_SITE_ID}              IS NULL OR A.SITES_ID             = $P{P_SITE_ID})
+  AND ($P{P_FROM_DATE}            IS NULL OR A.ATTENDANCE_DATE >= TO_DATE($P{P_FROM_DATE}, 'DD-MM-YYYY'))
+  AND ($P{P_TO_DATE}              IS NULL OR A.ATTENDANCE_DATE <= TO_DATE($P{P_TO_DATE},   'DD-MM-YYYY'))
+ORDER BY D.ARABIC_NAME ASC, E.FULL_NAME_AR ASC, A.ATTENDANCE_DATE ASC]]>
+	</queryString>
+	<field name="EMPLOYEE_CODE" class="java.lang.String"/>
+	<field name="EMPLOYEE_ID" class="java.math.BigDecimal"/>
+	<field name="DEPARTMENT_ID" class="java.math.BigDecimal"/>
+	<field name="ATTENDANCE_DATE" class="java.sql.Timestamp"/>
+	<field name="CHECK_IN_TIME" class="java.lang.String"/>
+	<field name="CHECK_OUT_TIME" class="java.lang.String"/>
+	<field name="OT_DAYS_250_CALCULATED" class="java.math.BigDecimal"/>
+	<field name="OT_DAYS_400_CALCULATED" class="java.math.BigDecimal"/>
+	<field name="OVERTIME_DAYS_CALCULATED" class="java.math.BigDecimal"/>
+	<field name="EMPLOYEE_NAME" class="java.lang.String"/>
+	<field name="DEPARTMENT_NAME" class="java.lang.String"/>
+	<variable name="ROW_NUM" class="java.lang.Integer" resetType="Group" resetGroup="DepartmentGroup" calculation="Count">
+		<variableExpression><![CDATA[$F{EMPLOYEE_ID}]]></variableExpression>
+	</variable>
+	<variable name="VAL_OT_250_SUM" class="java.math.BigDecimal" resetType="Group" resetGroup="EmployeeGroup" calculation="Sum">
+		<variableExpression><![CDATA[$F{OT_DAYS_250_CALCULATED}]]></variableExpression>
+	</variable>
+	<variable name="VAL_OT_400_SUM" class="java.math.BigDecimal" resetType="Group" resetGroup="EmployeeGroup" calculation="Sum">
+		<variableExpression><![CDATA[$F{OT_DAYS_400_CALCULATED}]]></variableExpression>
+	</variable>
+	<variable name="VAL_OT_TOTAL_SUM" class="java.math.BigDecimal" resetType="Group" resetGroup="EmployeeGroup" calculation="Sum">
+		<variableExpression><![CDATA[$F{OVERTIME_DAYS_CALCULATED}]]></variableExpression>
+	</variable>
+	<group name="DepartmentGroup">
+		<groupExpression><![CDATA[$F{DEPARTMENT_NAME}]]></groupExpression>
+		<groupHeader>
+			<band height="25" splitType="Stretch">
+				<textField isBlankWhenNull="true">
+					<reportElement mode="Opaque" x="0" y="5" width="802" height="20" backcolor="#EAF2F8" uuid="cc33dd44-0006-0001-0001-000000000002"/>
+					<box leftPadding="5" rightPadding="5">
+						<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{DEPARTMENT_NAME} == null ? ("ar".equals($P{P_LANG}) ? "قسم غير محدد" : "Unspecified Department") : $F{DEPARTMENT_NAME}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
+	<group name="EmployeeGroup">
+		<groupExpression><![CDATA[$F{EMPLOYEE_ID}]]></groupExpression>
+		<groupFooter>
+			<band height="20" splitType="Stretch">
+				<frame>
+					<reportElement mode="Opaque" x="0" y="0" width="802" height="20" backcolor="#F9F9F9" uuid="cc33dd44-0006-0002-0001-000000000001"/>
+					<box>
+						<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+					</box>
+					<textField>
+						<reportElement x="330" y="0" width="472" height="20" uuid="cc33dd44-0006-0002-0001-000000000002"/>
+						<box rightPadding="10"/>
+						<textElement textAlignment="Right" verticalAlignment="Middle">
+							<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
+						</textElement>
+						<textFieldExpression><![CDATA[("ar".equals($P{P_LANG}) ? "إجمالي الموظف: " : "Employee Total: ") + ($F{EMPLOYEE_NAME} != null ? $F{EMPLOYEE_NAME} : "")]]></textFieldExpression>
+					</textField>
+					<textField isBlankWhenNull="true">
+						<reportElement mode="Opaque" x="220" y="0" width="110" height="20" backcolor="#EAFAF1" uuid="cc33dd44-0006-0002-0001-000000000003"/>
+						<box>
+							<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+						</box>
+						<textElement textAlignment="Center" verticalAlignment="Middle">
+							<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$V{VAL_OT_250_SUM} == null ? BigDecimal.ZERO : $V{VAL_OT_250_SUM}]]></textFieldExpression>
+					</textField>
+					<textField isBlankWhenNull="true">
+						<reportElement mode="Opaque" x="110" y="0" width="110" height="20" backcolor="#EAFAF1" uuid="cc33dd44-0006-0002-0001-000000000004"/>
+						<box>
+							<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+						</box>
+						<textElement textAlignment="Center" verticalAlignment="Middle">
+							<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$V{VAL_OT_400_SUM} == null ? BigDecimal.ZERO : $V{VAL_OT_400_SUM}]]></textFieldExpression>
+					</textField>
+					<textField isBlankWhenNull="true">
+						<reportElement mode="Opaque" x="0" y="0" width="110" height="20" backcolor="#D4EFDF" uuid="cc33dd44-0006-0002-0001-000000000005"/>
+						<box>
+							<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+						</box>
+						<textElement textAlignment="Center" verticalAlignment="Middle">
+							<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
+						</textElement>
+						<textFieldExpression><![CDATA[$V{VAL_OT_TOTAL_SUM} == null ? BigDecimal.ZERO : $V{VAL_OT_TOTAL_SUM}]]></textFieldExpression>
+					</textField>
+				</frame>
+			</band>
+		</groupFooter>
+	</group>
+	<pageHeader>
+		<band height="50" splitType="Stretch">
+			<subreport>
+				<reportElement positionType="Float" x="-20" y="0" width="842" height="50" uuid="cc33dd44-0001-0001-0001-000000000001"/>
+				<subreportParameter name="P_COMP_ID">
+					<subreportParameterExpression><![CDATA[$P{P_COMP_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="P_TITLE_REPORT">
+					<subreportParameterExpression><![CDATA["ar".equals($P{P_LANG}) ? "تقرير العمل الإضافي حسب القسم" : "Overtime Report by Department"]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "HEAD_TITEL_PA_LAND.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="65" splitType="Stretch">
+			<textField>
+				<reportElement mode="Opaque" x="552" y="1" width="250" height="18" backcolor="#EAF2F8" uuid="cc33dd44-0001-0002-0001-000000000003"/>
+				<box>
+					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "الموظف" : "Employee"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="552" y="19" width="250" height="18" uuid="cc33dd44-0001-0003-0001-000000000003"/>
+				<box>
+					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{P_EMPLOYEE_ID} != null ? String.valueOf($P{P_EMPLOYEE_ID}) : ("ar".equals($P{P_LANG}) ? "الجميع" : "All")]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="302" y="19" width="250" height="18" uuid="cc33dd44-0001-0003-0001-000000000004"/>
+				<box>
+					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{P_DEPARTMENT_ID} != null ? String.valueOf($P{P_DEPARTMENT_ID}) : ("ar".equals($P{P_LANG}) ? "الجميع" : "All")]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Opaque" x="302" y="1" width="250" height="18" backcolor="#EAF2F8" uuid="cc33dd44-0001-0002-0001-000000000004"/>
+				<box>
+					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "القسم" : "Department"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="19" width="302" height="18" uuid="cc33dd44-0001-0003-0001-000000000005"/>
+				<box>
+					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($P{P_FROM_DATE} == null && $P{P_TO_DATE} == null) ? ("ar".equals($P{P_LANG}) ? "الجميع" : "All") : 
+(
+  ($P{P_FROM_DATE} != null ? ("ar".equals($P{P_LANG}) ? "من " : "From ") + $P{P_FROM_DATE} : "") + 
+  ($P{P_TO_DATE} != null ? ("ar".equals($P{P_LANG}) ? " إلى " : " to ") + $P{P_TO_DATE} : "")
+)]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Opaque" x="0" y="1" width="302" height="18" backcolor="#EAF2F8" uuid="cc33dd44-0001-0002-0001-000000000005"/>
+				<box>
+					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "الفترة" : "Period"]]></textFieldExpression>
+			</textField>
+			
+			<textField>
+				<reportElement mode="Opaque" x="0" y="40" width="110" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000002"/>
+				<box><pen lineWidth="0.5" lineColor="#000000"/></box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "أيام الإضافي المحتسبة" : "OT Days Calc"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Opaque" x="110" y="40" width="110" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000003"/>
+				<box><pen lineWidth="0.5" lineColor="#000000"/></box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "أيام إضافي 400%" : "OT Days 400 Calc"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Opaque" x="220" y="40" width="110" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000004"/>
+				<box><pen lineWidth="0.5" lineColor="#000000"/></box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "أيام إضافي 250%" : "OT Days 250 Calc"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Opaque" x="330" y="40" width="74" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000005"/>
+				<box><pen lineWidth="0.5" lineColor="#000000"/></box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "الانصراف" : "Check Out"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Opaque" x="404" y="40" width="73" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000006"/>
+				<box><pen lineWidth="0.5" lineColor="#000000"/></box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "الحضور" : "Check In"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Opaque" x="477" y="40" width="90" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000007"/>
+				<box><pen lineWidth="0.5" lineColor="#000000"/></box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "التاريخ" : "Date"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Opaque" x="567" y="40" width="160" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000008"/>
+				<box><pen lineWidth="0.5" lineColor="#000000"/></box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "اسم الموظف" : "Employee Name"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Opaque" x="727" y="40" width="50" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000009"/>
+				<box><pen lineWidth="0.5" lineColor="#000000"/></box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "الكود" : "Code"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Opaque" x="777" y="40" width="25" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000010"/>
+				<box><pen lineWidth="0.5" lineColor="#000000"/></box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "م" : "Seq"]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="18" splitType="Stretch">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement stretchType="ContainerHeight" x="0" y="0" width="110" height="18" uuid="cc33dd44-0003-0001-0001-000000000002"/>
+				<box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{OVERTIME_DAYS_CALCULATED} == null || $F{OVERTIME_DAYS_CALCULATED}.doubleValue() == 0 ? "—" : $F{OVERTIME_DAYS_CALCULATED}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement stretchType="ContainerHeight" x="110" y="0" width="110" height="18" uuid="cc33dd44-0003-0001-0001-000000000003"/>
+				<box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{OT_DAYS_400_CALCULATED} == null || $F{OT_DAYS_400_CALCULATED}.doubleValue() == 0 ? "—" : $F{OT_DAYS_400_CALCULATED}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement stretchType="ContainerHeight" x="220" y="0" width="110" height="18" uuid="cc33dd44-0003-0001-0001-000000000004"/>
+				<box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{OT_DAYS_250_CALCULATED} == null || $F{OT_DAYS_250_CALCULATED}.doubleValue() == 0 ? "—" : $F{OT_DAYS_250_CALCULATED}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement stretchType="ContainerHeight" x="330" y="0" width="74" height="18" uuid="cc33dd44-0003-0001-0001-000000000005"/>
+				<box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CHECK_OUT_TIME} == null ? "—" : $F{CHECK_OUT_TIME}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement stretchType="ContainerHeight" x="404" y="0" width="73" height="18" uuid="cc33dd44-0003-0001-0001-000000000006"/>
+				<box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CHECK_IN_TIME} == null ? "—" : $F{CHECK_IN_TIME}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement stretchType="ContainerHeight" x="477" y="0" width="90" height="18" uuid="cc33dd44-0003-0001-0001-000000000007"/>
+				<box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{ATTENDANCE_DATE} == null ? "" : new java.text.SimpleDateFormat("dd/MM/yyyy").format($F{ATTENDANCE_DATE})]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement stretchType="ContainerHeight" x="567" y="0" width="160" height="18" uuid="cc33dd44-0003-0001-0001-000000000008"/>
+				<box topPadding="2" leftPadding="4" bottomPadding="2" rightPadding="4">
+					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMPLOYEE_NAME} == null ? "" : $F{EMPLOYEE_NAME}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement stretchType="ContainerHeight" x="727" y="0" width="50" height="18" uuid="cc33dd44-0003-0001-0001-000000000009"/>
+				<box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{EMPLOYEE_CODE}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement stretchType="ContainerHeight" x="777" y="0" width="25" height="18" uuid="cc33dd44-0003-0001-0001-000000000010"/>
+				<box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{ROW_NUM}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="30" splitType="Stretch">
+			<subreport>
+				<reportElement positionType="Float" x="-20" y="0" width="842" height="30" uuid="cc33dd44-0004-0001-0001-000000000001"/>
+				<subreportParameter name="P_USERPRINT">
+					<subreportParameterExpression><![CDATA[$P{P_USERPRINT}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="P_LANG">
+					<subreportParameterExpression><![CDATA[$P{P_LANG}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "FOOTER_TITEL_PA_LAND.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</pageFooter>
+</jasperReport>
