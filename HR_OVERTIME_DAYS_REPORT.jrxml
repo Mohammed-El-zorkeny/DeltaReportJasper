@@ -206,7 +206,7 @@ ORDER BY E.FULL_NAME_AR ASC, A.ATTENDANCE_DATE ASC]]>
 								<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 							</box>
 							<textField>
-								<reportElement x="0" y="0" width="35" height="25" uuid="cc33dd44-0005-0003-0001-000000000002"/>
+								<reportElement x="0" y="0" width="80" height="25" uuid="cc33dd44-0005-0003-0001-000000000002"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
 								</textElement>
@@ -232,13 +232,13 @@ ORDER BY E.FULL_NAME_AR ASC, A.ATTENDANCE_DATE ASC]]>
 				<measure name="OVERTIME_DAYS_CALCULATED_MEASURE" class="java.math.BigDecimal" calculation="Sum">
 					<measureExpression><![CDATA[$F{OVERTIME_DAYS_CALCULATED}]]></measureExpression>
 				</measure>
-				<crosstabCell width="35" height="20">
+				<crosstabCell width="80" height="20">
 					<cellContents mode="Opaque">
 						<box>
 							<pen lineWidth="0.5" lineColor="#E5E8E8"/>
 						</box>
 						<textField isBlankWhenNull="true">
-							<reportElement x="0" y="0" width="35" height="20" uuid="cc33dd44-0005-0004-0001-000000000002"/>
+							<reportElement x="0" y="0" width="80" height="20" uuid="cc33dd44-0005-0004-0001-000000000002"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font fontName="IBM Plex Sans Arabic" size="8"/>
 							</textElement>
