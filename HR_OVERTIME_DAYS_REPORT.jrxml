@@ -28,7 +28,9 @@
     A.EMPLOYEE_ID,
     DECODE($P{P_LANG}, 'ar', E.FULL_NAME_AR, E.FULL_NAME_EN) AS EMPLOYEE_NAME,
     A.ATTENDANCE_DATE,
-    A.OVERTIME_DAYS_CALCULATED
+    A.OVERTIME_DAYS_CALCULATED,
+    (SELECT DECODE($P{P_LANG}, 'ar', E2.FULL_NAME_AR, E2.FULL_NAME_EN) FROM HR_EMPLOYEES E2 WHERE E2.EMPLOYEE_ID = $P{P_EMPLOYEE_ID}) AS SELECTED_EMPLOYEE_NAME,
+    (SELECT DECODE($P{P_LANG}, 'ar', D2.ARABIC_NAME, D2.NAME) FROM HR_DEPARTMENT D2 WHERE D2.ID = $P{P_DEPARTMENT_ID}) AS SELECTED_DEPARTMENT_NAME
 FROM VW_OVERTIME_LOG A
 LEFT JOIN HR_EMPLOYEES E ON E.EMPLOYEE_ID = A.EMPLOYEE_ID
 WHERE A.WORK_SHIFT_TYPE_ID = 2
@@ -53,6 +55,8 @@ ORDER BY E.FULL_NAME_AR ASC, A.ATTENDANCE_DATE ASC]]>
 	<field name="EMPLOYEE_NAME" class="java.lang.String"/>
 	<field name="ATTENDANCE_DATE" class="java.sql.Timestamp"/>
 	<field name="OVERTIME_DAYS_CALCULATED" class="java.math.BigDecimal"/>
+	<field name="SELECTED_EMPLOYEE_NAME" class="java.lang.String"/>
+	<field name="SELECTED_DEPARTMENT_NAME" class="java.lang.String"/>
 	<pageHeader>
 		<band height="50" splitType="Stretch">
 			<subreport>
@@ -88,7 +92,7 @@ ORDER BY E.FULL_NAME_AR ASC, A.ATTENDANCE_DATE ASC]]>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{P_EMPLOYEE_ID} != null ? String.valueOf($P{P_EMPLOYEE_ID}) : ("ar".equals($P{P_LANG}) ? "الجميع" : "All")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{SELECTED_EMPLOYEE_NAME} != null ? $F{SELECTED_EMPLOYEE_NAME} : ("ar".equals($P{P_LANG}) ? "الجميع" : "All")]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="302" y="19" width="250" height="18" uuid="cc33dd44-0001-0003-0001-000000000004"/>
@@ -98,7 +102,7 @@ ORDER BY E.FULL_NAME_AR ASC, A.ATTENDANCE_DATE ASC]]>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{P_DEPARTMENT_ID} != null ? String.valueOf($P{P_DEPARTMENT_ID}) : ("ar".equals($P{P_LANG}) ? "الجميع" : "All")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{SELECTED_DEPARTMENT_NAME} != null ? $F{SELECTED_DEPARTMENT_NAME} : ("ar".equals($P{P_LANG}) ? "الجميع" : "All")]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement mode="Opaque" x="302" y="1" width="250" height="18" backcolor="#EAF2F8" uuid="cc33dd44-0001-0002-0001-000000000004"/>
@@ -270,4 +274,33 @@ ORDER BY E.FULL_NAME_AR ASC, A.ATTENDANCE_DATE ASC]]>
 			</crosstab>
 		</band>
 	</summary>
+	<pageFooter>
+		<band height="30" splitType="Stretch">
+			<subreport>
+				<reportElement positionType="Float" x="-20" y="0" width="842" height="30" uuid="cc33dd44-0004-0001-0001-000000000001"/>
+				<subreportParameter name="P_USERPRINT">
+					<subreportParameterExpression><![CDATA[$P{P_USERPRINT}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="P_LANG">
+					<subreportParameterExpression><![CDATA[$P{P_LANG}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "FOOTER_TITEL_PA_LAND.jasper"]]></subreportExpression>
+			</subreport>
+			<textField>
+				<reportElement positionType="Float" x="0" y="10" width="150" height="20" uuid="cc33dd44-0004-0002-0001-000000000002"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "صفحة " + $V{PAGE_NUMBER} + " من " : "Page " + $V{PAGE_NUMBER} + " of "]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement positionType="Float" x="150" y="10" width="50" height="20" uuid="cc33dd44-0004-0002-0001-000000000003"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
 </jasperReport>
