@@ -136,7 +136,7 @@ ORDER BY E.FULL_NAME_AR ASC, A.ATTENDANCE_DATE ASC]]>
 				<crosstabParameter name="P_LANG" class="java.lang.String">
 					<parameterValueExpression><![CDATA[$P{P_LANG}]]></parameterValueExpression>
 				</crosstabParameter>
-				<crosstabHeader>
+				<crosstabHeaderCell>
 					<cellContents mode="Opaque" backcolor="#1F4E79">
 						<box>
 							<pen lineWidth="0.5" lineColor="#BDC3C7"/>
@@ -156,7 +156,7 @@ ORDER BY E.FULL_NAME_AR ASC, A.ATTENDANCE_DATE ASC]]>
 							<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "اسم الموظف" : "Employee Name"]]></textFieldExpression>
 						</textField>
 					</cellContents>
-				</crosstabHeader>
+				</crosstabHeaderCell>
 				<rowGroup name="EMPLOYEE_CODE" width="50" totalPosition="None">
 					<bucket class="java.lang.String">
 						<bucketExpression><![CDATA[$F{EMPLOYEE_CODE}]]></bucketExpression>
