@@ -34,6 +34,10 @@
     A.OT_DAYS_400_CALCULATED,
     A.OVERTIME_DAYS_CALCULATED,
     CASE WHEN NVL(A.OT_HOURS_400_CALCULATED, 0) >= 1.6 THEN 1 ELSE 0 END AS MEAL_ALLOWANCE,
+    DECODE($P{P_LANG},
+        'ar', CASE A.IS_OFF_DAY WHEN 1 THEN 'يوم راحة / عطلة' ELSE 'يوم عمل' END,
+              CASE A.IS_OFF_DAY WHEN 1 THEN 'Day Off / Holiday' ELSE 'Work Day' END
+    )                                           AS DAY_TYPE,
     DECODE($P{P_LANG}, 'ar', E.FULL_NAME_AR, E.FULL_NAME_EN) AS EMPLOYEE_NAME,
     DECODE($P{P_LANG}, 'ar', D.ARABIC_NAME, D.NAME) AS DEPARTMENT_NAME,
     (SELECT DECODE($P{P_LANG}, 'ar', E2.FULL_NAME_AR, E2.FULL_NAME_EN) FROM HR_EMPLOYEES E2 WHERE E2.EMPLOYEE_ID = $P{P_EMPLOYEE_ID}) AS SELECTED_EMPLOYEE_NAME,
@@ -72,6 +76,7 @@ ORDER BY D.ARABIC_NAME ASC, E.FULL_NAME_AR ASC, A.ATTENDANCE_DATE ASC]]>
 	<field name="SELECTED_EMPLOYEE_NAME" class="java.lang.String"/>
 	<field name="SELECTED_DEPARTMENT_NAME" class="java.lang.String"/>
 	<field name="MEAL_ALLOWANCE" class="java.math.BigDecimal"/>
+	<field name="DAY_TYPE" class="java.lang.String"/>
 	<variable name="ROW_NUM" class="java.lang.Integer" resetType="Group" resetGroup="DepartmentGroup" calculation="Count">
 		<variableExpression><![CDATA[$F{EMPLOYEE_ID}]]></variableExpression>
 	</variable>
@@ -280,7 +285,7 @@ ORDER BY D.ARABIC_NAME ASC, E.FULL_NAME_AR ASC, A.ATTENDANCE_DATE ASC]]>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "بدل وجبة" : "Meal Allowance"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement mode="Opaque" x="330" y="40" width="74" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000005"/>
+				<reportElement mode="Opaque" x="330" y="40" width="59" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000005"/>
 				<box><pen lineWidth="0.5" lineColor="#000000"/></box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
@@ -288,7 +293,7 @@ ORDER BY D.ARABIC_NAME ASC, E.FULL_NAME_AR ASC, A.ATTENDANCE_DATE ASC]]>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "الانصراف" : "Check Out"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement mode="Opaque" x="404" y="40" width="73" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000006"/>
+				<reportElement mode="Opaque" x="389" y="40" width="63" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000006"/>
 				<box><pen lineWidth="0.5" lineColor="#000000"/></box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
@@ -296,7 +301,15 @@ ORDER BY D.ARABIC_NAME ASC, E.FULL_NAME_AR ASC, A.ATTENDANCE_DATE ASC]]>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "الحضور" : "Check In"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement mode="Opaque" x="477" y="40" width="90" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000007"/>
+				<reportElement mode="Opaque" x="452" y="40" width="80" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000030"/>
+				<box><pen lineWidth="0.5" lineColor="#000000"/></box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "نوع اليوم" : "Day Type"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Opaque" x="532" y="40" width="75" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000007"/>
 				<box><pen lineWidth="0.5" lineColor="#000000"/></box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
@@ -304,7 +317,7 @@ ORDER BY D.ARABIC_NAME ASC, E.FULL_NAME_AR ASC, A.ATTENDANCE_DATE ASC]]>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "التاريخ" : "Date"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement mode="Opaque" x="567" y="40" width="160" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000008"/>
+				<reportElement mode="Opaque" x="607" y="40" width="120" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000008"/>
 				<box><pen lineWidth="0.5" lineColor="#000000"/></box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
@@ -364,7 +377,7 @@ ORDER BY D.ARABIC_NAME ASC, E.FULL_NAME_AR ASC, A.ATTENDANCE_DATE ASC]]>
 				<textFieldExpression><![CDATA[$F{MEAL_ALLOWANCE} == null || $F{MEAL_ALLOWANCE}.doubleValue() == 0 ? "—" : $F{MEAL_ALLOWANCE}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement stretchType="ContainerHeight" x="330" y="0" width="74" height="18" uuid="cc33dd44-0003-0001-0001-000000000005"/>
+				<reportElement stretchType="ContainerHeight" x="330" y="0" width="59" height="18" uuid="cc33dd44-0003-0001-0001-000000000005"/>
 				<box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9"/>
@@ -372,7 +385,7 @@ ORDER BY D.ARABIC_NAME ASC, E.FULL_NAME_AR ASC, A.ATTENDANCE_DATE ASC]]>
 				<textFieldExpression><![CDATA[$F{CHECK_OUT_TIME} == null ? "—" : $F{CHECK_OUT_TIME}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement stretchType="ContainerHeight" x="404" y="0" width="73" height="18" uuid="cc33dd44-0003-0001-0001-000000000006"/>
+				<reportElement stretchType="ContainerHeight" x="389" y="0" width="63" height="18" uuid="cc33dd44-0003-0001-0001-000000000006"/>
 				<box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9"/>
@@ -380,7 +393,15 @@ ORDER BY D.ARABIC_NAME ASC, E.FULL_NAME_AR ASC, A.ATTENDANCE_DATE ASC]]>
 				<textFieldExpression><![CDATA[$F{CHECK_IN_TIME} == null ? "—" : $F{CHECK_IN_TIME}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement stretchType="ContainerHeight" x="477" y="0" width="90" height="18" uuid="cc33dd44-0003-0001-0001-000000000007"/>
+				<reportElement stretchType="ContainerHeight" x="452" y="0" width="80" height="18" uuid="cc33dd44-0003-0001-0001-000000000030"/>
+				<box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DAY_TYPE} == null ? "" : $F{DAY_TYPE}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement stretchType="ContainerHeight" x="532" y="0" width="75" height="18" uuid="cc33dd44-0003-0001-0001-000000000007"/>
 				<box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9"/>
@@ -388,7 +409,7 @@ ORDER BY D.ARABIC_NAME ASC, E.FULL_NAME_AR ASC, A.ATTENDANCE_DATE ASC]]>
 				<textFieldExpression><![CDATA[$F{ATTENDANCE_DATE} == null ? "" : new java.text.SimpleDateFormat("dd/MM/yyyy").format($F{ATTENDANCE_DATE})]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement stretchType="ContainerHeight" x="567" y="0" width="160" height="18" uuid="cc33dd44-0003-0001-0001-000000000008"/>
+				<reportElement stretchType="ContainerHeight" x="607" y="0" width="120" height="18" uuid="cc33dd44-0003-0001-0001-000000000008"/>
 				<box topPadding="2" leftPadding="4" bottomPadding="2" rightPadding="4">
 					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
 				</box>
