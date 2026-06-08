@@ -43,7 +43,7 @@
     DECODE($P{P_LANG}, 'ar', D.ARABIC_NAME, D.NAME) AS DEPARTMENT_NAME,
     (SELECT DECODE($P{P_LANG}, 'ar', E2.FULL_NAME_AR, E2.FULL_NAME_EN) FROM HR_EMPLOYEES E2 WHERE E2.EMPLOYEE_ID = $P{P_EMPLOYEE_ID}) AS SELECTED_EMPLOYEE_NAME,
     (SELECT DECODE($P{P_LANG}, 'ar', D2.ARABIC_NAME, D2.NAME) FROM HR_DEPARTMENT D2 WHERE D2.ID = $P{P_DEPARTMENT_ID}) AS SELECTED_DEPARTMENT_NAME,
-    (SELECT DECODE($P{P_LANG}, 'ar', C.ARABIC_NAME, C.NAME) FROM HR_EMPLOYEE_CATEGORIES C WHERE C.ID = $P{P_EMPLOYEE_CATEGORY_ID}) AS SELECTED_CATEGORY_NAME
+ ' ' AS SELECTED_CATEGORY_NAME
 FROM VW_OVERTIME_LOG A
 LEFT JOIN HR_EMPLOYEES E ON E.EMPLOYEE_ID = A.EMPLOYEE_ID
 LEFT JOIN HR_DEPARTMENT D ON D.ID = A.DEPARTMENT_ID
@@ -65,22 +65,70 @@ WHERE A.WORK_SHIFT_TYPE_ID = 2
   AND ($P{P_TO_DATE}              IS NULL OR A.ATTENDANCE_DATE <= TO_DATE($P{P_TO_DATE},   'DD-MM-YYYY'))
 ORDER BY D.ARABIC_NAME ASC, E.FULL_NAME_AR ASC, A.ATTENDANCE_DATE ASC]]>
 	</queryString>
-	<field name="EMPLOYEE_CODE" class="java.lang.String"/>
-	<field name="EMPLOYEE_ID" class="java.math.BigDecimal"/>
-	<field name="DEPARTMENT_ID" class="java.math.BigDecimal"/>
-	<field name="ATTENDANCE_DATE" class="java.sql.Timestamp"/>
-	<field name="CHECK_IN_TIME" class="java.lang.String"/>
-	<field name="CHECK_OUT_TIME" class="java.lang.String"/>
-	<field name="OT_DAYS_250_CALCULATED" class="java.math.BigDecimal"/>
-	<field name="OT_DAYS_400_CALCULATED" class="java.math.BigDecimal"/>
-	<field name="OVERTIME_DAYS_CALCULATED" class="java.math.BigDecimal"/>
-	<field name="EMPLOYEE_NAME" class="java.lang.String"/>
-	<field name="DEPARTMENT_NAME" class="java.lang.String"/>
-	<field name="SELECTED_EMPLOYEE_NAME" class="java.lang.String"/>
-	<field name="SELECTED_DEPARTMENT_NAME" class="java.lang.String"/>
-	<field name="MEAL_ALLOWANCE" class="java.math.BigDecimal"/>
-	<field name="DAY_TYPE" class="java.lang.String"/>
-	<field name="SELECTED_CATEGORY_NAME" class="java.lang.String"/>
+	<field name="EMPLOYEE_CODE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="EMPLOYEE_CODE"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYEE_CODE"/>
+	</field>
+	<field name="EMPLOYEE_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMPLOYEE_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYEE_ID"/>
+	</field>
+	<field name="DEPARTMENT_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="DEPARTMENT_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="DEPARTMENT_ID"/>
+	</field>
+	<field name="ATTENDANCE_DATE" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="ATTENDANCE_DATE"/>
+		<property name="com.jaspersoft.studio.field.label" value="ATTENDANCE_DATE"/>
+	</field>
+	<field name="CHECK_IN_TIME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="CHECK_IN_TIME"/>
+		<property name="com.jaspersoft.studio.field.label" value="CHECK_IN_TIME"/>
+	</field>
+	<field name="CHECK_OUT_TIME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="CHECK_OUT_TIME"/>
+		<property name="com.jaspersoft.studio.field.label" value="CHECK_OUT_TIME"/>
+	</field>
+	<field name="OT_DAYS_250_CALCULATED" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="OT_DAYS_250_CALCULATED"/>
+		<property name="com.jaspersoft.studio.field.label" value="OT_DAYS_250_CALCULATED"/>
+	</field>
+	<field name="OT_DAYS_400_CALCULATED" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="OT_DAYS_400_CALCULATED"/>
+		<property name="com.jaspersoft.studio.field.label" value="OT_DAYS_400_CALCULATED"/>
+	</field>
+	<field name="OVERTIME_DAYS_CALCULATED" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="OVERTIME_DAYS_CALCULATED"/>
+		<property name="com.jaspersoft.studio.field.label" value="OVERTIME_DAYS_CALCULATED"/>
+	</field>
+	<field name="MEAL_ALLOWANCE" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="MEAL_ALLOWANCE"/>
+		<property name="com.jaspersoft.studio.field.label" value="MEAL_ALLOWANCE"/>
+	</field>
+	<field name="DAY_TYPE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DAY_TYPE"/>
+		<property name="com.jaspersoft.studio.field.label" value="DAY_TYPE"/>
+	</field>
+	<field name="EMPLOYEE_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="EMPLOYEE_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYEE_NAME"/>
+	</field>
+	<field name="DEPARTMENT_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DEPARTMENT_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="DEPARTMENT_NAME"/>
+	</field>
+	<field name="SELECTED_EMPLOYEE_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SELECTED_EMPLOYEE_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="SELECTED_EMPLOYEE_NAME"/>
+	</field>
+	<field name="SELECTED_DEPARTMENT_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SELECTED_DEPARTMENT_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="SELECTED_DEPARTMENT_NAME"/>
+	</field>
+	<field name="SELECTED_CATEGORY_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SELECTED_CATEGORY_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="SELECTED_CATEGORY_NAME"/>
+	</field>
 	<variable name="ROW_NUM" class="java.lang.Integer" resetType="Group" resetGroup="DepartmentGroup" calculation="Count">
 		<variableExpression><![CDATA[$F{EMPLOYEE_ID}]]></variableExpression>
 	</variable>
@@ -275,10 +323,11 @@ ORDER BY D.ARABIC_NAME ASC, E.FULL_NAME_AR ASC, A.ATTENDANCE_DATE ASC]]>
 				</textElement>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "الفترة" : "Period"]]></textFieldExpression>
 			</textField>
-			
 			<textField>
 				<reportElement mode="Opaque" x="0" y="40" width="90" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000002"/>
-				<box><pen lineWidth="0.5" lineColor="#000000"/></box>
+				<box>
+					<pen lineWidth="0.5" lineColor="#000000"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
 				</textElement>
@@ -286,7 +335,9 @@ ORDER BY D.ARABIC_NAME ASC, E.FULL_NAME_AR ASC, A.ATTENDANCE_DATE ASC]]>
 			</textField>
 			<textField>
 				<reportElement mode="Opaque" x="90" y="40" width="90" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000003"/>
-				<box><pen lineWidth="0.5" lineColor="#000000"/></box>
+				<box>
+					<pen lineWidth="0.5" lineColor="#000000"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
 				</textElement>
@@ -294,7 +345,9 @@ ORDER BY D.ARABIC_NAME ASC, E.FULL_NAME_AR ASC, A.ATTENDANCE_DATE ASC]]>
 			</textField>
 			<textField>
 				<reportElement mode="Opaque" x="180" y="40" width="90" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000004"/>
-				<box><pen lineWidth="0.5" lineColor="#000000"/></box>
+				<box>
+					<pen lineWidth="0.5" lineColor="#000000"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
 				</textElement>
@@ -302,7 +355,9 @@ ORDER BY D.ARABIC_NAME ASC, E.FULL_NAME_AR ASC, A.ATTENDANCE_DATE ASC]]>
 			</textField>
 			<textField>
 				<reportElement mode="Opaque" x="270" y="40" width="60" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000024"/>
-				<box><pen lineWidth="0.5" lineColor="#000000"/></box>
+				<box>
+					<pen lineWidth="0.5" lineColor="#000000"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
 				</textElement>
@@ -310,7 +365,9 @@ ORDER BY D.ARABIC_NAME ASC, E.FULL_NAME_AR ASC, A.ATTENDANCE_DATE ASC]]>
 			</textField>
 			<textField>
 				<reportElement mode="Opaque" x="330" y="40" width="59" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000005"/>
-				<box><pen lineWidth="0.5" lineColor="#000000"/></box>
+				<box>
+					<pen lineWidth="0.5" lineColor="#000000"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
 				</textElement>
@@ -318,7 +375,9 @@ ORDER BY D.ARABIC_NAME ASC, E.FULL_NAME_AR ASC, A.ATTENDANCE_DATE ASC]]>
 			</textField>
 			<textField>
 				<reportElement mode="Opaque" x="389" y="40" width="63" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000006"/>
-				<box><pen lineWidth="0.5" lineColor="#000000"/></box>
+				<box>
+					<pen lineWidth="0.5" lineColor="#000000"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
 				</textElement>
@@ -326,7 +385,9 @@ ORDER BY D.ARABIC_NAME ASC, E.FULL_NAME_AR ASC, A.ATTENDANCE_DATE ASC]]>
 			</textField>
 			<textField>
 				<reportElement mode="Opaque" x="452" y="40" width="80" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000030"/>
-				<box><pen lineWidth="0.5" lineColor="#000000"/></box>
+				<box>
+					<pen lineWidth="0.5" lineColor="#000000"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
 				</textElement>
@@ -334,7 +395,9 @@ ORDER BY D.ARABIC_NAME ASC, E.FULL_NAME_AR ASC, A.ATTENDANCE_DATE ASC]]>
 			</textField>
 			<textField>
 				<reportElement mode="Opaque" x="532" y="40" width="75" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000007"/>
-				<box><pen lineWidth="0.5" lineColor="#000000"/></box>
+				<box>
+					<pen lineWidth="0.5" lineColor="#000000"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
 				</textElement>
@@ -342,7 +405,9 @@ ORDER BY D.ARABIC_NAME ASC, E.FULL_NAME_AR ASC, A.ATTENDANCE_DATE ASC]]>
 			</textField>
 			<textField>
 				<reportElement mode="Opaque" x="607" y="40" width="120" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000008"/>
-				<box><pen lineWidth="0.5" lineColor="#000000"/></box>
+				<box>
+					<pen lineWidth="0.5" lineColor="#000000"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
 				</textElement>
@@ -350,7 +415,9 @@ ORDER BY D.ARABIC_NAME ASC, E.FULL_NAME_AR ASC, A.ATTENDANCE_DATE ASC]]>
 			</textField>
 			<textField>
 				<reportElement mode="Opaque" x="727" y="40" width="50" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000009"/>
-				<box><pen lineWidth="0.5" lineColor="#000000"/></box>
+				<box>
+					<pen lineWidth="0.5" lineColor="#000000"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
 				</textElement>
@@ -358,7 +425,9 @@ ORDER BY D.ARABIC_NAME ASC, E.FULL_NAME_AR ASC, A.ATTENDANCE_DATE ASC]]>
 			</textField>
 			<textField>
 				<reportElement mode="Opaque" x="777" y="40" width="25" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000010"/>
-				<box><pen lineWidth="0.5" lineColor="#000000"/></box>
+				<box>
+					<pen lineWidth="0.5" lineColor="#000000"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
 				</textElement>
@@ -370,7 +439,9 @@ ORDER BY D.ARABIC_NAME ASC, E.FULL_NAME_AR ASC, A.ATTENDANCE_DATE ASC]]>
 		<band height="18" splitType="Stretch">
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement stretchType="ContainerHeight" x="0" y="0" width="90" height="18" uuid="cc33dd44-0003-0001-0001-000000000002"/>
-				<box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box>
+				<box>
+					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9"/>
 				</textElement>
@@ -378,7 +449,9 @@ ORDER BY D.ARABIC_NAME ASC, E.FULL_NAME_AR ASC, A.ATTENDANCE_DATE ASC]]>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement stretchType="ContainerHeight" x="90" y="0" width="90" height="18" uuid="cc33dd44-0003-0001-0001-000000000003"/>
-				<box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box>
+				<box>
+					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9"/>
 				</textElement>
@@ -386,7 +459,9 @@ ORDER BY D.ARABIC_NAME ASC, E.FULL_NAME_AR ASC, A.ATTENDANCE_DATE ASC]]>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement stretchType="ContainerHeight" x="180" y="0" width="90" height="18" uuid="cc33dd44-0003-0001-0001-000000000004"/>
-				<box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box>
+				<box>
+					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9"/>
 				</textElement>
@@ -394,7 +469,9 @@ ORDER BY D.ARABIC_NAME ASC, E.FULL_NAME_AR ASC, A.ATTENDANCE_DATE ASC]]>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement stretchType="ContainerHeight" x="270" y="0" width="60" height="18" uuid="cc33dd44-0003-0001-0001-000000000025"/>
-				<box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box>
+				<box>
+					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9"/>
 				</textElement>
@@ -402,7 +479,9 @@ ORDER BY D.ARABIC_NAME ASC, E.FULL_NAME_AR ASC, A.ATTENDANCE_DATE ASC]]>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement stretchType="ContainerHeight" x="330" y="0" width="59" height="18" uuid="cc33dd44-0003-0001-0001-000000000005"/>
-				<box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box>
+				<box>
+					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9"/>
 				</textElement>
@@ -410,7 +489,9 @@ ORDER BY D.ARABIC_NAME ASC, E.FULL_NAME_AR ASC, A.ATTENDANCE_DATE ASC]]>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement stretchType="ContainerHeight" x="389" y="0" width="63" height="18" uuid="cc33dd44-0003-0001-0001-000000000006"/>
-				<box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box>
+				<box>
+					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9"/>
 				</textElement>
@@ -418,7 +499,9 @@ ORDER BY D.ARABIC_NAME ASC, E.FULL_NAME_AR ASC, A.ATTENDANCE_DATE ASC]]>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement stretchType="ContainerHeight" x="452" y="0" width="80" height="18" uuid="cc33dd44-0003-0001-0001-000000000030"/>
-				<box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box>
+				<box>
+					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9"/>
 				</textElement>
@@ -426,7 +509,9 @@ ORDER BY D.ARABIC_NAME ASC, E.FULL_NAME_AR ASC, A.ATTENDANCE_DATE ASC]]>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement stretchType="ContainerHeight" x="532" y="0" width="75" height="18" uuid="cc33dd44-0003-0001-0001-000000000007"/>
-				<box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box>
+				<box>
+					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9"/>
 				</textElement>
@@ -444,7 +529,9 @@ ORDER BY D.ARABIC_NAME ASC, E.FULL_NAME_AR ASC, A.ATTENDANCE_DATE ASC]]>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement stretchType="ContainerHeight" x="727" y="0" width="50" height="18" uuid="cc33dd44-0003-0001-0001-000000000009"/>
-				<box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box>
+				<box>
+					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9"/>
 				</textElement>
@@ -452,7 +539,9 @@ ORDER BY D.ARABIC_NAME ASC, E.FULL_NAME_AR ASC, A.ATTENDANCE_DATE ASC]]>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement stretchType="ContainerHeight" x="777" y="0" width="25" height="18" uuid="cc33dd44-0003-0001-0001-000000000010"/>
-				<box><pen lineWidth="0.5" lineColor="#CCCCCC"/></box>
+				<box>
+					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
+				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9"/>
 				</textElement>
