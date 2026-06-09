@@ -80,7 +80,14 @@ LEFT JOIN HR_DEPARTMENT D ON D.ID = A.DEPARTMENT_ID
 LEFT JOIN HR_WORK_SHIFTS S ON S.ID = A.SHIFT_ID
 WHERE NVL(A.HAS_IN, 0) = 1
   AND ($P{P_EMPLOYEE_ID}          IS NULL OR A.EMPLOYEE_ID          = $P{P_EMPLOYEE_ID})
-  AND ($P{P_DEPARTMENT_ID}        IS NULL OR A.DEPARTMENT_ID        = $P{P_DEPARTMENT_ID})
+  AND (
+      $P{P_DEPARTMENT_ID} IS NULL
+      OR A.DEPARTMENT_ID IN (
+          SELECT ID FROM HR_DEPARTMENT
+           START WITH ID      = $P{P_DEPARTMENT_ID}
+          CONNECT BY PRIOR ID = PARENT_ID
+      )
+  )
   AND ($P{P_SHIFT_ID}             IS NULL OR A.SHIFT_ID             = $P{P_SHIFT_ID})
   AND ($P{P_SITE_ID}              IS NULL OR A.SITES_ID             = $P{P_SITE_ID})
   AND ($P{P_EMPLOYEE_CATEGORY_ID} IS NULL OR A.EMPLOYEE_CATEGORY_ID = $P{P_EMPLOYEE_CATEGORY_ID})
@@ -290,11 +297,7 @@ ORDER BY A.ATTENDANCE_DATE DESC, E.FULL_NAME_AR ASC]]>
 	<detail>
 		<band height="18" splitType="Stretch">
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-<<<<<<< HEAD
-				<reportElement stretchType="ContainerHeight" x="0" y="0" width="115" height="18" uuid="cc33dd44-0003-0001-0001-000000000002"/>
-=======
 				<reportElement stretchType="ContainerHeight" x="0" y="0" width="100" height="18" uuid="cc33dd44-0003-0001-0001-000000000002"/>
->>>>>>> da96cc590cae8c45d9d1513319b91779bc28cae2
 				<box>
 					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
 				</box>
@@ -304,11 +307,7 @@ ORDER BY A.ATTENDANCE_DATE DESC, E.FULL_NAME_AR ASC]]>
 				<textFieldExpression><![CDATA[$F{LATE_PENALTY_STATUS} == null ? "—" : $F{LATE_PENALTY_STATUS}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-<<<<<<< HEAD
-				<reportElement stretchType="ContainerHeight" x="115" y="0" width="92" height="18" uuid="cc33dd44-0003-0001-0001-000000000003"/>
-=======
 				<reportElement stretchType="ContainerHeight" x="100" y="0" width="92" height="18" uuid="cc33dd44-0003-0001-0001-000000000003"/>
->>>>>>> da96cc590cae8c45d9d1513319b91779bc28cae2
 				<box>
 					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
 				</box>
@@ -318,11 +317,7 @@ ORDER BY A.ATTENDANCE_DATE DESC, E.FULL_NAME_AR ASC]]>
 				<textFieldExpression><![CDATA[$F{ATTENDANCE_STATUS}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-<<<<<<< HEAD
-				<reportElement stretchType="ContainerHeight" x="207" y="0" width="65" height="18" uuid="cc33dd44-0003-0001-0001-000000000005"/>
-=======
 				<reportElement stretchType="ContainerHeight" x="192" y="0" width="65" height="18" uuid="cc33dd44-0003-0001-0001-000000000005"/>
->>>>>>> da96cc590cae8c45d9d1513319b91779bc28cae2
 				<box>
 					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
 				</box>
@@ -332,11 +327,7 @@ ORDER BY A.ATTENDANCE_DATE DESC, E.FULL_NAME_AR ASC]]>
 				<textFieldExpression><![CDATA[$F{CHECK_OUT_TIME} == null ? "—" : $F{CHECK_OUT_TIME}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-<<<<<<< HEAD
-				<reportElement stretchType="ContainerHeight" x="272" y="0" width="65" height="18" uuid="cc33dd44-0003-0001-0001-000000000006"/>
-=======
 				<reportElement stretchType="ContainerHeight" x="257" y="0" width="65" height="18" uuid="cc33dd44-0003-0001-0001-000000000006"/>
->>>>>>> da96cc590cae8c45d9d1513319b91779bc28cae2
 				<box>
 					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
 				</box>
@@ -346,11 +337,7 @@ ORDER BY A.ATTENDANCE_DATE DESC, E.FULL_NAME_AR ASC]]>
 				<textFieldExpression><![CDATA[$F{CHECK_IN_TIME} == null ? "—" : $F{CHECK_IN_TIME}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-<<<<<<< HEAD
-				<reportElement stretchType="ContainerHeight" x="337" y="0" width="75" height="18" uuid="cc33dd44-0003-0001-0001-000000000007"/>
-=======
 				<reportElement stretchType="ContainerHeight" x="322" y="0" width="67" height="18" uuid="cc33dd44-0003-0001-0001-000000000007"/>
->>>>>>> da96cc590cae8c45d9d1513319b91779bc28cae2
 				<box>
 					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
 				</box>
@@ -360,11 +347,7 @@ ORDER BY A.ATTENDANCE_DATE DESC, E.FULL_NAME_AR ASC]]>
 				<textFieldExpression><![CDATA[$F{ATTENDANCE_DATE} == null ? "" : new java.text.SimpleDateFormat("dd/MM/yyyy").format($F{ATTENDANCE_DATE})]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-<<<<<<< HEAD
-				<reportElement stretchType="ContainerHeight" x="412" y="0" width="120" height="18" uuid="cc33dd44-0003-0001-0001-000000000009"/>
-=======
 				<reportElement stretchType="ContainerHeight" x="389" y="0" width="209" height="18" uuid="cc33dd44-0003-0001-0001-000000000009"/>
->>>>>>> da96cc590cae8c45d9d1513319b91779bc28cae2
 				<box topPadding="2" leftPadding="4" bottomPadding="2" rightPadding="4">
 					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
 				</box>
@@ -374,11 +357,7 @@ ORDER BY A.ATTENDANCE_DATE DESC, E.FULL_NAME_AR ASC]]>
 				<textFieldExpression><![CDATA[$F{DEPARTMENT_NAME} == null ? "" : $F{DEPARTMENT_NAME}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-<<<<<<< HEAD
-				<reportElement stretchType="ContainerHeight" x="532" y="0" width="190" height="18" uuid="cc33dd44-0003-0001-0001-000000000010"/>
-=======
 				<reportElement stretchType="ContainerHeight" x="598" y="0" width="132" height="18" uuid="cc33dd44-0003-0001-0001-000000000010"/>
->>>>>>> da96cc590cae8c45d9d1513319b91779bc28cae2
 				<box topPadding="2" leftPadding="4" bottomPadding="2" rightPadding="4">
 					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
 				</box>
@@ -388,11 +367,7 @@ ORDER BY A.ATTENDANCE_DATE DESC, E.FULL_NAME_AR ASC]]>
 				<textFieldExpression><![CDATA[$F{EMPLOYEE_NAME} == null ? "" : $F{EMPLOYEE_NAME}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-<<<<<<< HEAD
-				<reportElement stretchType="ContainerHeight" x="722" y="0" width="55" height="18" uuid="cc33dd44-0003-0001-0001-000000000011"/>
-=======
 				<reportElement stretchType="ContainerHeight" x="730" y="0" width="47" height="18" uuid="cc33dd44-0003-0001-0001-000000000011"/>
->>>>>>> da96cc590cae8c45d9d1513319b91779bc28cae2
 				<box>
 					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
 				</box>
