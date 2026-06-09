@@ -6,6 +6,16 @@
 	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<style name="AttendanceStatusStyle" mode="Opaque" forecolor="#000000" backcolor="#FFFFFF">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[($F{HAS_OUT} == null ? 0 : $F{HAS_OUT}.intValue()) == 0]]></conditionExpression>
+			<style forecolor="#C0392B" backcolor="#FDEDEC" isBold="true"/>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[($F{HAS_OUT} != null ? $F{HAS_OUT}.intValue() : 0) == 1]]></conditionExpression>
+			<style forecolor="#27AE60" backcolor="#E8F8F5" isBold="true"/>
+		</conditionalStyle>
+	</style>
 	<parameter name="P_LANG" class="java.lang.String">
 		<defaultValueExpression><![CDATA["ar"]]></defaultValueExpression>
 	</parameter>
@@ -311,7 +321,7 @@ ORDER BY A.ATTENDANCE_DATE DESC, E.FULL_NAME_AR ASC]]>
 				<textFieldExpression><![CDATA[$F{LATE_PENALTY_STATUS} == null ? "—" : $F{LATE_PENALTY_STATUS}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement stretchType="ContainerHeight" x="100" y="0" width="92" height="18" uuid="cc33dd44-0003-0001-0001-000000000003"/>
+				<reportElement style="AttendanceStatusStyle" stretchType="ContainerHeight" x="100" y="0" width="92" height="18" uuid="cc33dd44-0003-0001-0001-000000000003"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
 				</box>
