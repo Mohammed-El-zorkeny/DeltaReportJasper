@@ -38,13 +38,13 @@
 	<parameter name="P_STATUS_ID" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[SELECT
-    E.EMPLOYEE_ID,
-    E.CODE                                                          AS EMPLOYEE_CODE,
-    E.DEPARTMENT_ID,
-    E.DAY_DATE                                                      AS ATTENDANCE_DATE,
+    AL_CHECK.EMPLOYEE_ID,
+    AL_CHECK.CODE                                                   AS EMPLOYEE_CODE,
+    AL_CHECK.DEPARTMENT_ID,
+    AL_CHECK.DAY_DATE                                               AS ATTENDANCE_DATE,
     DECODE($P{P_LANG},
-        'ar', TO_CHAR(E.DAY_DATE, 'DAY', 'NLS_DATE_LANGUAGE=ARABIC'),
-              TO_CHAR(E.DAY_DATE, 'DAY', 'NLS_DATE_LANGUAGE=AMERICAN')
+        'ar', TO_CHAR(AL_CHECK.DAY_DATE, 'DAY', 'NLS_DATE_LANGUAGE=ARABIC'),
+              TO_CHAR(AL_CHECK.DAY_DATE, 'DAY', 'NLS_DATE_LANGUAGE=AMERICAN')
     )                                                               AS DAY_NAME,
     CASE
         WHEN LV.EMPLOYEE_ID  IS NOT NULL
@@ -55,7 +55,7 @@
             THEN DECODE($P{P_LANG}, 'ar', 'عطلة رسمية',   'Public Holiday')
         WHEN CD.COMP_DATE    IS NOT NULL
             THEN DECODE($P{P_LANG}, 'ar', 'راحة مستحقة',  'Compensatory Day')
-        WHEN WO.SHIFT_ID  IS NOT NULL
+        WHEN WO.SHIFT_ID     IS NOT NULL
             THEN DECODE($P{P_LANG}, 'ar', 'راحة أسبوعية', 'Weekly Off')
         ELSE DECODE($P{P_LANG}, 'ar', 'لم يحضر',          'Not Present')
     END                                                             AS ATTENDANCE_STATUS,
@@ -64,7 +64,7 @@
         WHEN AB.EMPLOYEE_ID  IS NOT NULL THEN 'redBadge'
         WHEN PH.HOLIDAY_DATE IS NOT NULL THEN 'grayBadge'
         WHEN CD.COMP_DATE    IS NOT NULL THEN 'grayBadge'
-        WHEN WO.SHIFT_ID  IS NOT NULL THEN 'grayBadge'
+        WHEN WO.SHIFT_ID     IS NOT NULL THEN 'grayBadge'
         ELSE                                  'redBadge'
     END                                                             AS STATUS_CLASS,
     CASE
@@ -72,39 +72,39 @@
         WHEN AB.EMPLOYEE_ID  IS NOT NULL THEN 3
         WHEN PH.HOLIDAY_DATE IS NOT NULL THEN 6
         WHEN CD.COMP_DATE    IS NOT NULL THEN 10
-        WHEN WO.SHIFT_ID  IS NOT NULL THEN 5
+        WHEN WO.SHIFT_ID     IS NOT NULL THEN 5
         ELSE                                  7
     END                                                             AS STATUS_ID,
-    DECODE($P{P_LANG}, 'ar', E.FULL_NAME_AR, E.FULL_NAME_EN) AS EMPLOYEE_NAME,
-    DECODE($P{P_LANG}, 'ar', E.DEPARTMENT_NAME_AR, E.DEPARTMENT_NAME_EN) AS DEPARTMENT_NAME,
+    DECODE($P{P_LANG}, 'ar', AL_CHECK.FULL_NAME_AR, AL_CHECK.FULL_NAME_EN) AS EMPLOYEE_NAME,
+    DECODE($P{P_LANG}, 'ar', AL_CHECK.DEPT_ARABIC_NAME, AL_CHECK.DEPT_NAME) AS DEPARTMENT_NAME,
     (SELECT DECODE($P{P_LANG}, 'ar', E2.FULL_NAME_AR, E2.FULL_NAME_EN) FROM HR_EMPLOYEES E2 WHERE E2.EMPLOYEE_ID = $P{P_EMPLOYEE_ID}) AS SELECTED_EMPLOYEE_NAME,
     (SELECT DECODE($P{P_LANG}, 'ar', D2.ARABIC_NAME, D2.NAME) FROM HR_DEPARTMENT D2 WHERE D2.ID = $P{P_DEPARTMENT_ID}) AS SELECTED_DEPARTMENT_NAME
 
 FROM (
+    WITH date_range AS (
+        SELECT TO_DATE($P{P_FROM_DATE}, 'DD-MM-YYYY') + LEVEL - 1 AS DAY_DATE
+          FROM DUAL
+         WHERE $P{P_FROM_DATE} IS NOT NULL
+           AND $P{P_TO_DATE}   IS NOT NULL
+        CONNECT BY LEVEL <= (
+            TO_DATE($P{P_TO_DATE},   'DD-MM-YYYY')
+          - TO_DATE($P{P_FROM_DATE}, 'DD-MM-YYYY') + 1
+        )
+    )
     SELECT E2.EMPLOYEE_ID,
            E2.CODE,
            E2.DEPARTMENT_ID,
            E2.WORK_SHIFT_ID,
            E2.RELIGION,
            E2.EMPLOYEE_CATEGORY_ID,
+           DR.DAY_DATE,
            E2.FULL_NAME_AR,
            E2.FULL_NAME_EN,
-           D.ARABIC_NAME AS DEPARTMENT_NAME_AR,
-           D.NAME AS DEPARTMENT_NAME_EN,
-           CAL.DAY_DATE
-      FROM HR_EMPLOYEES E2
-      LEFT JOIN HR_DEPARTMENT D ON D.ID = E2.DEPARTMENT_ID,
-           (
-               SELECT TO_DATE($P{P_FROM_DATE}, 'DD-MM-YYYY') + LEVEL - 1 AS DAY_DATE
-                 FROM DUAL
-                WHERE $P{P_FROM_DATE} IS NOT NULL
-                  AND $P{P_TO_DATE}   IS NOT NULL
-               CONNECT BY LEVEL <= (
-                   TO_DATE($P{P_TO_DATE},   'DD-MM-YYYY')
-                 - TO_DATE($P{P_FROM_DATE}, 'DD-MM-YYYY') + 1
-               )
-           ) CAL
-     WHERE E2.EMPLOYMENT_STATUS  = 1
+           D.ARABIC_NAME AS DEPT_ARABIC_NAME,
+           D.NAME AS DEPT_NAME
+      FROM date_range DR
+      JOIN HR_EMPLOYEES E2
+        ON E2.EMPLOYMENT_STATUS  = 1
        AND E2.WORK_SHIFT_TYPE_ID = 2
        AND ($P{P_EMPLOYEE_ID}          IS NULL OR E2.EMPLOYEE_ID          = $P{P_EMPLOYEE_ID})
        AND ($P{P_EMPLOYEE_CATEGORY_ID} IS NULL OR E2.EMPLOYEE_CATEGORY_ID = $P{P_EMPLOYEE_CATEGORY_ID})
@@ -116,12 +116,14 @@ FROM (
                    CONNECT BY PRIOR ID = PARENT_ID
                )
            )
-       AND NOT EXISTS (
-               SELECT 1 FROM HR_ATTENDANCE_LOG AL
+      LEFT JOIN HR_DEPARTMENT D ON D.ID = E2.DEPARTMENT_ID
+     WHERE NOT EXISTS (
+               SELECT 1
+                 FROM HR_ATTENDANCE_LOG AL
                 WHERE AL.EMPLOYEE_ID    = E2.EMPLOYEE_ID
-                  AND AL.ATTENDANCE_DATE = CAL.DAY_DATE
+                  AND AL.ATTENDANCE_DATE = DR.DAY_DATE
            )
-) E
+) AL_CHECK
 
 LEFT JOIN (
     SELECT LR.EMPLOYEE_ID,
@@ -133,8 +135,8 @@ LEFT JOIN (
       JOIN HR_LEAVE_TYPES LT ON LT.ID = LR.LEAVE_TYPE_ID
      WHERE LR.STATUS_ID      = 4
        AND LR.LEAVE_TYPE_ID NOT IN (29, 26, 28, 4)
-) LV ON LV.EMPLOYEE_ID = E.EMPLOYEE_ID
-     AND E.DAY_DATE BETWEEN LV.START_DATE AND LV.END_DATE
+) LV ON LV.EMPLOYEE_ID = AL_CHECK.EMPLOYEE_ID
+     AND AL_CHECK.DAY_DATE BETWEEN LV.START_DATE AND LV.END_DATE
 
 LEFT JOIN (
     SELECT AB.EMPLOYEE_ID,
@@ -142,18 +144,18 @@ LEFT JOIN (
            NVL(AB.END_DATE, AB.ABSENCE_DATE) AS END_DATE
       FROM HR_ABSENCE_LOG AB
      WHERE AB.STATUS = '1'
-) AB ON AB.EMPLOYEE_ID = E.EMPLOYEE_ID
-     AND E.DAY_DATE BETWEEN AB.ABSENCE_DATE AND AB.END_DATE
+) AB ON AB.EMPLOYEE_ID = AL_CHECK.EMPLOYEE_ID
+     AND AL_CHECK.DAY_DATE BETWEEN AB.ABSENCE_DATE AND AB.END_DATE
 
 LEFT JOIN HR_OFFICIAL_HOLIDAYS PH
-       ON PH.HOLIDAY_DATE = E.DAY_DATE
+       ON PH.HOLIDAY_DATE = AL_CHECK.DAY_DATE
       AND PH.STATUS       = 1
-      AND (PH.RELIGION_ID IS NULL OR PH.RELIGION_ID = E.RELIGION)
-      AND (PH.SHIFT_ID    IS NULL OR PH.SHIFT_ID    = E.WORK_SHIFT_ID)
+      AND (PH.RELIGION_ID IS NULL OR PH.RELIGION_ID = AL_CHECK.RELIGION)
+      AND (PH.SHIFT_ID    IS NULL OR PH.SHIFT_ID    = AL_CHECK.WORK_SHIFT_ID)
 
 LEFT JOIN VW_SHIFT_COMPENSATORY_DAYS CD
-       ON CD.WORK_SHIFT_ID = E.WORK_SHIFT_ID
-      AND CD.COMP_DATE     = E.DAY_DATE
+       ON CD.WORK_SHIFT_ID = AL_CHECK.WORK_SHIFT_ID
+      AND CD.COMP_DATE     = AL_CHECK.DAY_DATE
 
 LEFT JOIN (
     SELECT SD.SHIFT_ID,
@@ -161,8 +163,8 @@ LEFT JOIN (
       FROM HR_WORK_SHIF_DAYS SD
       JOIN HR_WEEK_DAYS WD ON WD.DAY_ID = SD.DAY_ID
      WHERE SD.IS_OFF = 1
-) WO ON WO.SHIFT_ID  = E.WORK_SHIFT_ID
-     AND WO.DAY_NAME_EN = TRIM(TO_CHAR(E.DAY_DATE, 'DAY', 'NLS_DATE_LANGUAGE=AMERICAN'))
+) WO ON WO.SHIFT_ID  = AL_CHECK.WORK_SHIFT_ID
+     AND WO.DAY_NAME_EN = TRIM(TO_CHAR(AL_CHECK.DAY_DATE, 'DAY', 'NLS_DATE_LANGUAGE=AMERICAN'))
 
 WHERE (
     $P{P_STATUS_ID} IS NULL
@@ -171,12 +173,13 @@ WHERE (
            WHEN AB.EMPLOYEE_ID  IS NOT NULL THEN 3
            WHEN PH.HOLIDAY_DATE IS NOT NULL THEN 6
            WHEN CD.COMP_DATE    IS NOT NULL THEN 10
-           WHEN WO.SHIFT_ID  IS NOT NULL THEN 5
+           WHEN WO.SHIFT_ID     IS NOT NULL THEN 5
            ELSE                                  7
        END = $P{P_STATUS_ID}
 )
-ORDER BY E.DAY_DATE DESC, E.FULL_NAME_AR ASC]]>
+ORDER BY AL_CHECK.DAY_DATE DESC, AL_CHECK.FULL_NAME_AR ASC]]>
 	</queryString>
+
 	<field name="EMPLOYEE_ID" class="java.math.BigDecimal"/>
 	<field name="EMPLOYEE_CODE" class="java.lang.String"/>
 	<field name="DEPARTMENT_ID" class="java.math.BigDecimal"/>
