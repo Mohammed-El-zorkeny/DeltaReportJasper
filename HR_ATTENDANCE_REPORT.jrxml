@@ -72,7 +72,9 @@
     
     DECODE($P{P_LANG}, 'ar', E.FULL_NAME_AR, E.FULL_NAME_EN) AS EMPLOYEE_NAME,
     DECODE($P{P_LANG}, 'ar', D.ARABIC_NAME, D.NAME) AS DEPARTMENT_NAME,
-    DECODE($P{P_LANG}, 'ar', S.ARABIC_NAME, S.NAME) AS SHIFT_NAME
+    DECODE($P{P_LANG}, 'ar', S.ARABIC_NAME, S.NAME) AS SHIFT_NAME,
+    (SELECT DECODE($P{P_LANG}, 'ar', E2.FULL_NAME_AR, E2.FULL_NAME_EN) FROM HR_EMPLOYEES E2 WHERE E2.EMPLOYEE_ID = $P{P_EMPLOYEE_ID}) AS SELECTED_EMPLOYEE_NAME,
+    (SELECT DECODE($P{P_LANG}, 'ar', D2.ARABIC_NAME, D2.NAME) FROM HR_DEPARTMENT D2 WHERE D2.ID = $P{P_DEPARTMENT_ID}) AS SELECTED_DEPARTMENT_NAME
 
 FROM VW_ATTENDANCE_LOG A
 LEFT JOIN HR_EMPLOYEES E ON E.EMPLOYEE_ID = A.EMPLOYEE_ID
@@ -118,6 +120,8 @@ ORDER BY A.ATTENDANCE_DATE DESC, E.FULL_NAME_AR ASC]]>
 	<field name="STATUS_CLASS" class="java.lang.String"/>
 	<field name="LATE_PENALTY_STATUS" class="java.lang.String"/>
 	<field name="ANNUAL_LEAVE_BALANCE" class="java.math.BigDecimal"/>
+	<field name="SELECTED_EMPLOYEE_NAME" class="java.lang.String"/>
+	<field name="SELECTED_DEPARTMENT_NAME" class="java.lang.String"/>
 	<variable name="ROW_NUM" class="java.lang.Integer" calculation="Count">
 		<variableExpression><![CDATA[$F{EMPLOYEE_ID}]]></variableExpression>
 	</variable>
@@ -246,7 +250,7 @@ ORDER BY A.ATTENDANCE_DATE DESC, E.FULL_NAME_AR ASC]]>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{P_EMPLOYEE_ID} != null ? String.valueOf($P{P_EMPLOYEE_ID}) : ("ar".equals($P{P_LANG}) ? "الجميع" : "All")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{SELECTED_EMPLOYEE_NAME} != null ? $F{SELECTED_EMPLOYEE_NAME} : ("ar".equals($P{P_LANG}) ? "الجميع" : "All")]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement x="302" y="19" width="250" height="18" uuid="cc33dd44-0001-0003-0001-000000000004"/>
@@ -256,7 +260,7 @@ ORDER BY A.ATTENDANCE_DATE DESC, E.FULL_NAME_AR ASC]]>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{P_DEPARTMENT_ID} != null ? String.valueOf($P{P_DEPARTMENT_ID}) : ("ar".equals($P{P_LANG}) ? "الجميع" : "All")]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{SELECTED_DEPARTMENT_NAME} != null ? $F{SELECTED_DEPARTMENT_NAME} : ("ar".equals($P{P_LANG}) ? "الجميع" : "All")]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement mode="Opaque" x="302" y="1" width="250" height="18" backcolor="#EAF2F8" uuid="cc33dd44-0001-0002-0001-000000000004"/>
