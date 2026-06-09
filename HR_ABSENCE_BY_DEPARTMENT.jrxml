@@ -55,7 +55,7 @@
             THEN DECODE($P{P_LANG}, 'ar', 'عطلة رسمية',   'Public Holiday')
         WHEN CD.COMP_DATE    IS NOT NULL
             THEN DECODE($P{P_LANG}, 'ar', 'راحة مستحقة',  'Compensatory Day')
-        WHEN WO.EMPLOYEE_ID  IS NOT NULL
+        WHEN WO.SHIFT_ID  IS NOT NULL
             THEN DECODE($P{P_LANG}, 'ar', 'راحة أسبوعية', 'Weekly Off')
         ELSE DECODE($P{P_LANG}, 'ar', 'لم يحضر',          'Not Present')
     END                                                             AS ATTENDANCE_STATUS,
@@ -64,7 +64,7 @@
         WHEN AB.EMPLOYEE_ID  IS NOT NULL THEN 'redBadge'
         WHEN PH.HOLIDAY_DATE IS NOT NULL THEN 'grayBadge'
         WHEN CD.COMP_DATE    IS NOT NULL THEN 'grayBadge'
-        WHEN WO.EMPLOYEE_ID  IS NOT NULL THEN 'grayBadge'
+        WHEN WO.SHIFT_ID  IS NOT NULL THEN 'grayBadge'
         ELSE                                  'redBadge'
     END                                                             AS STATUS_CLASS,
     CASE
@@ -72,7 +72,7 @@
         WHEN AB.EMPLOYEE_ID  IS NOT NULL THEN 3
         WHEN PH.HOLIDAY_DATE IS NOT NULL THEN 6
         WHEN CD.COMP_DATE    IS NOT NULL THEN 10
-        WHEN WO.EMPLOYEE_ID  IS NOT NULL THEN 5
+        WHEN WO.SHIFT_ID  IS NOT NULL THEN 5
         ELSE                                  7
     END                                                             AS STATUS_ID,
     DECODE($P{P_LANG}, 'ar', E.FULL_NAME_AR, E.FULL_NAME_EN) AS EMPLOYEE_NAME,
@@ -156,14 +156,13 @@ LEFT JOIN VW_SHIFT_COMPENSATORY_DAYS CD
       AND CD.COMP_DATE     = E.DAY_DATE
 
 LEFT JOIN (
-    SELECT DISTINCT E3.EMPLOYEE_ID,
-                    WD.DAY_NAME_EN
-      FROM HR_EMPLOYEES E3
-      JOIN HR_WORK_SHIF_DAYS SD ON SD.SHIFT_ID = E3.WORK_SHIFT_ID
-                                AND SD.IS_OFF   = 1
-      JOIN HR_WEEK_DAYS WD      ON WD.DAY_ID   = SD.DAY_ID
-) WO ON WO.EMPLOYEE_ID  = E.EMPLOYEE_ID
-     AND WO.DAY_NAME_EN = TRIM(TO_CHAR(E.DAY_DATE, 'DAY'))
+    SELECT SD.SHIFT_ID,
+           WD.DAY_NAME_EN
+      FROM HR_WORK_SHIF_DAYS SD
+      JOIN HR_WEEK_DAYS WD ON WD.DAY_ID = SD.DAY_ID
+     WHERE SD.IS_OFF = 1
+) WO ON WO.SHIFT_ID  = E.WORK_SHIFT_ID
+     AND WO.DAY_NAME_EN = TRIM(TO_CHAR(E.DAY_DATE, 'DAY', 'NLS_DATE_LANGUAGE=AMERICAN'))
 
 WHERE (
     $P{P_STATUS_ID} IS NULL
@@ -172,7 +171,7 @@ WHERE (
            WHEN AB.EMPLOYEE_ID  IS NOT NULL THEN 3
            WHEN PH.HOLIDAY_DATE IS NOT NULL THEN 6
            WHEN CD.COMP_DATE    IS NOT NULL THEN 10
-           WHEN WO.EMPLOYEE_ID  IS NOT NULL THEN 5
+           WHEN WO.SHIFT_ID  IS NOT NULL THEN 5
            ELSE                                  7
        END = $P{P_STATUS_ID}
 )
