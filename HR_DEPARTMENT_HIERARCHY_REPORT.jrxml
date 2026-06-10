@@ -6,15 +6,30 @@
 	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<style name="HierarchicalRowStyle" mode="Opaque" forecolor="#000000" backcolor="#FFFFFF">
-		<conditionalStyle>
-			<conditionExpression><![CDATA[$F{DEPT_LEVEL} != null && $F{DEPT_LEVEL}.intValue() == 1]]></conditionExpression>
-			<style forecolor="#1F4E79" backcolor="#D9E2F3" isBold="true"/>
-		</conditionalStyle>
-		<conditionalStyle>
-			<conditionExpression><![CDATA[$F{DEPT_LEVEL} != null && $F{DEPT_LEVEL}.intValue() == 2]]></conditionExpression>
-			<style forecolor="#2C3E50" backcolor="#EAF2F8" isBold="true"/>
-		</conditionalStyle>
+	<style name="Level1Style" mode="Opaque" forecolor="#FFFFFF" backcolor="#1E4620" fontName="IBM Plex Sans Arabic" fontSize="8" isBold="true">
+		<box>
+			<pen lineWidth="1.0" lineColor="#153016"/>
+		</box>
+	</style>
+	<style name="Level2Style" mode="Opaque" forecolor="#FFFFFF" backcolor="#1F4E79" fontName="IBM Plex Sans Arabic" fontSize="8" isBold="true">
+		<box>
+			<pen lineWidth="1.0" lineColor="#153452"/>
+		</box>
+	</style>
+	<style name="Level3Style" mode="Opaque" forecolor="#FFFFFF" backcolor="#D35400" fontName="IBM Plex Sans Arabic" fontSize="8" isBold="true">
+		<box>
+			<pen lineWidth="1.0" lineColor="#9E3D00"/>
+		</box>
+	</style>
+	<style name="Level4Style" mode="Opaque" forecolor="#1F4E79" backcolor="#8FAADC" fontName="IBM Plex Sans Arabic" fontSize="8" isBold="true">
+		<box>
+			<pen lineWidth="1.0" lineColor="#5B7FB8"/>
+		</box>
+	</style>
+	<style name="Level5Style" mode="Opaque" forecolor="#2C3E50" backcolor="#D9E2F3" fontName="IBM Plex Sans Arabic" fontSize="8" isBold="false">
+		<box>
+			<pen lineWidth="1.0" lineColor="#A3B2C8"/>
+		</box>
 	</style>
 	<parameter name="P_COMP_ID" class="java.lang.String"/>
 	<parameter name="P_BRANCH_ID" class="java.lang.String"/>
@@ -66,10 +81,7 @@ SELECT
     H.ID,
     H.PARENT_ID,
     H.DEPT_LEVEL,
-    CASE 
-        WHEN H.DEPT_LEVEL = 1 THEN H.DEPT_NAME_AR
-        ELSE LPAD(' ', (H.DEPT_LEVEL - 1) * 4) || '├─ ' || H.DEPT_NAME_AR
-    END AS INDENTED_DEPARTMENT_NAME,
+    H.DEPT_NAME_AR,
     NVL(CC.TOTAL_EMP_COUNT, 0) AS TOTAL_EMP_COUNT
 FROM V_DEPT_HIERARCHY H
 LEFT JOIN V_CUMULATIVE_COUNTS CC ON CC.DEPARTMENT_ID = H.ID
@@ -80,7 +92,7 @@ ORDER BY H.HIER_ORDER ASC]]>
 	<field name="ID" class="java.math.BigDecimal"/>
 	<field name="PARENT_ID" class="java.math.BigDecimal"/>
 	<field name="DEPT_LEVEL" class="java.math.BigDecimal"/>
-	<field name="INDENTED_DEPARTMENT_NAME" class="java.lang.String"/>
+	<field name="DEPT_NAME_AR" class="java.lang.String"/>
 	<field name="TOTAL_EMP_COUNT" class="java.math.BigDecimal"/>
 	<pageHeader>
 		<band height="50" splitType="Stretch">
@@ -100,17 +112,17 @@ ORDER BY H.HIER_ORDER ASC]]>
 	<columnHeader>
 		<band height="25" splitType="Stretch">
 			<textField>
-				<reportElement mode="Opaque" x="120" y="0" width="435" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0003-0001-0001-000000000001"/>
+				<reportElement mode="Opaque" x="55" y="0" width="500" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0003-0001-0001-000000000001"/>
 				<box rightPadding="10">
 					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 				</box>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="10" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["القسم / الإدارة"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["الهيكل التنظيمي للإدارات والأقسام"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement mode="Opaque" x="0" y="0" width="120" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0003-0001-0001-000000000002"/>
+				<reportElement mode="Opaque" x="0" y="0" width="55" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0003-0001-0001-000000000002"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 				</box>
@@ -122,24 +134,134 @@ ORDER BY H.HIER_ORDER ASC]]>
 		</band>
 	</columnHeader>
 	<detail>
-		<band height="20" splitType="Stretch">
-			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="HierarchicalRowStyle" positionType="Float" stretchType="ContainerHeight" x="120" y="0" width="435" height="20" uuid="cc33dd44-0004-0001-0001-000000000001"/>
-				<box rightPadding="10">
-					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
-				</box>
-				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
-					<font fontName="IBM Plex Sans Arabic" size="9"/>
+		<band height="30" splitType="Stretch">
+			<!-- Vertical lines to connect siblings -->
+			<line>
+				<reportElement x="505" y="0" width="1" height="30" uuid="cc33dd44-0005-0001-0001-000000000001" forecolor="#BDC3C7">
+					<printWhenExpression><![CDATA[$F{DEPT_LEVEL} != null && $F{DEPT_LEVEL}.intValue() >= 2]]></printWhenExpression>
+				</reportElement>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Solid"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="405" y="0" width="1" height="30" uuid="cc33dd44-0005-0001-0001-000000000002" forecolor="#BDC3C7">
+					<printWhenExpression><![CDATA[$F{DEPT_LEVEL} != null && $F{DEPT_LEVEL}.intValue() >= 3]]></printWhenExpression>
+				</reportElement>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Solid"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="305" y="0" width="1" height="30" uuid="cc33dd44-0005-0001-0001-000000000003" forecolor="#BDC3C7">
+					<printWhenExpression><![CDATA[$F{DEPT_LEVEL} != null && $F{DEPT_LEVEL}.intValue() >= 4]]></printWhenExpression>
+				</reportElement>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Solid"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="205" y="0" width="1" height="30" uuid="cc33dd44-0005-0001-0001-000000000004" forecolor="#BDC3C7">
+					<printWhenExpression><![CDATA[$F{DEPT_LEVEL} != null && $F{DEPT_LEVEL}.intValue() >= 5]]></printWhenExpression>
+				</reportElement>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Solid"/>
+				</graphicElement>
+			</line>
+
+			<!-- Horizontal lines to branch to cards -->
+			<line>
+				<reportElement x="455" y="15" width="50" height="1" uuid="cc33dd44-0005-0002-0001-000000000001" forecolor="#BDC3C7">
+					<printWhenExpression><![CDATA[$F{DEPT_LEVEL} != null && $F{DEPT_LEVEL}.intValue() == 2]]></printWhenExpression>
+				</reportElement>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Solid"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="355" y="15" width="50" height="1" uuid="cc33dd44-0005-0002-0001-000000000002" forecolor="#BDC3C7">
+					<printWhenExpression><![CDATA[$F{DEPT_LEVEL} != null && $F{DEPT_LEVEL}.intValue() == 3]]></printWhenExpression>
+				</reportElement>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Solid"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="255" y="15" width="50" height="1" uuid="cc33dd44-0005-0002-0001-000000000003" forecolor="#BDC3C7">
+					<printWhenExpression><![CDATA[$F{DEPT_LEVEL} != null && $F{DEPT_LEVEL}.intValue() == 4]]></printWhenExpression>
+				</reportElement>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Solid"/>
+				</graphicElement>
+			</line>
+			<line>
+				<reportElement x="155" y="15" width="50" height="1" uuid="cc33dd44-0005-0002-0001-000000000004" forecolor="#BDC3C7">
+					<printWhenExpression><![CDATA[$F{DEPT_LEVEL} != null && $F{DEPT_LEVEL}.intValue() >= 5]]></printWhenExpression>
+				</reportElement>
+				<graphicElement>
+					<pen lineWidth="1.0" lineStyle="Solid"/>
+				</graphicElement>
+			</line>
+
+			<!-- Level 1 Node -->
+			<textField isBlankWhenNull="true">
+				<reportElement style="Level1Style" x="455" y="3" width="100" height="24" uuid="cc33dd44-0004-0001-0001-000000000001">
+					<printWhenExpression><![CDATA[$F{DEPT_LEVEL} != null && $F{DEPT_LEVEL}.intValue() == 1]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["\u202B" + $F{INDENTED_DEPARTMENT_NAME} + "\u202C"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{DEPT_NAME_AR}]]></textFieldExpression>
 			</textField>
-			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement style="HierarchicalRowStyle" positionType="Float" stretchType="ContainerHeight" x="0" y="0" width="120" height="20" uuid="cc33dd44-0004-0001-0001-000000000002"/>
+			<!-- Level 2 Node -->
+			<textField isBlankWhenNull="true">
+				<reportElement style="Level2Style" x="355" y="3" width="100" height="24" uuid="cc33dd44-0004-0001-0001-000000000002">
+					<printWhenExpression><![CDATA[$F{DEPT_LEVEL} != null && $F{DEPT_LEVEL}.intValue() == 2]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DEPT_NAME_AR}]]></textFieldExpression>
+			</textField>
+			<!-- Level 3 Node -->
+			<textField isBlankWhenNull="true">
+				<reportElement style="Level3Style" x="255" y="3" width="100" height="24" uuid="cc33dd44-0004-0001-0001-000000000003">
+					<printWhenExpression><![CDATA[$F{DEPT_LEVEL} != null && $F{DEPT_LEVEL}.intValue() == 3]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DEPT_NAME_AR}]]></textFieldExpression>
+			</textField>
+			<!-- Level 4 Node -->
+			<textField isBlankWhenNull="true">
+				<reportElement style="Level4Style" x="155" y="3" width="100" height="24" uuid="cc33dd44-0004-0001-0001-000000000004">
+					<printWhenExpression><![CDATA[$F{DEPT_LEVEL} != null && $F{DEPT_LEVEL}.intValue() == 4]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DEPT_NAME_AR}]]></textFieldExpression>
+			</textField>
+			<!-- Level 5+ Node -->
+			<textField isBlankWhenNull="true">
+				<reportElement style="Level5Style" x="55" y="3" width="100" height="24" uuid="cc33dd44-0004-0001-0001-000000000005">
+					<printWhenExpression><![CDATA[$F{DEPT_LEVEL} != null && $F{DEPT_LEVEL}.intValue() >= 5]]></printWhenExpression>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="8" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DEPT_NAME_AR}]]></textFieldExpression>
+			</textField>
+
+			<!-- Employee Count Badge -->
+			<textField isBlankWhenNull="true">
+				<reportElement mode="Opaque" x="0" y="3" width="50" height="24" backcolor="#F2F3F4" uuid="cc33dd44-0004-0002-0001-000000000002"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="9"/>
+					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{TOTAL_EMP_COUNT}]]></textFieldExpression>
 			</textField>
