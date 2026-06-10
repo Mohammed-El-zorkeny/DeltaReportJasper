@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.5.final using JasperReports Library version 6.20.5-3efcf2e67f959db3888d79f73dde2dbd7acb4f8e  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HR_DEPARTMENT_HIERARCHY_REPORT" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="bc25926c-8240-4ad7-82e4-dc6d0e7a5333">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Delta"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<style name="HierarchicalRowStyle" mode="Opaque" forecolor="#000000" backcolor="#FFFFFF">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{DEPT_LEVEL} != null && $F{DEPT_LEVEL}.intValue() == 1]]></conditionExpression>
+			<style forecolor="#1F4E79" backcolor="#D9E2F3" isBold="true"/>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{DEPT_LEVEL} != null && $F{DEPT_LEVEL}.intValue() == 2]]></conditionExpression>
+			<style forecolor="#2C3E50" backcolor="#EAF2F8" isBold="true"/>
+		</conditionalStyle>
+	</style>
+	<parameter name="P_LANG" class="java.lang.String">
+		<defaultValueExpression><![CDATA["ar"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_COMP_ID" class="java.lang.String"/>
+	<parameter name="P_BRANCH_ID" class="java.lang.String"/>
+	<parameter name="P_USERPRINT" class="java.lang.String">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT 
+    D.ID,
+    D.PARENT_ID,
+    LEVEL AS DEPT_LEVEL,
+    CASE 
+        WHEN LEVEL = 1 THEN DECODE($P{P_LANG}, 'ar', D.ARABIC_NAME, D.NAME)
+        ELSE LPAD(' ', (LEVEL - 1) * 4) || '├─ ' || DECODE($P{P_LANG}, 'ar', D.ARABIC_NAME, D.NAME)
+    END AS INDENTED_DEPARTMENT_NAME,
+    (
+        SELECT COUNT(*) 
+        FROM HR_EMPLOYEES E 
+        WHERE E.DEPARTMENT_ID IN (
+            SELECT ID 
+            FROM HR_DEPARTMENT
+            START WITH ID = D.ID
+            CONNECT BY PRIOR ID = PARENT_ID
+        )
+    ) AS TOTAL_EMP_COUNT
+FROM HR_DEPARTMENT D
+WHERE D.STATUS = '1'
+  AND ($P{P_COMP_ID} IS NULL OR D.COMPANY_ID = $P{P_COMP_ID})
+  AND ($P{P_BRANCH_ID} IS NULL OR D.BRANCH_ID = $P{P_BRANCH_ID})
+START WITH D.PARENT_ID IS NULL
+CONNECT BY PRIOR D.ID = D.PARENT_ID]]>
+	</queryString>
+	<field name="ID" class="java.math.BigDecimal"/>
+	<field name="PARENT_ID" class="java.math.BigDecimal"/>
+	<field name="DEPT_LEVEL" class="java.math.BigDecimal"/>
+	<field name="INDENTED_DEPARTMENT_NAME" class="java.lang.String"/>
+	<field name="TOTAL_EMP_COUNT" class="java.math.BigDecimal"/>
+	<pageHeader>
+		<band height="50" splitType="Stretch">
+			<subreport>
+				<reportElement positionType="Float" x="-20" y="0" width="575" height="50" uuid="cc33dd44-0001-0001-0001-000000000001"/>
+				<subreportParameter name="P_COMP_ID">
+					<subreportParameterExpression><![CDATA[$P{P_COMP_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="P_TITLE_REPORT">
+					<subreportParameterExpression><![CDATA["ar".equals($P{P_LANG}) ? "تقرير هيكل الإدارات وعدد العمالة" : "Department Hierarchy & Employee Count"]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "HEAD_TITEL_PA.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="25" splitType="Stretch">
+			<textField>
+				<reportElement mode="Opaque" x="120" y="0" width="435" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0003-0001-0001-000000000001"/>
+				<box rightPadding="10">
+					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "القسم / الإدارة" : "Department / Section"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Opaque" x="0" y="0" width="120" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0003-0001-0001-000000000002"/>
+				<box>
+					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "عدد العمالة" : "Employee Count"]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="20" splitType="Stretch">
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="HierarchicalRowStyle" positionType="Float" stretchType="ContainerHeight" x="120" y="0" width="435" height="20" uuid="cc33dd44-0004-0001-0001-000000000001"/>
+				<box rightPadding="10">
+					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{INDENTED_DEPARTMENT_NAME}]]></textFieldExpression>
+			</textField>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="HierarchicalRowStyle" positionType="Float" stretchType="ContainerHeight" x="0" y="0" width="120" height="20" uuid="cc33dd44-0004-0001-0001-000000000002"/>
+				<box>
+					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TOTAL_EMP_COUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="40" splitType="Stretch">
+			<subreport>
+				<reportElement positionType="Float" x="-20" y="0" width="575" height="40" uuid="cc33dd44-0006-0001-0001-000000000001"/>
+				<subreportParameter name="P_USERPRINT">
+					<subreportParameterExpression><![CDATA[$P{P_USERPRINT}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="PAGE_NUMBER">
+					<subreportParameterExpression><![CDATA[$V{PAGE_NUMBER}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "FOOTER_TITEL_PA.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</pageFooter>
+</jasperReport>
