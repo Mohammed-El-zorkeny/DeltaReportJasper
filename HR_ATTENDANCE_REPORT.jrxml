@@ -46,6 +46,14 @@
     A.SHIFT_ID,
     A.SITES_ID,
     A.ATTENDANCE_DATE,
+    A.DAY_TYPE,
+    DECODE(A.DAY_TYPE,
+        'WORK',    DECODE($P{P_LANG}, 'ar', 'يوم عمل',      'Work Day'),
+        'HOLIDAY', DECODE($P{P_LANG}, 'ar', 'عطلة رسمية',   'Public Holiday'),
+        'OFF',     DECODE($P{P_LANG}, 'ar', 'راحة أسبوعية', 'Weekly Off'),
+        'COMP',    DECODE($P{P_LANG}, 'ar', 'راحة مستحقة',  'Compensatory Day'),
+        A.DAY_TYPE
+    ) AS DAY_TYPE_NAME,
     TO_CHAR(A.CHECK_IN_TIME, 'HH12:MI PM')  AS CHECK_IN_TIME,
     CASE WHEN A.HAS_OUT = 1
          THEN TO_CHAR(A.CHECK_OUT_TIME, 'HH12:MI PM')
@@ -130,6 +138,7 @@ WHERE NVL(A.HAS_IN, 0) = 1
 ORDER BY A.ATTENDANCE_DATE DESC, E.FULL_NAME_AR ASC]]>
 	</queryString>
 	<field name="EMPLOYEE_ID" class="java.math.BigDecimal"/>
+	<field name="DAY_TYPE_NAME" class="java.lang.String"/>
 	<field name="EMPLOYEE_CODE" class="java.lang.String"/>
 	<field name="EMPLOYEE_NAME" class="java.lang.String"/>
 	<field name="DEPARTMENT_NAME" class="java.lang.String"/>
@@ -172,7 +181,7 @@ ORDER BY A.ATTENDANCE_DATE DESC, E.FULL_NAME_AR ASC]]>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "الجزاء / الإجراء" : "Penalty/Status"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "نوع اليوم" : "Day Type"]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement mode="Opaque" x="100" y="40" width="92" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000003"/>
@@ -330,7 +339,7 @@ ORDER BY A.ATTENDANCE_DATE DESC, E.FULL_NAME_AR ASC]]>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{LATE_PENALTY_STATUS} == null ? "—" : $F{LATE_PENALTY_STATUS}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{DAY_TYPE_NAME} == null ? "—" : $F{DAY_TYPE_NAME}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement style="AttendanceStatusStyle" stretchType="ContainerHeight" x="100" y="0" width="92" height="18" uuid="cc33dd44-0003-0001-0001-000000000003"/>
