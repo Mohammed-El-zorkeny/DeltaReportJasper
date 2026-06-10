@@ -39,6 +39,7 @@
 	<parameter name="P_EMPLOYEE_CATEGORY_ID" class="java.lang.String"/>
 	<parameter name="P_FROM_DATE" class="java.lang.String"/>
 	<parameter name="P_TO_DATE" class="java.lang.String"/>
+	<parameter name="P_STATUS_ID" class="java.lang.String"/>
 	<parameter name="P_CHECK_TIME" class="java.lang.String"/>
 	<parameter name="P_CHECK_TYPE" class="java.lang.String"/>
 	<parameter name="P_TIME_DIRECTION" class="java.lang.String"/>
@@ -111,6 +112,17 @@ WHERE NVL(A.HAS_IN, 0) = 1
   AND ($P{P_EMPLOYEE_CATEGORY_ID} IS NULL OR A.EMPLOYEE_CATEGORY_ID = $P{P_EMPLOYEE_CATEGORY_ID})
   AND ($P{P_FROM_DATE}            IS NULL OR A.ATTENDANCE_DATE >= TO_DATE($P{P_FROM_DATE}, 'DD-MM-YYYY'))
   AND ($P{P_TO_DATE}              IS NULL OR A.ATTENDANCE_DATE <= TO_DATE($P{P_TO_DATE},   'DD-MM-YYYY'))
+  AND (
+      $P{P_STATUS_ID} IS NULL
+      OR (
+          $P{P_STATUS_ID} = '1'
+          AND A.HAS_OUT = 1
+      )
+      OR (
+          $P{P_STATUS_ID} = '2'
+          AND A.HAS_OUT = 0
+      )
+  )
   AND (
       $P{P_CHECK_TIME} IS NULL
       OR (UPPER($P{P_CHECK_TYPE}) = 'IN'  AND UPPER($P{P_TIME_DIRECTION}) = 'B'  AND A.CHECK_IN_TIME  < TO_DATE($P{P_CHECK_TIME}, 'HH24:MI'))
