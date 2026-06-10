@@ -6,19 +6,23 @@
 	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<style name="HeaderStyle" mode="Opaque" forecolor="#000000" backcolor="#FFFFFF" fontName="IBM Plex Sans Arabic" fontSize="9" isBold="true">
+	<style name="HeaderStyle" mode="Opaque" forecolor="#FFFFFF" backcolor="#1F4E79" fontName="IBM Plex Sans Arabic" fontSize="9" isBold="true">
 		<box>
-			<pen lineWidth="1.0" lineColor="#000000"/>
+			<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 		</box>
 	</style>
-	<style name="RowStyle" mode="Opaque" forecolor="#000000" backcolor="#FFFFFF" fontName="IBM Plex Sans Arabic" fontSize="9">
+	<style name="RowStyle" mode="Opaque" forecolor="#2C3E50" backcolor="#FFFFFF" fontName="IBM Plex Sans Arabic" fontSize="9">
 		<box>
-			<pen lineWidth="1.0" lineColor="#000000"/>
+			<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 		</box>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[new Boolean($V{REPORT_COUNT}.intValue() % 2 == 0)]]></conditionExpression>
+			<style backcolor="#F9FAFB"/>
+		</conditionalStyle>
 	</style>
-	<style name="TotalStyle" mode="Opaque" forecolor="#000000" backcolor="#FFFFFF" fontName="IBM Plex Sans Arabic" fontSize="9" isBold="true">
+	<style name="TotalStyle" mode="Opaque" forecolor="#1F4E79" backcolor="#D9E2F3" fontName="IBM Plex Sans Arabic" fontSize="9" isBold="true">
 		<box>
-			<pen lineWidth="1.0" lineColor="#000000"/>
+			<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 		</box>
 	</style>
 	<parameter name="P_LANG" class="java.lang.String">
@@ -117,35 +121,7 @@ ORDER BY G.AGE_GROUP_ID ASC]]>
 	<variable name="SUM_TOTAL" class="java.math.BigDecimal" calculation="Sum">
 		<variableExpression><![CDATA[$F{TOTAL_COUNT}]]></variableExpression>
 	</variable>
-	<pageHeader>
-		<band height="120" splitType="Stretch">
-			<subreport>
-				<reportElement positionType="Float" x="-20" y="0" width="575" height="50" uuid="cc33dd44-0001-0001-0001-000000000001"/>
-				<subreportParameter name="P_COMP_ID">
-					<subreportParameterExpression><![CDATA[$P{P_COMP_ID}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="P_TITLE_REPORT">
-					<subreportParameterExpression><![CDATA["Employee Count by Age Group & Category"]]></subreportParameterExpression>
-				</subreportParameter>
-				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "HEAD_TITEL_PA.jasper"]]></subreportExpression>
-			</subreport>
-			<textField>
-				<reportElement x="0" y="65" width="555" height="20" uuid="cc33dd44-0001-0002-0001-000000000001"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="10" isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA["Average entitlement of workers consists of end-of-service gratuity + leave balance"]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="0" y="90" width="555" height="20" uuid="cc33dd44-0001-0002-0002-000000000002"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="11" isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA["Statement of average worker wage after end of service (early retirement) by headcount category"]]></textFieldExpression>
-			</textField>
-		</band>
-	</pageHeader>
+
 	<columnHeader>
 		<band height="45" splitType="Stretch">
 			<!-- Far Left: Age column headers -->

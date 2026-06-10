@@ -103,10 +103,45 @@ ORDER BY G.AGE_GROUP_ID ASC]]>
 	<field name="CAT_4_COUNT" class="java.math.BigDecimal"/>
 	<field name="CAT_5_COUNT" class="java.math.BigDecimal"/>
 	<field name="TOTAL_COUNT" class="java.math.BigDecimal"/>
+
 	<variable name="SUM_CAT_1" class="java.math.BigDecimal" calculation="Sum">
 		<variableExpression><![CDATA[$F{CAT_1_COUNT}]]></variableExpression>
 	</variable>
-
+	<variable name="SUM_CAT_2" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{CAT_2_COUNT}]]></variableExpression>
+	</variable>
+	<variable name="SUM_CAT_3" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{CAT_3_COUNT}]]></variableExpression>
+	</variable>
+	<variable name="SUM_CAT_4" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{CAT_4_COUNT}]]></variableExpression>
+	</variable>
+	<variable name="SUM_CAT_5" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{CAT_5_COUNT}]]></variableExpression>
+	</variable>
+	<variable name="SUM_TOTAL" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{TOTAL_COUNT}]]></variableExpression>
+	</variable>
+	<pageHeader>
+		<band height="50" splitType="Stretch">
+			<subreport>
+				<reportElement positionType="Float" x="-20" y="0" width="575" height="50" uuid="cc33dd44-0001-0001-0001-000000000001"/>
+				<subreportParameter name="P_COMP_ID">
+					<subreportParameterExpression><![CDATA[$P{P_COMP_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="P_TITLE_REPORT">
+					<subreportParameterExpression><![CDATA["بيان أعداد العمالة طبقاً للسن وتصنيف العمالة"]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "HEAD_TITEL_PA.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="45" splitType="Stretch">
+			<!-- Far Right: Age column headers -->
+			<textField>
+				<reportElement style="HeaderStyle" x="455" y="0" width="100" height="20" uuid="cc33dd44-0003-0001-0001-000000000001"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
