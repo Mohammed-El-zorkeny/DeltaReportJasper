@@ -106,27 +106,7 @@ ORDER BY G.AGE_GROUP_ID ASC]]>
 	<variable name="SUM_CAT_1" class="java.math.BigDecimal" calculation="Sum">
 		<variableExpression><![CDATA[$F{CAT_1_COUNT}]]></variableExpression>
 	</variable>
-	<variable name="SUM_CAT_2" class="java.math.BigDecimal" calculation="Sum">
-		<variableExpression><![CDATA[$F{CAT_2_COUNT}]]></variableExpression>
-	</variable>
-	<variable name="SUM_CAT_3" class="java.math.BigDecimal" calculation="Sum">
-		<variableExpression><![CDATA[$F{CAT_3_COUNT}]]></variableExpression>
-	</variable>
-	<variable name="SUM_CAT_4" class="java.math.BigDecimal" calculation="Sum">
-		<variableExpression><![CDATA[$F{CAT_4_COUNT}]]></variableExpression>
-	</variable>
-	<variable name="SUM_CAT_5" class="java.math.BigDecimal" calculation="Sum">
-		<variableExpression><![CDATA[$F{CAT_5_COUNT}]]></variableExpression>
-	</variable>
-	<variable name="SUM_TOTAL" class="java.math.BigDecimal" calculation="Sum">
-		<variableExpression><![CDATA[$F{TOTAL_COUNT}]]></variableExpression>
-	</variable>
 
-	<columnHeader>
-		<band height="45" splitType="Stretch">
-			<!-- Far Right: Age column headers -->
-			<textField>
-				<reportElement style="HeaderStyle" x="455" y="0" width="100" height="20" uuid="cc33dd44-0003-0001-0001-000000000001"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
