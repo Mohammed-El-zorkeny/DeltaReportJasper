@@ -1,0 +1,359 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.5.final using JasperReports Library version 6.20.5-3efcf2e67f959db3888d79f73dde2dbd7acb4f8e  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HR_EMPLOYEE_AGE_CATEGORY_REPORT" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="e6d64789-9012-4bae-8765-3456789012f1">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Delta"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<style name="HeaderStyle" mode="Opaque" forecolor="#000000" backcolor="#FFFFFF" fontName="IBM Plex Sans Arabic" fontSize="9" isBold="true">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="RowStyle" mode="Opaque" forecolor="#000000" backcolor="#FFFFFF" fontName="IBM Plex Sans Arabic" fontSize="9">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="TotalStyle" mode="Opaque" forecolor="#000000" backcolor="#FFFFFF" fontName="IBM Plex Sans Arabic" fontSize="9" isBold="true">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<parameter name="P_LANG" class="java.lang.String">
+		<defaultValueExpression><![CDATA["ar"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_COMP_ID" class="java.lang.String"/>
+	<parameter name="P_BRANCH_ID" class="java.lang.String"/>
+	<parameter name="P_USERPRINT" class="java.lang.String">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[WITH V_DEPT_HIERARCHY AS (
+    SELECT 
+        D.ID,
+        D.PARENT_ID,
+        D.DEPARTMENT_CATGOERY_ID
+    FROM HR_DEPARTMENT D
+    WHERE D.STATUS = '1'
+),
+V_CAT_DEPT_PAIRS AS (
+    SELECT DISTINCT
+        CONNECT_BY_ROOT(H.DEPARTMENT_CATGOERY_ID) AS CAT_ID,
+        H.ID AS DEPT_ID
+    FROM V_DEPT_HIERARCHY H
+    START WITH H.DEPARTMENT_CATGOERY_ID IS NOT NULL
+    CONNECT BY PRIOR H.ID = H.PARENT_ID
+),
+V_EMP_AGE_GROUP AS (
+    SELECT DISTINCT
+        E.EMPLOYEE_ID,
+        P.CAT_ID,
+        TRUNC(MONTHS_BETWEEN(SYSDATE, E.DATE_OF_BIRTH) / 12) AS AGE,
+        CASE
+            WHEN TRUNC(MONTHS_BETWEEN(SYSDATE, E.DATE_OF_BIRTH) / 12) >= 40 AND TRUNC(MONTHS_BETWEEN(SYSDATE, E.DATE_OF_BIRTH) / 12) < 45 THEN 1
+            WHEN TRUNC(MONTHS_BETWEEN(SYSDATE, E.DATE_OF_BIRTH) / 12) >= 45 AND TRUNC(MONTHS_BETWEEN(SYSDATE, E.DATE_OF_BIRTH) / 12) < 50 THEN 2
+            WHEN TRUNC(MONTHS_BETWEEN(SYSDATE, E.DATE_OF_BIRTH) / 12) >= 50 AND TRUNC(MONTHS_BETWEEN(SYSDATE, E.DATE_OF_BIRTH) / 12) < 55 THEN 3
+            WHEN TRUNC(MONTHS_BETWEEN(SYSDATE, E.DATE_OF_BIRTH) / 12) >= 55 AND TRUNC(MONTHS_BETWEEN(SYSDATE, E.DATE_OF_BIRTH) / 12) <= 58 THEN 4
+        END AS AGE_GROUP_ID,
+        E.COMPANY_ID,
+        E.BRANCH_ID
+    FROM HR_EMPLOYEES E
+    JOIN V_CAT_DEPT_PAIRS P ON E.DEPARTMENT_ID = P.DEPT_ID
+    WHERE E.DATE_OF_BIRTH IS NOT NULL
+      AND ($P{P_COMP_ID} IS NULL OR E.COMPANY_ID = $P{P_COMP_ID})
+      AND ($P{P_BRANCH_ID} IS NULL OR E.BRANCH_ID = $P{P_BRANCH_ID})
+),
+V_AGE_GROUPS AS (
+    SELECT 1 AS AGE_GROUP_ID, 'من 40 : 45' AS AGE_GROUP_AR, '40 - 45' AS AGE_GROUP_EN FROM dual
+    UNION ALL
+    SELECT 2 AS AGE_GROUP_ID, 'من 45 : 50' AS AGE_GROUP_AR, '45 - 50' AS AGE_GROUP_EN FROM dual
+    UNION ALL
+    SELECT 3 AS AGE_GROUP_ID, 'من 50 : 55' AS AGE_GROUP_AR, '50 - 55' AS AGE_GROUP_EN FROM dual
+    UNION ALL
+    SELECT 4 AS AGE_GROUP_ID, 'من 55 : 58' AS AGE_GROUP_AR, '55 - 58' AS AGE_GROUP_EN FROM dual
+)
+SELECT 
+    G.AGE_GROUP_ID,
+    DECODE($P{P_LANG}, 'ar', G.AGE_GROUP_AR, G.AGE_GROUP_EN) AS AGE_GROUP_NAME,
+    SUM(CASE WHEN E.CAT_ID = 1 THEN 1 ELSE 0 END) AS CAT_1_COUNT,
+    SUM(CASE WHEN E.CAT_ID = 4 THEN 1 ELSE 0 END) AS CAT_2_COUNT,
+    SUM(CASE WHEN E.CAT_ID = 2 THEN 1 ELSE 0 END) AS CAT_3_COUNT,
+    SUM(CASE WHEN E.CAT_ID = 3 THEN 1 ELSE 0 END) AS CAT_4_COUNT,
+    SUM(CASE WHEN E.CAT_ID = 5 THEN 1 ELSE 0 END) AS CAT_5_COUNT,
+    COUNT(E.EMPLOYEE_ID) AS TOTAL_COUNT
+FROM V_AGE_GROUPS G
+LEFT JOIN V_EMP_AGE_GROUP E ON E.AGE_GROUP_ID = G.AGE_GROUP_ID
+GROUP BY G.AGE_GROUP_ID, G.AGE_GROUP_AR, G.AGE_GROUP_EN
+ORDER BY G.AGE_GROUP_ID ASC]]>
+	</queryString>
+	<field name="AGE_GROUP_ID" class="java.math.BigDecimal"/>
+	<field name="AGE_GROUP_NAME" class="java.lang.String"/>
+	<field name="CAT_1_COUNT" class="java.math.BigDecimal"/>
+	<field name="CAT_2_COUNT" class="java.math.BigDecimal"/>
+	<field name="CAT_3_COUNT" class="java.math.BigDecimal"/>
+	<field name="CAT_4_COUNT" class="java.math.BigDecimal"/>
+	<field name="CAT_5_COUNT" class="java.math.BigDecimal"/>
+	<field name="TOTAL_COUNT" class="java.math.BigDecimal"/>
+	<variable name="SUM_CAT_1" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{CAT_1_COUNT}]]></variableExpression>
+	</variable>
+	<variable name="SUM_CAT_2" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{CAT_2_COUNT}]]></variableExpression>
+	</variable>
+	<variable name="SUM_CAT_3" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{CAT_3_COUNT}]]></variableExpression>
+	</variable>
+	<variable name="SUM_CAT_4" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{CAT_4_COUNT}]]></variableExpression>
+	</variable>
+	<variable name="SUM_CAT_5" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{CAT_5_COUNT}]]></variableExpression>
+	</variable>
+	<variable name="SUM_TOTAL" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{TOTAL_COUNT}]]></variableExpression>
+	</variable>
+	<pageHeader>
+		<band height="120" splitType="Stretch">
+			<subreport>
+				<reportElement positionType="Float" x="-20" y="0" width="575" height="50" uuid="cc33dd44-0001-0001-0001-000000000001"/>
+				<subreportParameter name="P_COMP_ID">
+					<subreportParameterExpression><![CDATA[$P{P_COMP_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="P_TITLE_REPORT">
+					<subreportParameterExpression><![CDATA["بيان أعداد العمالة طبقاً للسن وتصنيف العمالة"]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "HEAD_TITEL_PA.jasper"]]></subreportExpression>
+			</subreport>
+			<textField>
+				<reportElement x="0" y="65" width="555" height="20" uuid="cc33dd44-0001-0002-0001-000000000001"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["متوسط ما يستحقه العمال عبارة عن مكافأة نهاية الخدمة + رصيد الاجازات"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="90" width="555" height="20" uuid="cc33dd44-0001-0002-0002-000000000002"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["بيان اجر متوسط العامل بعد نهاية الخدمة (معاش مبكر) طبقا للتصنيف العمالة"]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="45" splitType="Stretch">
+			<!-- Far Right: Age column headers -->
+			<textField>
+				<reportElement style="HeaderStyle" x="455" y="0" width="100" height="20" uuid="cc33dd44-0003-0001-0001-000000000001"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA["عدد العاملين"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="HeaderStyle" x="455" y="20" width="100" height="25" uuid="cc33dd44-0003-0001-0001-000000000002"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["الاعمار السنية"]]></textFieldExpression>
+			</textField>
+
+			<!-- Middle: Category header spanning multiple columns -->
+			<textField>
+				<reportElement style="HeaderStyle" x="100" y="0" width="355" height="20" uuid="cc33dd44-0003-0002-0001-000000000001"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["تصنيف العمالة"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="HeaderStyle" x="385" y="20" width="70" height="25" uuid="cc33dd44-0003-0002-0002-000000000001"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["إدارية"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="HeaderStyle" x="315" y="20" width="70" height="25" uuid="cc33dd44-0003-0002-0002-000000000002"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["انتاج"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="HeaderStyle" x="245" y="20" width="70" height="25" uuid="cc33dd44-0003-0002-0002-000000000003"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["فنية"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="HeaderStyle" x="175" y="20" width="70" height="25" uuid="cc33dd44-0003-0002-0002-000000000004"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["تسويقية"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="HeaderStyle" x="100" y="20" width="75" height="25" uuid="cc33dd44-0003-0002-0002-000000000005"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["عمالة أخرى"]]></textFieldExpression>
+			</textField>
+
+			<!-- Far Left: Total column header spanning full height -->
+			<textField>
+				<reportElement style="HeaderStyle" x="0" y="0" width="100" height="45" uuid="cc33dd44-0003-0003-0001-000000000001"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["اجمالي عمالة"]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="25" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement style="RowStyle" x="455" y="0" width="100" height="25" uuid="cc33dd44-0004-0001-0001-000000000001"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{AGE_GROUP_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="RowStyle" x="385" y="0" width="70" height="25" uuid="cc33dd44-0004-0002-0001-000000000001"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CAT_1_COUNT}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="RowStyle" x="315" y="0" width="70" height="25" uuid="cc33dd44-0004-0002-0002-000000000002"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CAT_2_COUNT}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="RowStyle" x="245" y="0" width="70" height="25" uuid="cc33dd44-0004-0002-0003-000000000003"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CAT_3_COUNT}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="RowStyle" x="175" y="0" width="70" height="25" uuid="cc33dd44-0004-0002-0004-000000000004"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CAT_4_COUNT}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="RowStyle" x="100" y="0" width="75" height="25" uuid="cc33dd44-0004-0002-0005-000000000005"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{CAT_5_COUNT}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="RowStyle" x="0" y="0" width="100" height="25" uuid="cc33dd44-0004-0003-0001-000000000001"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{TOTAL_COUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="40" splitType="Stretch">
+			<subreport>
+				<reportElement positionType="Float" x="-20" y="0" width="575" height="40" uuid="cc33dd44-0006-0001-0001-000000000001"/>
+				<subreportParameter name="P_USERPRINT">
+					<subreportParameterExpression><![CDATA[$P{P_USERPRINT}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="PAGE_NUMBER">
+					<subreportParameterExpression><![CDATA[$V{PAGE_NUMBER}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "FOOTER_TITEL_PA.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="100" splitType="Stretch">
+			<!-- Grand Total row matching details structure -->
+			<textField>
+				<reportElement style="TotalStyle" x="455" y="0" width="100" height="25" uuid="cc33dd44-0005-0001-0001-000000000001"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["الاجاملي"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="TotalStyle" x="385" y="0" width="70" height="25" uuid="cc33dd44-0005-0002-0001-000000000001"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{SUM_CAT_1}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="TotalStyle" x="315" y="0" width="70" height="25" uuid="cc33dd44-0005-0002-0002-000000000002"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{SUM_CAT_2}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="TotalStyle" x="245" y="0" width="70" height="25" uuid="cc33dd44-0005-0002-0003-000000000003"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{SUM_CAT_3}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="TotalStyle" x="175" y="0" width="70" height="25" uuid="cc33dd44-0005-0002-0004-000000000004"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{SUM_CAT_4}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="TotalStyle" x="100" y="0" width="75" height="25" uuid="cc33dd44-0005-0002-0005-000000000005"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{SUM_CAT_5}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="TotalStyle" x="0" y="0" width="100" height="25" uuid="cc33dd44-0005-0003-0001-000000000001"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{SUM_TOTAL}]]></textFieldExpression>
+			</textField>
+
+			<!-- Signatures block placed left-aligned as in the image -->
+			<textField>
+				<reportElement x="0" y="45" width="250" height="20" uuid="cc33dd44-0005-0004-0001-000000000001"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["العضو المنتدب التنفيذي"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="65" width="250" height="20" uuid="cc33dd44-0005-0004-0002-000000000002"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["كيميائي / اشرف السيد"]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>
