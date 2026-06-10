@@ -149,6 +149,21 @@ ORDER BY C.CAT_ID ASC]]>
 			</textField>
 		</band>
 	</detail>
+	<pageFooter>
+		<band height="40" splitType="Stretch">
+			<subreport>
+				<reportElement positionType="Float" x="-20" y="0" width="575" height="40" uuid="cc33dd44-0006-0001-0001-000000000001"/>
+				<subreportParameter name="P_USERPRINT">
+					<subreportParameterExpression><![CDATA[$P{P_USERPRINT}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="PAGE_NUMBER">
+					<subreportParameterExpression><![CDATA[$V{PAGE_NUMBER}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "FOOTER_TITEL_PA.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</pageFooter>
 	<summary>
 		<band height="30" splitType="Stretch">
 			<textField>
@@ -168,19 +183,4 @@ ORDER BY C.CAT_ID ASC]]>
 			</textField>
 		</band>
 	</summary>
-	<pageFooter>
-		<band height="40" splitType="Stretch">
-			<subreport>
-				<reportElement positionType="Float" x="-20" y="0" width="575" height="40" uuid="cc33dd44-0006-0001-0001-000000000001"/>
-				<subreportParameter name="P_USERPRINT">
-					<subreportParameterExpression><![CDATA[$P{P_USERPRINT}]]></subreportParameterExpression>
-				</subreportParameter>
-				<subreportParameter name="PAGE_NUMBER">
-					<subreportParameterExpression><![CDATA[$V{PAGE_NUMBER}]]></subreportParameterExpression>
-				</subreportParameter>
-				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "FOOTER_TITEL_PA.jasper"]]></subreportExpression>
-			</subreport>
-		</band>
-	</pageFooter>
 </jasperReport>
