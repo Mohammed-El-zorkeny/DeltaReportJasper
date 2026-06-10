@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.5.final using JasperReports Library version 6.20.5-3efcf2e67f959db3888d79f73dde2dbd7acb4f8e  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HR_DEPARTMENT_CATEGORY_DETAIL_REPORT_EN" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="e6d64789-9012-4bae-8765-3456789012f4">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Delta"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<style name="HeaderStyle" mode="Opaque" forecolor="#FFFFFF" backcolor="#1F4E79" fontName="IBM Plex Sans Arabic" fontSize="9" isBold="true">
+		<box>
+			<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+		</box>
+	</style>
+	<style name="RowStyle" mode="Opaque" forecolor="#2C3E50" backcolor="#FFFFFF" fontName="IBM Plex Sans Arabic" fontSize="9">
+		<box>
+			<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+		</box>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[new Boolean($V{REPORT_COUNT}.intValue() % 2 == 0)]]></conditionExpression>
+			<style backcolor="#F9FAFB"/>
+		</conditionalStyle>
+	</style>
+	<style name="TotalStyle" mode="Opaque" forecolor="#1F4E79" backcolor="#D9E2F3" fontName="IBM Plex Sans Arabic" fontSize="9" isBold="true">
+		<box>
+			<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+		</box>
+	</style>
+	<parameter name="P_LANG" class="java.lang.String">
+		<defaultValueExpression><![CDATA["en"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_COMP_ID" class="java.lang.String"/>
+	<parameter name="P_BRANCH_ID" class="java.lang.String"/>
+	<parameter name="P_USERPRINT" class="java.lang.String">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[WITH V_DEPT_HIERARCHY AS (
+    SELECT 
+        D.ID,
+        D.PARENT_ID,
+        D.DEPARTMENT_CATGOERY_ID,
+        D.NAME AS DEPT_NAME_EN,
+        D.ARABIC_NAME AS DEPT_NAME_AR,
+        D.COMPANY_ID,
+        D.BRANCH_ID
+    FROM HR_DEPARTMENT D
+    WHERE D.STATUS = '1'
+),
+V_DEPT_PAIRS AS (
+    SELECT 
+        CONNECT_BY_ROOT(ID) AS ANCESTOR_ID,
+        ID AS DESCENDANT_ID
+    FROM HR_DEPARTMENT
+    WHERE STATUS = '1'
+    CONNECT BY PRIOR ID = PARENT_ID
+),
+V_DEPT_COUNTS AS (
+    SELECT DEPARTMENT_ID, COUNT(*) AS EMP_COUNT
+    FROM HR_EMPLOYEES
+    GROUP BY DEPARTMENT_ID
+),
+V_CUMULATIVE_COUNTS AS (
+    SELECT 
+        P.ANCESTOR_ID AS DEPARTMENT_ID,
+        SUM(NVL(C.EMP_COUNT, 0)) AS TOTAL_EMP_COUNT
+    FROM V_DEPT_PAIRS P
+    LEFT JOIN V_DEPT_COUNTS C ON C.DEPARTMENT_ID = P.DESCENDANT_ID
+    GROUP BY P.ANCESTOR_ID
+),
+V_CAT_DEPT_PAIRS AS (
+    SELECT DISTINCT
+        CONNECT_BY_ROOT(H.DEPARTMENT_CATGOERY_ID) AS CAT_ID,
+        H.ID AS DEPT_ID
+    FROM V_DEPT_HIERARCHY H
+    START WITH H.DEPARTMENT_CATGOERY_ID IS NOT NULL
+    CONNECT BY PRIOR H.ID = H.PARENT_ID
+),
+V_CAT_EMP AS (
+    SELECT DISTINCT
+        P.CAT_ID,
+        E.EMPLOYEE_ID
+    FROM V_CAT_DEPT_PAIRS P
+    JOIN HR_EMPLOYEES E ON E.DEPARTMENT_ID = P.DEPT_ID
+    WHERE ($P{P_COMP_ID} IS NULL OR E.COMPANY_ID = $P{P_COMP_ID})
+      AND ($P{P_BRANCH_ID} IS NULL OR E.BRANCH_ID = $P{P_BRANCH_ID})
+),
+V_CAT_COUNTS AS (
+    SELECT 
+        CAT_ID, 
+        COUNT(*) AS TOTAL_EMP_COUNT
+    FROM V_CAT_EMP
+    GROUP BY CAT_ID
+),
+V_CATEGORIES AS (
+    SELECT 'العمالة الإدارية' AS CAT_NAME_AR, 'Administrative Staff' AS CAT_NAME_EN, 1 AS CAT_ID FROM dual
+    UNION ALL
+    SELECT 'العمالة الفنية' AS CAT_NAME_AR, 'Technical Staff' AS CAT_NAME_EN, 2 AS CAT_ID FROM dual
+    UNION ALL
+    SELECT 'العمالة التسويقية' AS CAT_NAME_AR, 'Marketing Staff' AS CAT_NAME_EN, 3 AS CAT_ID FROM dual
+    UNION ALL
+    SELECT 'العمالة الإنتاجية' AS CAT_NAME_AR, 'Production Staff' AS CAT_NAME_EN, 4 AS CAT_ID FROM dual
+    UNION ALL
+    SELECT 'عمالة أخرى' AS CAT_NAME_AR, 'Other Staff' AS CAT_NAME_EN, 5 AS CAT_ID FROM dual
+)
+SELECT 
+    C.CAT_ID,
+    DECODE($P{P_LANG}, 'ar', C.CAT_NAME_AR, C.CAT_NAME_EN) AS CAT_NAME,
+    P.DEPT_ID,
+    DECODE($P{P_LANG}, 'ar', D.DEPT_NAME_AR, D.DEPT_NAME_EN) AS DEPT_NAME,
+    NVL(CC.TOTAL_EMP_COUNT, 0) AS DEPT_EMP_COUNT,
+    NVL(CCC.TOTAL_EMP_COUNT, 0) AS CAT_TOTAL_EMP_COUNT
+FROM V_CATEGORIES C
+JOIN V_CAT_DEPT_PAIRS P ON P.CAT_ID = C.CAT_ID
+JOIN V_DEPT_HIERARCHY D ON D.ID = P.DEPT_ID
+LEFT JOIN V_CUMULATIVE_COUNTS CC ON CC.DEPARTMENT_ID = P.DEPT_ID
+LEFT JOIN V_CAT_COUNTS CCC ON CCC.CAT_ID = C.CAT_ID
+WHERE ($P{P_COMP_ID} IS NULL OR D.COMPANY_ID = $P{P_COMP_ID})
+  AND ($P{P_BRANCH_ID} IS NULL OR D.BRANCH_ID = $P{P_BRANCH_ID})
+ORDER BY C.CAT_ID ASC, DEPT_EMP_COUNT DESC, D.ID ASC]]>
+	</queryString>
+	<field name="CAT_ID" class="java.math.BigDecimal"/>
+	<field name="CAT_NAME" class="java.lang.String"/>
+	<field name="DEPT_ID" class="java.math.BigDecimal"/>
+	<field name="DEPT_NAME" class="java.lang.String"/>
+	<field name="DEPT_EMP_COUNT" class="java.math.BigDecimal"/>
+	<field name="CAT_TOTAL_EMP_COUNT" class="java.math.BigDecimal"/>
+	<variable name="VAL_GRAND_TOTAL_EMP" class="java.math.BigDecimal" resetType="Report" incrementType="Group" incrementGroup="CategoryGroup" calculation="Sum">
+		<variableExpression><![CDATA[$F{CAT_TOTAL_EMP_COUNT}]]></variableExpression>
+	</variable>
+	<group name="CategoryGroup">
+		<groupExpression><![CDATA[$F{CAT_ID}]]></groupExpression>
+		<groupHeader>
+			<band height="35">
+				<textField>
+					<reportElement mode="Opaque" x="0" y="5" width="555" height="25" forecolor="#1F4E79" backcolor="#D9E2F3" uuid="cc33dd44-0007-0001-0001-000000000001"/>
+					<box leftPadding="10">
+						<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+					</box>
+					<textElement textAlignment="Left" verticalAlignment="Middle">
+						<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Sector Category: " + $F{CAT_NAME}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="30">
+				<textField>
+					<reportElement style="TotalStyle" x="0" y="0" width="435" height="25" uuid="cc33dd44-0008-0001-0001-000000000001"/>
+					<box leftPadding="10"/>
+					<textElement textAlignment="Left" verticalAlignment="Middle">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Total Headcount for Category (" + $F{CAT_NAME} + ")"]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement style="TotalStyle" x="435" y="0" width="120" height="25" uuid="cc33dd44-0008-0001-0002-000000000002"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{CAT_TOTAL_EMP_COUNT}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<pageHeader>
+		<band height="50" splitType="Stretch">
+			<subreport>
+				<reportElement positionType="Float" x="-20" y="0" width="575" height="50" uuid="cc33dd44-0001-0001-0001-000000000001"/>
+				<subreportParameter name="P_COMP_ID">
+					<subreportParameterExpression><![CDATA[$P{P_COMP_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="P_TITLE_REPORT">
+					<subreportParameterExpression><![CDATA["Department Category Detail Employee Headcount"]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "HEAD_TITEL_PA.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="25" splitType="Stretch">
+			<textField>
+				<reportElement style="HeaderStyle" x="0" y="0" width="435" height="25" uuid="cc33dd44-0003-0001-0001-000000000001"/>
+				<box leftPadding="10"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Department / Section Name"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="HeaderStyle" x="435" y="0" width="120" height="25" uuid="cc33dd44-0003-0001-0001-000000000002"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Headcount"]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="25" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement style="RowStyle" x="0" y="0" width="435" height="25" uuid="cc33dd44-0004-0001-0001-000000000001"/>
+				<box leftPadding="10"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DEPT_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="RowStyle" x="435" y="0" width="120" height="25" uuid="cc33dd44-0004-0001-0001-000000000002"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DEPT_EMP_COUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="40" splitType="Stretch">
+			<subreport>
+				<reportElement positionType="Float" x="-20" y="0" width="575" height="40" uuid="cc33dd44-0006-0001-0001-000000000001"/>
+				<subreportParameter name="P_USERPRINT">
+					<subreportParameterExpression><![CDATA[$P{P_USERPRINT}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="PAGE_NUMBER">
+					<subreportParameterExpression><![CDATA[$V{PAGE_NUMBER}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "FOOTER_TITEL_PA.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="30" splitType="Stretch">
+			<textField>
+				<reportElement style="TotalStyle" x="0" y="0" width="435" height="30" uuid="cc33dd44-0005-0001-0001-000000000001"/>
+				<box leftPadding="10"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Grand Total for All Categories"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="TotalStyle" x="435" y="0" width="120" height="30" uuid="cc33dd44-0005-0001-0002-000000000002"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="10" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{VAL_GRAND_TOTAL_EMP}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>
