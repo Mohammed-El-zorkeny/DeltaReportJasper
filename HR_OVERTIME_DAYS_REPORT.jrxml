@@ -44,9 +44,17 @@ V_EMPS AS (
     SELECT DISTINCT 
            A.EMPLOYEE_ID, 
            A.EMPLOYEE_CODE, 
-           DECODE($P{P_LANG}, 'ar', E.FULL_NAME_AR, E.FULL_NAME_EN) AS EMPLOYEE_NAME
+           DECODE($P{P_LANG}, 'ar', E.FULL_NAME_AR, E.FULL_NAME_EN) AS EMPLOYEE_NAME,
+           NVL(
+               DECODE($P{P_LANG}, 'ar', D.ARABIC_NAME, D.NAME),
+               CASE 
+                   WHEN A.DEPARTMENT_ID IS NULL THEN DECODE($P{P_LANG}, 'ar', 'بدون قسم', 'No Department')
+                   ELSE DECODE($P{P_LANG}, 'ar', 'قسم غير معروف (' || A.DEPARTMENT_ID || ')', 'Unknown Department (' || A.DEPARTMENT_ID || ')')
+               END
+           ) AS DEPARTMENT_NAME
     FROM VW_OVERTIME_LOG A
     LEFT JOIN HR_EMPLOYEES E ON E.EMPLOYEE_ID = A.EMPLOYEE_ID
+    LEFT JOIN HR_DEPARTMENT D ON D.ID = A.DEPARTMENT_ID
     WHERE A.WORK_SHIFT_TYPE_ID = 2
       AND NVL(A.OVERTIME_HOURS_ACTUAL, 0) > 0
       AND ($P{P_EMPLOYEE_ID}          IS NULL OR A.EMPLOYEE_ID          = $P{P_EMPLOYEE_ID})
@@ -67,6 +75,7 @@ SELECT
     VE.EMPLOYEE_CODE,
     VE.EMPLOYEE_ID,
     VE.EMPLOYEE_NAME,
+    VE.DEPARTMENT_NAME,
     VD.DT AS ATTENDANCE_DATE,
     NVL(A.OVERTIME_DAYS_CALCULATED, 0) AS OVERTIME_DAYS_CALCULATED,
     (SELECT DECODE($P{P_LANG}, 'ar', E2.FULL_NAME_AR, E2.FULL_NAME_EN) FROM HR_EMPLOYEES E2 WHERE E2.EMPLOYEE_ID = $P{P_EMPLOYEE_ID}) AS SELECTED_EMPLOYEE_NAME,
@@ -77,11 +86,12 @@ LEFT JOIN VW_OVERTIME_LOG A ON A.EMPLOYEE_ID = VE.EMPLOYEE_ID
                            AND A.ATTENDANCE_DATE = VD.DT
                            AND A.WORK_SHIFT_TYPE_ID = 2
                            AND NVL(A.OVERTIME_HOURS_ACTUAL, 0) > 0
-ORDER BY VE.EMPLOYEE_NAME ASC, VD.DT ASC]]>
+ORDER BY VE.DEPARTMENT_NAME ASC, VE.EMPLOYEE_NAME ASC, VD.DT ASC]]>
 	</queryString>
 	<field name="EMPLOYEE_CODE" class="java.lang.String"/>
 	<field name="EMPLOYEE_ID" class="java.math.BigDecimal"/>
 	<field name="EMPLOYEE_NAME" class="java.lang.String"/>
+	<field name="DEPARTMENT_NAME" class="java.lang.String"/>
 	<field name="ATTENDANCE_DATE" class="java.sql.Timestamp"/>
 	<field name="OVERTIME_DAYS_CALCULATED" class="java.math.BigDecimal"/>
 	<field name="SELECTED_EMPLOYEE_NAME" class="java.lang.String"/>
@@ -211,14 +221,21 @@ ORDER BY VE.EMPLOYEE_NAME ASC, VD.DT ASC]]>
 							<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 						</box>
 						<textField>
-							<reportElement x="0" y="0" width="50" height="25" forecolor="#FFFFFF" uuid="cc33dd44-0005-0005-0001-000000000002"/>
+							<reportElement x="0" y="0" width="120" height="25" forecolor="#FFFFFF" uuid="cc33dd44-0005-0005-0001-000000000001"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
+							</textElement>
+							<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "القسم" : "Department"]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement x="120" y="0" width="50" height="25" forecolor="#FFFFFF" uuid="cc33dd44-0005-0005-0001-000000000002"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
 							</textElement>
 							<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "الكود" : "Code"]]></textFieldExpression>
 						</textField>
 						<textField>
-							<reportElement x="50" y="0" width="120" height="25" forecolor="#FFFFFF" uuid="cc33dd44-0005-0005-0001-000000000003"/>
+							<reportElement x="170" y="0" width="120" height="25" forecolor="#FFFFFF" uuid="cc33dd44-0005-0005-0001-000000000003"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
 							</textElement>
@@ -226,6 +243,26 @@ ORDER BY VE.EMPLOYEE_NAME ASC, VD.DT ASC]]>
 						</textField>
 					</cellContents>
 				</crosstabHeaderCell>
+				<rowGroup name="DEPARTMENT_NAME" width="120" totalPosition="None">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{DEPARTMENT_NAME}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents mode="Opaque">
+							<box>
+								<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+							</box>
+							<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+								<reportElement x="0" y="0" width="120" height="20" uuid="cc33dd44-0005-0002-0001-000000000001"/>
+								<box leftPadding="4" rightPadding="4"/>
+								<textElement textAlignment="Right" verticalAlignment="Middle">
+									<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{DEPARTMENT_NAME}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+				</rowGroup>
 				<rowGroup name="EMPLOYEE_CODE" width="50" totalPosition="None">
 					<bucket class="java.lang.String">
 						<bucketExpression><![CDATA[$F{EMPLOYEE_CODE}]]></bucketExpression>
