@@ -210,7 +210,7 @@ ORDER BY VE.DEPARTMENT_NAME ASC, VE.EMPLOYEE_NAME ASC, VD.DT ASC]]>
 	</pageFooter>
 	<summary>
 		<band height="300" splitType="Stretch">
-			<crosstab>
+			<crosstab runDirection="RTL">
 				<reportElement x="0" y="10" width="802" height="280" uuid="cc33dd44-0005-0001-0001-000000000001"/>
 				<crosstabParameter name="P_LANG" class="java.lang.String">
 					<parameterValueExpression><![CDATA[$P{P_LANG}]]></parameterValueExpression>
@@ -221,11 +221,11 @@ ORDER BY VE.DEPARTMENT_NAME ASC, VE.EMPLOYEE_NAME ASC, VD.DT ASC]]>
 							<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 						</box>
 						<textField>
-							<reportElement x="0" y="0" width="120" height="25" forecolor="#FFFFFF" uuid="cc33dd44-0005-0005-0001-000000000001"/>
+							<reportElement x="0" y="0" width="120" height="25" forecolor="#FFFFFF" uuid="cc33dd44-0005-0005-0001-000000000003"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
 							</textElement>
-							<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "القسم" : "Department"]]></textFieldExpression>
+							<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "اسم الموظف" : "Employee Name"]]></textFieldExpression>
 						</textField>
 						<textField>
 							<reportElement x="120" y="0" width="50" height="25" forecolor="#FFFFFF" uuid="cc33dd44-0005-0005-0001-000000000002"/>
@@ -235,11 +235,11 @@ ORDER BY VE.DEPARTMENT_NAME ASC, VE.EMPLOYEE_NAME ASC, VD.DT ASC]]>
 							<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "الكود" : "Code"]]></textFieldExpression>
 						</textField>
 						<textField>
-							<reportElement x="170" y="0" width="120" height="25" forecolor="#FFFFFF" uuid="cc33dd44-0005-0005-0001-000000000003"/>
+							<reportElement x="170" y="0" width="120" height="25" forecolor="#FFFFFF" uuid="cc33dd44-0005-0005-0001-000000000001"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
 							</textElement>
-							<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "اسم الموظف" : "Employee Name"]]></textFieldExpression>
+							<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "القسم" : "Department"]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabHeaderCell>
