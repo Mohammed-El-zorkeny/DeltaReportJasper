@@ -136,11 +136,11 @@ ORDER BY MISSING_CHECK_OUT_COUNT DESC]]>
 				<textFieldExpression><![CDATA[$F{TOTAL_ATTENDANCE_COUNT}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement stretchType="ContainerHeight" x="240" y="0" width="140" height="20" uuid="e0e64789-9012-4bae-8765-3456789012eb"/>
+				<reportElement stretchType="ContainerHeight" mode="Opaque" x="240" y="0" width="140" height="20" backcolor="#FDEDEC" uuid="e0e64789-9012-4bae-8765-3456789012eb"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle" mode="Opaque" backcolor="#FDEDEC">
+				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true" forecolor="#C0392B"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{MISSING_CHECK_OUT_COUNT}]]></textFieldExpression>

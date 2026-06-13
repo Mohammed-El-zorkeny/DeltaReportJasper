@@ -148,12 +148,12 @@ ORDER BY ABSENCE_DAYS_COUNT DESC]]>
 				<textFieldExpression><![CDATA[$F{ABSENT_EMPLOYEES_COUNT}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement stretchType="ContainerHeight" x="162" y="0" width="160" height="20" uuid="e0e64789-9012-4bae-8765-345678901208"/>
-				<box style="AbsenceStatusStyle">
+				<reportElement stretchType="ContainerHeight" mode="Opaque" x="162" y="0" width="160" height="20" backcolor="#FDEDEC" uuid="e0e64789-9012-4bae-8765-345678901208"/>
+				<box>
 					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
+					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true" forecolor="#C0392B"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{ABSENCE_DAYS_COUNT}]]></textFieldExpression>
 			</textField>

@@ -114,11 +114,11 @@ ORDER BY ATTENDANCE_DAYS_COUNT DESC]]>
 				<textFieldExpression><![CDATA[$F{ATTENDING_EMPLOYEES_COUNT}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement stretchType="ContainerHeight" x="162" y="0" width="160" height="20" uuid="e0e64789-9012-4bae-8765-3456789012d9"/>
+				<reportElement stretchType="ContainerHeight" mode="Opaque" x="162" y="0" width="160" height="20" backcolor="#EAFAF1" uuid="e0e64789-9012-4bae-8765-3456789012d9"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle" mode="Opaque" backcolor="#EAFAF1">
+				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true" forecolor="#27AE60"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{ATTENDANCE_DAYS_COUNT}]]></textFieldExpression>
