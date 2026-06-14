@@ -118,8 +118,8 @@ ORDER BY ATTENDANCE_DAYS_COUNT DESC]]>
 				<box>
 					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true" forecolor="#27AE60"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" forecolor="#27AE60">
+					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{ATTENDANCE_DAYS_COUNT}]]></textFieldExpression>
 			</textField>

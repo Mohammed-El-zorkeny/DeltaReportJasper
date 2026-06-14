@@ -140,8 +140,8 @@ ORDER BY MISSING_CHECK_OUT_COUNT DESC]]>
 				<box>
 					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
 				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true" forecolor="#C0392B"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" forecolor="#C0392B">
+					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{MISSING_CHECK_OUT_COUNT}]]></textFieldExpression>
 			</textField>
