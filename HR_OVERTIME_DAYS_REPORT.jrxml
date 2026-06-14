@@ -77,8 +77,10 @@ SELECT
     VE.EMPLOYEE_NAME,
     VE.DEPARTMENT_NAME,
     VD.DT AS ATTENDANCE_DATE,
-    NVL(A.OVERTIME_DAYS_CALCULATED, 0) AS OVERTIME_DAYS_CALCULATED,
-    NVL(CASE WHEN NVL(A.OVERTIME_FACTOR, 0) = 1.6 THEN A.OVERTIME_DAYS_CALCULATED ELSE 0 END, 0) AS MEAL_ALLOWANCE_DAYS,
+    NVL(A.OVERTIME_DAYS_CALCULATED, 0)                                                              AS OVERTIME_DAYS_CALCULATED,
+    CASE WHEN NVL(A.OT_HOURS_400_CALCULATED, 0) >= 1.6 THEN NVL(A.OVERTIME_DAYS_CALCULATED, 0)
+         ELSE 0
+    END                                                                                             AS MEAL_ALLOWANCE_DAYS,
     (SELECT DECODE($P{P_LANG}, 'ar', E2.FULL_NAME_AR, E2.FULL_NAME_EN) FROM HR_EMPLOYEES E2 WHERE E2.EMPLOYEE_ID = $P{P_EMPLOYEE_ID}) AS SELECTED_EMPLOYEE_NAME,
     (SELECT DECODE($P{P_LANG}, 'ar', D2.ARABIC_NAME, D2.NAME) FROM HR_DEPARTMENT D2 WHERE D2.ID = $P{P_DEPARTMENT_ID}) AS SELECTED_DEPARTMENT_NAME
 FROM V_EMPS VE
@@ -323,19 +325,20 @@ ORDER BY VE.DEPARTMENT_NAME ASC, VE.EMPLOYEE_NAME ASC, VD.DT ASC]]>
 						</cellContents>
 					</crosstabColumnHeader>
 					<crosstabTotalColumnHeader>
+						<!-- عمودين في رأس المجموع: بدل الوجبة + إجمالي الأيام -->
 						<cellContents mode="Opaque" backcolor="#1F4E79">
 							<box>
 								<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 							</box>
 							<textField>
-								<reportElement x="0" y="0" width="55" height="12" forecolor="#FFFFFF" uuid="cc33dd44-0005-0003-0001-000000000003a"/>
+								<reportElement x="0" y="0" width="55" height="25" forecolor="#FFFFFF" uuid="cc33dd44-0005-0003-0001-000000000006"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font fontName="IBM Plex Sans Arabic" size="7" isBold="true"/>
 								</textElement>
 								<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "بدل الوجبة" : "Meal Allow."]]></textFieldExpression>
 							</textField>
 							<textField>
-								<reportElement x="55" y="0" width="50" height="12" forecolor="#FFFFFF" uuid="cc33dd44-0005-0003-0001-000000000003b"/>
+								<reportElement x="55" y="0" width="50" height="25" forecolor="#FFFFFF" uuid="cc33dd44-0005-0003-0001-000000000007"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font fontName="IBM Plex Sans Arabic" size="7" isBold="true"/>
 								</textElement>
@@ -344,12 +347,15 @@ ORDER BY VE.DEPARTMENT_NAME ASC, VE.EMPLOYEE_NAME ASC, VD.DT ASC]]>
 						</cellContents>
 					</crosstabTotalColumnHeader>
 				</columnGroup>
+				<!-- Measure 1: إجمالي الأيام -->
 				<measure name="OVERTIME_DAYS_CALCULATED_MEASURE" class="java.math.BigDecimal" calculation="Sum">
 					<measureExpression><![CDATA[$F{OVERTIME_DAYS_CALCULATED}]]></measureExpression>
 				</measure>
+				<!-- Measure 2: عدد بدل الوجبة (إضافي 400% بعامل 1.6) -->
 				<measure name="MEAL_ALLOWANCE_MEASURE" class="java.math.BigDecimal" calculation="Sum">
 					<measureExpression><![CDATA[$F{MEAL_ALLOWANCE_DAYS}]]></measureExpression>
 				</measure>
+				<!-- خلية التفاصيل اليومية -->
 				<crosstabCell width="18" height="20">
 					<cellContents mode="Opaque">
 						<box>
@@ -364,11 +370,13 @@ ORDER BY VE.DEPARTMENT_NAME ASC, VE.EMPLOYEE_NAME ASC, VD.DT ASC]]>
 						</textField>
 					</cellContents>
 				</crosstabCell>
+				<!-- خلية المجموع: بدل الوجبة + إجمالي الأيام جنب بعض -->
 				<crosstabCell width="105" height="20" columnTotalGroup="ATTENDANCE_DATE">
 					<cellContents mode="Opaque" backcolor="#EAFAF1">
 						<box>
 							<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 						</box>
+						<!-- بدل الوجبة أولاً (الجزء الأيسر في RTL = يظهر على اليسار) -->
 						<textField>
 							<reportElement x="0" y="0" width="55" height="20" uuid="cc33dd44-0005-0004-0001-000000000004"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -376,6 +384,7 @@ ORDER BY VE.DEPARTMENT_NAME ASC, VE.EMPLOYEE_NAME ASC, VD.DT ASC]]>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{MEAL_ALLOWANCE_MEASURE} == null ? java.math.BigDecimal.ZERO : $V{MEAL_ALLOWANCE_MEASURE}]]></textFieldExpression>
 						</textField>
+						<!-- إجمالي الأيام بعده -->
 						<textField>
 							<reportElement x="55" y="0" width="50" height="20" uuid="cc33dd44-0005-0004-0001-000000000003"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
