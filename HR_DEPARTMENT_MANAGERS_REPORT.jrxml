@@ -31,7 +31,7 @@
 		</conditionalStyle>
 		<conditionalStyle>
 			<conditionExpression><![CDATA[$F{DEPT_LEVEL} != null && $F{DEPT_LEVEL}.intValue() >= 3]]></conditionExpression>
-			<style forecolor="#7F8C8D" isBold="false"/>
+			<style forecolor="#000000" isBold="false"/>
 		</conditionalStyle>
 	</style>
 	<style name="TotalStyle" mode="Opaque" forecolor="#1F4E79" backcolor="#D9E2F3" fontName="IBM Plex Sans Arabic" fontSize="9" isBold="true">
