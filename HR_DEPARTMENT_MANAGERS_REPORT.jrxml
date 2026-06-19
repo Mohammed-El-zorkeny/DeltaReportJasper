@@ -6,12 +6,12 @@
 	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<style name="HeaderStyle" mode="Opaque" forecolor="#FFFFFF" backcolor="#1F4E79" fontName="IBM Plex Sans Arabic" fontSize="10" isBold="true">
+	<style name="HeaderStyle" mode="Opaque" forecolor="#FFFFFF" backcolor="#1F4E79" fontName="IBM Plex Sans Arabic" fontSize="9" isBold="true">
 		<box>
 			<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 		</box>
 	</style>
-	<style name="RowStyle" mode="Opaque" forecolor="#2C3E50" backcolor="#FFFFFF" fontName="IBM Plex Sans Arabic" fontSize="9">
+	<style name="RowStyle" mode="Opaque" forecolor="#2C3E50" backcolor="#FFFFFF" fontName="IBM Plex Sans Arabic" fontSize="8">
 		<box>
 			<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 		</box>
@@ -20,7 +20,7 @@
 			<style backcolor="#F9FAFB"/>
 		</conditionalStyle>
 	</style>
-	<style name="TotalStyle" mode="Opaque" forecolor="#1F4E79" backcolor="#D9E2F3" fontName="IBM Plex Sans Arabic" fontSize="10" isBold="true">
+	<style name="TotalStyle" mode="Opaque" forecolor="#1F4E79" backcolor="#D9E2F3" fontName="IBM Plex Sans Arabic" fontSize="9" isBold="true">
 		<box>
 			<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 		</box>
@@ -38,7 +38,11 @@
 	</parameter>
 	<queryString>
 		<![CDATA[SELECT 
-    DECODE($P{P_LANG}, 'ar', D.ARABIC_NAME, D.NAME) AS DEPT_NAME,
+    LEVEL AS DEPT_LEVEL,
+    CASE 
+        WHEN LEVEL > 1 THEN LPAD(' ', (LEVEL - 1) * 4, ' ') || '└── ' || DECODE($P{P_LANG}, 'ar', D.ARABIC_NAME, D.NAME)
+        ELSE DECODE($P{P_LANG}, 'ar', D.ARABIC_NAME, D.NAME)
+    END AS DEPT_NAME,
     M.CODE AS MGR_CODE,
     DECODE($P{P_LANG}, 'ar', M.FULL_NAME_AR, M.FULL_NAME_EN) AS MGR_NAME
 FROM HR_DEPARTMENT D
@@ -46,8 +50,11 @@ LEFT JOIN HR_EMPLOYEES M ON D.MANAGER_ID = M.EMPLOYEE_ID
 WHERE D.STATUS = '1'
   AND ($P{P_COMP_ID} IS NULL OR D.COMPANY_ID = $P{P_COMP_ID})
   AND ($P{P_BRANCH_ID} IS NULL OR D.BRANCH_ID = $P{P_BRANCH_ID})
-ORDER BY D.CODE]]>
+START WITH D.PARENT_ID IS NULL
+CONNECT BY PRIOR D.ID = D.PARENT_ID
+ORDER SIBLINGS BY D.CODE]]>
 	</queryString>
+	<field name="DEPT_LEVEL" class="java.math.BigDecimal"/>
 	<field name="DEPT_NAME" class="java.lang.String"/>
 	<field name="MGR_CODE" class="java.lang.String"/>
 	<field name="MGR_NAME" class="java.lang.String"/>
@@ -62,7 +69,7 @@ ORDER BY D.CODE]]>
 					<subreportParameterExpression><![CDATA[$P{P_COMP_ID}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="P_TITLE_REPORT">
-					<subreportParameterExpression><![CDATA["ar".equals($P{P_LANG}) ? "تقرير الإدارات ومدراءها" : "Departments and Managers Report"]]></subreportParameterExpression>
+					<subreportParameterExpression><![CDATA["ar".equals($P{P_LANG}) ? "تقرير الهيكل التنظيمي للإدارات والمديرين" : "Departments Organization Hierarchy & Managers"]]></subreportParameterExpression>
 				</subreportParameter>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "HEAD_TITEL_PA.jasper"]]></subreportExpression>
@@ -70,68 +77,68 @@ ORDER BY D.CODE]]>
 		</band>
 	</pageHeader>
 	<columnHeader>
-		<band height="25" splitType="Stretch">
+		<band height="20" splitType="Stretch">
 			<textField>
-				<reportElement style="HeaderStyle" x="515" y="0" width="40" height="25" uuid="cc33dd44-0002-0001-0001-000000000001"/>
+				<reportElement style="HeaderStyle" x="515" y="0" width="40" height="20" uuid="cc33dd44-0002-0001-0001-000000000001"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="10" isBold="true"/>
+					<font size="9" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "م" : "Seq"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement style="HeaderStyle" x="285" y="0" width="230" height="25" uuid="cc33dd44-0002-0001-0001-000000000002"/>
+				<reportElement style="HeaderStyle" x="285" y="0" width="230" height="20" uuid="cc33dd44-0002-0001-0001-000000000002"/>
 				<box rightPadding="10" leftPadding="10"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="10" isBold="true"/>
+					<font size="9" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "اسم الإدارة" : "Department Name"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "اسم الإدارة والهيكل التنظيمي" : "Department Organizational Hierarchy"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement style="HeaderStyle" x="200" y="0" width="85" height="25" uuid="cc33dd44-0002-0001-0001-000000000003"/>
+				<reportElement style="HeaderStyle" x="200" y="0" width="85" height="20" uuid="cc33dd44-0002-0001-0001-000000000003"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="10" isBold="true"/>
+					<font size="9" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "كود المدير" : "Manager Code"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement style="HeaderStyle" x="0" y="0" width="200" height="25" uuid="cc33dd44-0002-0001-0001-000000000004"/>
+				<reportElement style="HeaderStyle" x="0" y="0" width="200" height="20" uuid="cc33dd44-0002-0001-0001-000000000004"/>
 				<box rightPadding="10" leftPadding="10"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="10" isBold="true"/>
+					<font size="9" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "اسم المدير" : "Manager Name"]]></textFieldExpression>
 			</textField>
 		</band>
 	</columnHeader>
 	<detail>
-		<band height="30" splitType="Stretch">
+		<band height="18" splitType="Stretch">
 			<textField isBlankWhenNull="true">
-				<reportElement style="RowStyle" x="515" y="0" width="40" height="30" uuid="cc33dd44-0003-0001-0001-000000000001"/>
+				<reportElement style="RowStyle" x="515" y="0" width="40" height="18" uuid="cc33dd44-0003-0001-0001-000000000001"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="9"/>
+					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{ROW_NUM}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement style="RowStyle" x="285" y="0" width="230" height="30" uuid="cc33dd44-0003-0001-0001-000000000002"/>
+				<reportElement style="RowStyle" x="285" y="0" width="230" height="18" uuid="cc33dd44-0003-0001-0001-000000000002"/>
 				<box rightPadding="10" leftPadding="10"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="9"/>
+					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{DEPT_NAME}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement style="RowStyle" x="200" y="0" width="85" height="30" uuid="cc33dd44-0003-0001-0001-000000000003"/>
+				<reportElement style="RowStyle" x="200" y="0" width="85" height="18" uuid="cc33dd44-0003-0001-0001-000000000003"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font size="9"/>
+					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{MGR_CODE} != null ? $F{MGR_CODE} : ("ar".equals($P{P_LANG}) ? "-" : "-")]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement style="RowStyle" x="0" y="0" width="200" height="30" uuid="cc33dd44-0003-0001-0001-000000000004"/>
+				<reportElement style="RowStyle" x="0" y="0" width="200" height="18" uuid="cc33dd44-0003-0001-0001-000000000004"/>
 				<box rightPadding="10" leftPadding="10"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="9"/>
+					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{MGR_NAME} != null ? $F{MGR_NAME} : ("ar".equals($P{P_LANG}) ? "لا يوجد" : "N/A")]]></textFieldExpression>
 			</textField>
@@ -153,9 +160,9 @@ ORDER BY D.CODE]]>
 		</band>
 	</pageFooter>
 	<summary>
-		<band height="30" splitType="Stretch">
+		<band height="20" splitType="Stretch">
 			<textField>
-				<reportElement style="TotalStyle" x="200" y="0" width="355" height="30" uuid="cc33dd44-0005-0001-0001-000000000001"/>
+				<reportElement style="TotalStyle" x="200" y="0" width="355" height="20" uuid="cc33dd44-0005-0001-0001-000000000001"/>
 				<box rightPadding="10" leftPadding="10"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="9" isBold="true"/>
@@ -163,10 +170,10 @@ ORDER BY D.CODE]]>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "إجمالي عدد الإدارات" : "Total Number of Departments"]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement style="TotalStyle" x="0" y="0" width="200" height="30" uuid="cc33dd44-0005-0001-0001-000000000002"/>
+				<reportElement style="TotalStyle" x="0" y="0" width="200" height="20" uuid="cc33dd44-0005-0001-0001-000000000002"/>
 				<box rightPadding="10" leftPadding="10"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font size="10" isBold="true"/>
+					<font size="9" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{ROW_NUM}]]></textFieldExpression>
 			</textField>
