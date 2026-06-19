@@ -20,6 +20,20 @@
 			<style backcolor="#F9FAFB"/>
 		</conditionalStyle>
 	</style>
+	<style name="DeptNameStyle" style="RowStyle">
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{DEPT_LEVEL} != null && $F{DEPT_LEVEL}.intValue() == 1]]></conditionExpression>
+			<style forecolor="#1F4E79" isBold="true"/>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{DEPT_LEVEL} != null && $F{DEPT_LEVEL}.intValue() == 2]]></conditionExpression>
+			<style forecolor="#2E6F40" isBold="true"/>
+		</conditionalStyle>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[$F{DEPT_LEVEL} != null && $F{DEPT_LEVEL}.intValue() >= 3]]></conditionExpression>
+			<style forecolor="#7F8C8D" isBold="false"/>
+		</conditionalStyle>
+	</style>
 	<style name="TotalStyle" mode="Opaque" forecolor="#1F4E79" backcolor="#D9E2F3" fontName="IBM Plex Sans Arabic" fontSize="9" isBold="true">
 		<box>
 			<pen lineWidth="0.5" lineColor="#BDC3C7"/>
@@ -91,7 +105,7 @@ ORDER SIBLINGS BY D.CODE]]>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="9" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "اسم الإدارة والهيكل التنظيمي" : "Department Organizational Hierarchy"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "اسم الإدارة" : "Department Name"]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement style="HeaderStyle" x="200" y="0" width="85" height="20" uuid="cc33dd44-0002-0001-0001-000000000003"/>
@@ -120,7 +134,7 @@ ORDER SIBLINGS BY D.CODE]]>
 				<textFieldExpression><![CDATA[$V{ROW_NUM}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement style="RowStyle" x="285" y="0" width="230" height="18" uuid="cc33dd44-0003-0001-0001-000000000002"/>
+				<reportElement style="DeptNameStyle" x="285" y="0" width="230" height="18" uuid="cc33dd44-0003-0001-0001-000000000002"/>
 				<box rightPadding="10" leftPadding="10"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8"/>
