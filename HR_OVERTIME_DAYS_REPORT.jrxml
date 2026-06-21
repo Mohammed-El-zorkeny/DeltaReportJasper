@@ -397,7 +397,7 @@ ORDER BY VE.DEPARTMENT_NAME ASC, VE.EMPLOYEE_NAME ASC, VD.DT ASC]]>
 						</box>
 						<!-- خلفية خضر لو IS_CTO_COMPLETED = 1 -->
 						<rectangle>
-							<reportElement mode="Opaque" x="0" y="0" width="18" height="20" backcolor="#A9DFBF" uuid="cc33dd44-0005-cto1-0001-000000000001">
+							<reportElement mode="Opaque" x="0" y="0" width="18" height="20" backcolor="#A9DFBF" uuid="cc33dd44-0005-c701-0001-000000000001">
 								<printWhenExpression><![CDATA[$V{IS_CTO_COMPLETED_MEASURE} != null && $V{IS_CTO_COMPLETED_MEASURE}.intValue() > 0]]></printWhenExpression>
 							</reportElement>
 							<graphicElement>
@@ -414,7 +414,7 @@ ORDER BY VE.DEPARTMENT_NAME ASC, VE.EMPLOYEE_NAME ASC, VD.DT ASC]]>
 						</textField>
 						<!-- خط شطب أحمر لو IS_CTO_START = 1 -->
 						<line>
-							<reportElement x="1" y="10" width="16" height="1" uuid="cc33dd44-0005-cto2-0001-000000000001">
+							<reportElement x="1" y="10" width="16" height="1" uuid="cc33dd44-0005-c702-0001-000000000001">
 								<printWhenExpression><![CDATA[$V{IS_CTO_START_MEASURE} != null && $V{IS_CTO_START_MEASURE}.intValue() > 0]]></printWhenExpression>
 							</reportElement>
 							<graphicElement>
