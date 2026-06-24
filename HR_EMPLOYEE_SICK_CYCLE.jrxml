@@ -51,10 +51,7 @@
     MAX(CASE WHEN C.SALARY_PERCENT = 0 THEN D.REMAINING_DAYS END) AS NO_PAY_REMAINING,
 
     SUM(NVL(D.USED_DAYS, 0)) AS TOTAL_USED,
-    SUM(NVL(D.REMAINING_DAYS, 0)) AS TOTAL_REMAINING,
-    
-    (SELECT DECODE($P{P_LANG}, 'ar', E2.FULL_NAME_AR, E2.FULL_NAME_EN) FROM HR_EMPLOYEES E2 WHERE E2.EMPLOYEE_ID = $P{P_EMPLOYEE_ID}) AS SELECTED_EMPLOYEE_NAME,
-    (SELECT DECODE($P{P_LANG}, 'ar', D2.ARABIC_NAME, D2.NAME) FROM HR_DEPARTMENT D2 WHERE D2.ID = $P{P_DEPARTMENT_ID}) AS SELECTED_DEPARTMENT_NAME
+    SUM(NVL(D.REMAINING_DAYS, 0)) AS TOTAL_REMAINING
 
 FROM HR_EMPLOYEE_SICK_CYCLES SC
 JOIN HR_EMPLOYEES E ON SC.EMPLOYEE_ID = E.EMPLOYEE_ID
@@ -120,8 +117,6 @@ ORDER BY E.CODE ASC]]>
 	<field name="NO_PAY_REMAINING" class="java.math.BigDecimal"/>
 	<field name="TOTAL_USED" class="java.math.BigDecimal"/>
 	<field name="TOTAL_REMAINING" class="java.math.BigDecimal"/>
-	<field name="SELECTED_EMPLOYEE_NAME" class="java.lang.String"/>
-	<field name="SELECTED_DEPARTMENT_NAME" class="java.lang.String"/>
 	<variable name="ROW_NUM" class="java.lang.Integer" calculation="Count">
 		<variableExpression><![CDATA[$F{EMPLOYEE_ID}]]></variableExpression>
 	</variable>
@@ -141,73 +136,11 @@ ORDER BY E.CODE ASC]]>
 		</band>
 	</pageHeader>
 	<columnHeader>
-		<band height="80" splitType="Stretch">
-			<!-- Parameters Section -->
-			<textField>
-				<reportElement mode="Opaque" x="552" y="1" width="250" height="18" backcolor="#EAF2F8" uuid="e3b0c442-98fc-11d8-9669-0800200c9a68"/>
-				<box>
-					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "الموظف" : "Employee"]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement x="552" y="19" width="250" height="18" uuid="e3b0c442-98fc-11d8-9669-0800200c9a69"/>
-				<box>
-					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{SELECTED_EMPLOYEE_NAME} != null ? $F{SELECTED_EMPLOYEE_NAME} : ("ar".equals($P{P_LANG}) ? "الجميع" : "All")]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement mode="Opaque" x="302" y="1" width="250" height="18" backcolor="#EAF2F8" uuid="e3b0c442-98fc-11d8-9669-0800200c9a70"/>
-				<box>
-					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "القسم" : "Department"]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement x="302" y="19" width="250" height="18" uuid="e3b0c442-98fc-11d8-9669-0800200c9a71"/>
-				<box>
-					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{SELECTED_DEPARTMENT_NAME} != null ? $F{SELECTED_DEPARTMENT_NAME} : ("ar".equals($P{P_LANG}) ? "الجميع" : "All")]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement mode="Opaque" x="0" y="1" width="302" height="18" backcolor="#EAF2F8" uuid="e3b0c442-98fc-11d8-9669-0800200c9a72"/>
-				<box>
-					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "فترة البحث" : "Search Period"]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement x="0" y="19" width="302" height="18" uuid="e3b0c442-98fc-11d8-9669-0800200c9a73"/>
-				<box>
-					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "الكل" : "All"]]></textFieldExpression>
-			</textField>
-
+		<band height="40" splitType="Stretch">
 			<!-- Column Headers - Row 1 (Spanned & Group headers) -->
 			<!-- Seq -->
 			<textField>
-				<reportElement mode="Opaque" x="767" y="40" width="35" height="40" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a74"/>
+				<reportElement mode="Opaque" x="767" y="0" width="35" height="40" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a74"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
@@ -218,7 +151,7 @@ ORDER BY E.CODE ASC]]>
 			</textField>
 			<!-- Code -->
 			<textField>
-				<reportElement mode="Opaque" x="712" y="40" width="55" height="40" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a75"/>
+				<reportElement mode="Opaque" x="712" y="0" width="55" height="40" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a75"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
@@ -229,7 +162,7 @@ ORDER BY E.CODE ASC]]>
 			</textField>
 			<!-- Employee Name -->
 			<textField>
-				<reportElement mode="Opaque" x="532" y="40" width="180" height="40" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a76"/>
+				<reportElement mode="Opaque" x="532" y="0" width="180" height="40" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a76"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
@@ -240,7 +173,7 @@ ORDER BY E.CODE ASC]]>
 			</textField>
 			<!-- Cycle Start Date -->
 			<textField>
-				<reportElement mode="Opaque" x="467" y="40" width="65" height="40" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a77"/>
+				<reportElement mode="Opaque" x="467" y="0" width="65" height="40" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a77"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
@@ -251,7 +184,7 @@ ORDER BY E.CODE ASC]]>
 			</textField>
 			<!-- Cycle End Date -->
 			<textField>
-				<reportElement mode="Opaque" x="402" y="40" width="65" height="40" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a78"/>
+				<reportElement mode="Opaque" x="402" y="0" width="65" height="40" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a78"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
@@ -262,7 +195,7 @@ ORDER BY E.CODE ASC]]>
 			</textField>
 			<!-- Previous Sick Days -->
 			<textField>
-				<reportElement mode="Opaque" x="360" y="40" width="42" height="40" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a79"/>
+				<reportElement mode="Opaque" x="360" y="0" width="42" height="40" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a79"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
@@ -274,7 +207,7 @@ ORDER BY E.CODE ASC]]>
 
 			<!-- Full Pay Spanned Header (Row 1) -->
 			<textField>
-				<reportElement mode="Opaque" x="290" y="40" width="70" height="20" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a80"/>
+				<reportElement mode="Opaque" x="290" y="0" width="70" height="20" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a80"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
@@ -285,7 +218,7 @@ ORDER BY E.CODE ASC]]>
 			</textField>
 			<!-- Pay 75% Spanned Header (Row 1) -->
 			<textField>
-				<reportElement mode="Opaque" x="220" y="40" width="70" height="20" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a81"/>
+				<reportElement mode="Opaque" x="220" y="0" width="70" height="20" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a81"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
@@ -296,7 +229,7 @@ ORDER BY E.CODE ASC]]>
 			</textField>
 			<!-- Pay 50% Spanned Header (Row 1) -->
 			<textField>
-				<reportElement mode="Opaque" x="150" y="40" width="70" height="20" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a82"/>
+				<reportElement mode="Opaque" x="150" y="0" width="70" height="20" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a82"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
@@ -307,7 +240,7 @@ ORDER BY E.CODE ASC]]>
 			</textField>
 			<!-- No Pay Spanned Header (Row 1) -->
 			<textField>
-				<reportElement mode="Opaque" x="80" y="40" width="70" height="20" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a83"/>
+				<reportElement mode="Opaque" x="80" y="0" width="70" height="20" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a83"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
@@ -318,7 +251,7 @@ ORDER BY E.CODE ASC]]>
 			</textField>
 			<!-- Total Spanned Header (Row 1) -->
 			<textField>
-				<reportElement mode="Opaque" x="0" y="40" width="80" height="20" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a84"/>
+				<reportElement mode="Opaque" x="0" y="0" width="80" height="20" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a84"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
@@ -331,7 +264,7 @@ ORDER BY E.CODE ASC]]>
 			<!-- Grouped Column Headers - Row 2 (Used/Remaining subheaders) -->
 			<!-- Full Pay Used -->
 			<textField>
-				<reportElement mode="Opaque" x="325" y="60" width="35" height="20" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a85"/>
+				<reportElement mode="Opaque" x="325" y="20" width="35" height="20" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a85"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
@@ -342,7 +275,7 @@ ORDER BY E.CODE ASC]]>
 			</textField>
 			<!-- Full Pay Remaining -->
 			<textField>
-				<reportElement mode="Opaque" x="290" y="60" width="35" height="20" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a86"/>
+				<reportElement mode="Opaque" x="290" y="20" width="35" height="20" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a86"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
@@ -353,7 +286,7 @@ ORDER BY E.CODE ASC]]>
 			</textField>
 			<!-- Pay 75% Used -->
 			<textField>
-				<reportElement mode="Opaque" x="255" y="60" width="35" height="20" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a87"/>
+				<reportElement mode="Opaque" x="255" y="20" width="35" height="20" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a87"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
@@ -364,7 +297,7 @@ ORDER BY E.CODE ASC]]>
 			</textField>
 			<!-- Pay 75% Remaining -->
 			<textField>
-				<reportElement mode="Opaque" x="220" y="60" width="35" height="20" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a88"/>
+				<reportElement mode="Opaque" x="220" y="20" width="35" height="20" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a88"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
@@ -375,7 +308,7 @@ ORDER BY E.CODE ASC]]>
 			</textField>
 			<!-- Pay 50% Used -->
 			<textField>
-				<reportElement mode="Opaque" x="185" y="60" width="35" height="20" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a89"/>
+				<reportElement mode="Opaque" x="185" y="20" width="35" height="20" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a89"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
@@ -386,7 +319,7 @@ ORDER BY E.CODE ASC]]>
 			</textField>
 			<!-- Pay 50% Remaining -->
 			<textField>
-				<reportElement mode="Opaque" x="150" y="60" width="35" height="20" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a90"/>
+				<reportElement mode="Opaque" x="150" y="20" width="35" height="20" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a90"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
@@ -397,7 +330,7 @@ ORDER BY E.CODE ASC]]>
 			</textField>
 			<!-- No Pay Used -->
 			<textField>
-				<reportElement mode="Opaque" x="115" y="60" width="35" height="20" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a91"/>
+				<reportElement mode="Opaque" x="115" y="20" width="35" height="20" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a91"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
@@ -408,7 +341,7 @@ ORDER BY E.CODE ASC]]>
 			</textField>
 			<!-- No Pay Remaining -->
 			<textField>
-				<reportElement mode="Opaque" x="80" y="60" width="35" height="20" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a92"/>
+				<reportElement mode="Opaque" x="80" y="20" width="35" height="20" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a92"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
@@ -419,7 +352,7 @@ ORDER BY E.CODE ASC]]>
 			</textField>
 			<!-- Total Used -->
 			<textField>
-				<reportElement mode="Opaque" x="40" y="60" width="40" height="20" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a93"/>
+				<reportElement mode="Opaque" x="40" y="20" width="40" height="20" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a93"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
@@ -430,7 +363,7 @@ ORDER BY E.CODE ASC]]>
 			</textField>
 			<!-- Total Remaining -->
 			<textField>
-				<reportElement mode="Opaque" x="0" y="60" width="40" height="20" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a94"/>
+				<reportElement mode="Opaque" x="0" y="20" width="40" height="20" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="e3b0c442-98fc-11d8-9669-0800200c9a94"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
