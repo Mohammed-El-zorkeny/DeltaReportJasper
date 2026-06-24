@@ -380,7 +380,7 @@ ORDER BY E.CODE ASC]]>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement stretchType="ContainerHeight" x="767" y="0" width="35" height="18" uuid="e3b0c442-98fc-11d8-9669-0800200c9a95"/>
 				<box topPadding="1" bottomPadding="1">
-					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
+					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9"/>
@@ -391,7 +391,7 @@ ORDER BY E.CODE ASC]]>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement stretchType="ContainerHeight" x="712" y="0" width="55" height="18" uuid="e3b0c442-98fc-11d8-9669-0800200c9a96"/>
 				<box topPadding="1" bottomPadding="1">
-					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
+					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9"/>
@@ -402,7 +402,7 @@ ORDER BY E.CODE ASC]]>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement stretchType="ContainerHeight" x="532" y="0" width="180" height="18" uuid="e3b0c442-98fc-11d8-9669-0800200c9a97"/>
 				<box topPadding="1" leftPadding="4" bottomPadding="1" rightPadding="4">
-					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
+					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9"/>
@@ -413,7 +413,7 @@ ORDER BY E.CODE ASC]]>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement stretchType="ContainerHeight" x="467" y="0" width="65" height="18" uuid="e3b0c442-98fc-11d8-9669-0800200c9a98"/>
 				<box topPadding="1" bottomPadding="1">
-					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
+					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9"/>
@@ -424,7 +424,7 @@ ORDER BY E.CODE ASC]]>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement stretchType="ContainerHeight" x="402" y="0" width="65" height="18" uuid="e3b0c442-98fc-11d8-9669-0800200c9a99"/>
 				<box topPadding="1" bottomPadding="1">
-					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
+					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9"/>
@@ -435,7 +435,7 @@ ORDER BY E.CODE ASC]]>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement stretchType="ContainerHeight" x="360" y="0" width="42" height="18" uuid="e3b0c442-98fc-11d8-9669-0800200c9aa0"/>
 				<box topPadding="1" bottomPadding="1">
-					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
+					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="8"/>
@@ -447,7 +447,7 @@ ORDER BY E.CODE ASC]]>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement stretchType="ContainerHeight" x="325" y="0" width="35" height="18" uuid="e3b0c442-98fc-11d8-9669-0800200c9aa1"/>
 				<box topPadding="1" bottomPadding="1">
-					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
+					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="8"/>
@@ -458,7 +458,7 @@ ORDER BY E.CODE ASC]]>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement stretchType="ContainerHeight" x="290" y="0" width="35" height="18" uuid="e3b0c442-98fc-11d8-9669-0800200c9aa2"/>
 				<box topPadding="1" bottomPadding="1">
-					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
+					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="8"/>
@@ -470,7 +470,7 @@ ORDER BY E.CODE ASC]]>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement stretchType="ContainerHeight" x="255" y="0" width="35" height="18" uuid="e3b0c442-98fc-11d8-9669-0800200c9aa3"/>
 				<box topPadding="1" bottomPadding="1">
-					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
+					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="8"/>
@@ -481,7 +481,7 @@ ORDER BY E.CODE ASC]]>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement stretchType="ContainerHeight" x="220" y="0" width="35" height="18" uuid="e3b0c442-98fc-11d8-9669-0800200c9aa4"/>
 				<box topPadding="1" bottomPadding="1">
-					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
+					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="8"/>
@@ -493,7 +493,7 @@ ORDER BY E.CODE ASC]]>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement stretchType="ContainerHeight" x="185" y="0" width="35" height="18" uuid="e3b0c442-98fc-11d8-9669-0800200c9aa5"/>
 				<box topPadding="1" bottomPadding="1">
-					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
+					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="8"/>
@@ -504,7 +504,7 @@ ORDER BY E.CODE ASC]]>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement stretchType="ContainerHeight" x="150" y="0" width="35" height="18" uuid="e3b0c442-98fc-11d8-9669-0800200c9aa6"/>
 				<box topPadding="1" bottomPadding="1">
-					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
+					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="8"/>
@@ -516,7 +516,7 @@ ORDER BY E.CODE ASC]]>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement stretchType="ContainerHeight" x="115" y="0" width="35" height="18" uuid="e3b0c442-98fc-11d8-9669-0800200c9aa7"/>
 				<box topPadding="1" bottomPadding="1">
-					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
+					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="8"/>
@@ -527,7 +527,7 @@ ORDER BY E.CODE ASC]]>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement stretchType="ContainerHeight" x="80" y="0" width="35" height="18" uuid="e3b0c442-98fc-11d8-9669-0800200c9aa8"/>
 				<box topPadding="1" bottomPadding="1">
-					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
+					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="8"/>
@@ -539,7 +539,7 @@ ORDER BY E.CODE ASC]]>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement stretchType="ContainerHeight" x="40" y="0" width="40" height="18" uuid="e3b0c442-98fc-11d8-9669-0800200c9aa9"/>
 				<box topPadding="1" bottomPadding="1">
-					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
+					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="8"/>
@@ -550,7 +550,7 @@ ORDER BY E.CODE ASC]]>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
 				<reportElement stretchType="ContainerHeight" x="0" y="0" width="40" height="18" uuid="e3b0c442-98fc-11d8-9669-0800200c9ab0"/>
 				<box topPadding="1" bottomPadding="1">
-					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
+					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="8"/>
