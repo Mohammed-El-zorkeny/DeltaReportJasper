@@ -3,24 +3,21 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HR_EMPLOYEE_PROFILE_REPORT" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="f9d64789-9012-4bae-8765-3456789012de">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Delta"/>
 	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
-	<style name="LabelStyle" mode="Opaque" forecolor="#1F4E79" backcolor="#F2F4F7" fontName="IBM Plex Sans Arabic" fontSize="9" isBold="true">
-		<box rightPadding="5" leftPadding="5">
-			<pen lineWidth="0.5" lineColor="#BDC3C7"/>
-		</box>
+	<style name="LabelStyle" mode="Transparent" forecolor="#1F4E79" fontName="IBM Plex Sans Arabic" fontSize="9" isBold="true">
+		<box rightPadding="5" leftPadding="5"/>
 	</style>
-	<style name="ValueStyle" mode="Opaque" forecolor="#2C3E50" backcolor="#FFFFFF" fontName="IBM Plex Sans Arabic" fontSize="9">
-		<box rightPadding="5" leftPadding="5">
-			<pen lineWidth="0.5" lineColor="#BDC3C7"/>
-		</box>
+	<style name="ValueStyle" mode="Transparent" forecolor="#2C3E50" fontName="IBM Plex Sans Arabic" fontSize="9">
+		<box rightPadding="5" leftPadding="5"/>
 	</style>
-	<style name="HeaderStyle" mode="Opaque" forecolor="#FFFFFF" backcolor="#1F4E79" fontName="IBM Plex Sans Arabic" fontSize="9" isBold="true">
+	<style name="HeaderStyle" mode="Opaque" forecolor="#1F4E79" backcolor="#F2F4F7" fontName="IBM Plex Sans Arabic" fontSize="9" isBold="true">
 		<box>
-			<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+			<topPen lineWidth="0.5" lineColor="#BDC3C7"/>
+			<bottomPen lineWidth="1.0" lineColor="#1F4E79"/>
 		</box>
 	</style>
 	<style name="RowStyle" mode="Opaque" forecolor="#2C3E50" backcolor="#FFFFFF" fontName="IBM Plex Sans Arabic" fontSize="9">
 		<box>
-			<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+			<bottomPen lineWidth="0.5" lineColor="#BDC3C7"/>
 		</box>
 	</style>
 	<parameter name="P_LANG" class="java.lang.String">
@@ -47,6 +44,7 @@
     E.PHONE_PRIMARY AS PHONE,
     E.EMAIL_WORK AS EMAIL,
     E.DATE_OF_BIRTH,
+    TRUNC(MONTHS_BETWEEN(SYSDATE, E.DATE_OF_BIRTH) / 12) AS AGE,
     E.BASIC_SALARY,
     -- Annual Leave Balances (ID 3)
     HR_GET_LEAVE_ENTITLEMENT(E.EMPLOYEE_ID, 3, EXTRACT(YEAR FROM SYSDATE)) AS ANNUAL_ENTITLEMENT,
@@ -74,6 +72,7 @@ WHERE E.EMPLOYEE_ID = TO_NUMBER($P{P_EMPLOYEE_ID})]]>
 	<field name="PHONE" class="java.lang.String"/>
 	<field name="EMAIL" class="java.lang.String"/>
 	<field name="DATE_OF_BIRTH" class="java.sql.Timestamp"/>
+	<field name="AGE" class="java.math.BigDecimal"/>
 	<field name="BASIC_SALARY" class="java.math.BigDecimal"/>
 	<field name="ANNUAL_ENTITLEMENT" class="java.math.BigDecimal"/>
 	<field name="ANNUAL_CARRIED" class="java.math.BigDecimal"/>
@@ -101,12 +100,12 @@ WHERE E.EMPLOYEE_ID = TO_NUMBER($P{P_EMPLOYEE_ID})]]>
 		<band height="380" splitType="Stretch">
 			<!-- Section 1: Basic & Career Details -->
 			<textField>
-				<reportElement mode="Opaque" x="0" y="5" width="555" height="20" forecolor="#1F4E79" backcolor="#EBF5FB" uuid="cc33dd44-0001-0002-0001-000000000001"/>
+				<reportElement x="0" y="5" width="555" height="20" forecolor="#1F4E79" uuid="cc33dd44-0001-0002-0001-000000000001"/>
 				<box leftPadding="5" rightPadding="5">
-					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+					<bottomPen lineWidth="1.0" lineColor="#1F4E79"/>
 				</box>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
+					<font fontName="IBM Plex Sans Arabic" size="10" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "البيانات الأساسية والوظيفية" : "Basic & Job Details"]]></textFieldExpression>
 			</textField>
@@ -204,7 +203,7 @@ WHERE E.EMPLOYEE_ID = TO_NUMBER($P{P_EMPLOYEE_ID})]]>
 			<textField isBlankWhenNull="true">
 				<reportElement style="ValueStyle" x="0" y="85" width="185" height="20" uuid="cc33dd44-0001-0003-0001-000000000016"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{DATE_OF_BIRTH} != null ? new java.text.SimpleDateFormat("dd-MM-yyyy").format($F{DATE_OF_BIRTH}) : "-"]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{DATE_OF_BIRTH} != null ? (new java.text.SimpleDateFormat("dd-MM-yyyy").format($F{DATE_OF_BIRTH}) + ("ar".equals($P{P_LANG}) ? " (السن: " + $F{AGE} + " سنة)" : " (Age: " + $F{AGE} + " years)")) : "-"]]></textFieldExpression>
 			</textField>
 
 			<!-- Grid Row 5 -->
@@ -233,12 +232,12 @@ WHERE E.EMPLOYEE_ID = TO_NUMBER($P{P_EMPLOYEE_ID})]]>
 
 			<!-- Section 2: Leave Balances Summary Card -->
 			<textField>
-				<reportElement mode="Opaque" x="0" y="140" width="555" height="20" forecolor="#1F4E79" backcolor="#EBF5FB" uuid="cc33dd44-0001-0002-0001-000000000002"/>
+				<reportElement x="0" y="140" width="555" height="20" forecolor="#1F4E79" uuid="cc33dd44-0001-0002-0001-000000000002"/>
 				<box leftPadding="5" rightPadding="5">
-					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+					<bottomPen lineWidth="1.0" lineColor="#1F4E79"/>
 				</box>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
+					<font fontName="IBM Plex Sans Arabic" size="10" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "خلاصة أرصدة الإجازات الحالية" : "Leave Balances Summary"]]></textFieldExpression>
 			</textField>
