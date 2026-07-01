@@ -63,7 +63,7 @@ ORDER BY x."الإدارة", x."رقم_الموظف"]]>
 	<variable name="TOTAL_COUNT" class="java.lang.Integer" calculation="Count">
 		<variableExpression><![CDATA[$F{رقم_الموظف}]]></variableExpression>
 	</variable>
-	<group name="DepartmentGroup" isStartNewPage="true" reprintHeaderOnEachPage="true">
+	<group name="DepartmentGroup" isStartNewPage="true" isReprintHeaderOnEachPage="true">
 		<groupExpression><![CDATA[$F{الإدارة}]]></groupExpression>
 		<groupHeader>
 			<band height="55" splitType="Stretch">
