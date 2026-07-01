@@ -35,11 +35,11 @@
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
 	</parameter>
-	<parameter name="P90410_EMPLOYEE_ID" class="java.lang.String"/>
-	<parameter name="P90410_FROM_DATE" class="java.lang.String"/>
-	<parameter name="P90410_TO_DATE" class="java.lang.String"/>
-	<parameter name="P90410_LEAVE_TYPE_ID" class="java.lang.String"/>
-	<parameter name="P90410_STATUS_ID" class="java.lang.String"/>
+	<parameter name="P_EMPLOYEE_ID" class="java.lang.String"/>
+	<parameter name="P_FROM_DATE" class="java.lang.String"/>
+	<parameter name="P_TO_DATE" class="java.lang.String"/>
+	<parameter name="P_LEAVE_TYPE_ID" class="java.lang.String"/>
+	<parameter name="P_STATUS_ID" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[SELECT 
     R.ID,
@@ -81,9 +81,9 @@
     R.MODIFIED_BY,
     R.MODIFIED_DATE,
     R.CREATED_DATE,
-    (CASE WHEN $P{P90410_EMPLOYEE_ID} IS NOT NULL THEN (SELECT DECODE($P{P_LANG}, 'ar', E2.FULL_NAME_AR, E2.FULL_NAME_EN) FROM HR_EMPLOYEES E2 WHERE E2.EMPLOYEE_ID = TO_NUMBER($P{P90410_EMPLOYEE_ID})) ELSE NULL END) AS SELECTED_EMPLOYEE_NAME,
-    (CASE WHEN $P{P90410_LEAVE_TYPE_ID} IS NOT NULL THEN (SELECT DECODE($P{P_LANG}, 'ar', LT2.ARABIC_NAME, LT2.NAME) FROM HR_LEAVE_TYPES LT2 WHERE LT2.ID = TO_NUMBER($P{P90410_LEAVE_TYPE_ID})) ELSE NULL END) AS SELECTED_LEAVE_TYPE_NAME,
-    (CASE WHEN $P{P90410_STATUS_ID} IS NOT NULL THEN (SELECT DECODE($P{P_LANG}, 'ar', NVL(RS2.ARABIC_NAME, RS2.NAME), RS2.NAME) FROM HR_LEAVE_STATUS RS2 WHERE RS2.ID = TO_NUMBER($P{P90410_STATUS_ID})) ELSE NULL END) AS SELECTED_STATUS_NAME
+    (CASE WHEN $P{P_EMPLOYEE_ID} IS NOT NULL THEN (SELECT DECODE($P{P_LANG}, 'ar', E2.FULL_NAME_AR, E2.FULL_NAME_EN) FROM HR_EMPLOYEES E2 WHERE E2.EMPLOYEE_ID = TO_NUMBER($P{P_EMPLOYEE_ID})) ELSE NULL END) AS SELECTED_EMPLOYEE_NAME,
+    (CASE WHEN $P{P_LEAVE_TYPE_ID} IS NOT NULL THEN (SELECT DECODE($P{P_LANG}, 'ar', LT2.ARABIC_NAME, LT2.NAME) FROM HR_LEAVE_TYPES LT2 WHERE LT2.ID = TO_NUMBER($P{P_LEAVE_TYPE_ID})) ELSE NULL END) AS SELECTED_LEAVE_TYPE_NAME,
+    (CASE WHEN $P{P_STATUS_ID} IS NOT NULL THEN (SELECT DECODE($P{P_LANG}, 'ar', NVL(RS2.ARABIC_NAME, RS2.NAME), RS2.NAME) FROM HR_LEAVE_STATUS RS2 WHERE RS2.ID = TO_NUMBER($P{P_STATUS_ID})) ELSE NULL END) AS SELECTED_STATUS_NAME
 FROM HR_EMPLOYEE_LEAVE_REQUESTS R
 LEFT JOIN HR_EMPLOYEES E ON R.EMPLOYEE_ID = E.EMPLOYEE_ID
 LEFT JOIN HR_EMPLOYEES SUB ON R.SUBSTITUTE_EMP_ID = SUB.EMPLOYEE_ID
@@ -102,11 +102,11 @@ LEFT JOIN (
       FROM HR_LEAVE_TYPE_STAGES SG
 ) SG ON R.STAGE_ID = SG.STAGE_ID
 WHERE ($P{P_COMP_ID} IS NULL OR R.COMPANY_ID = $P{P_COMP_ID})
-  AND ($P{P90410_EMPLOYEE_ID} IS NULL OR $P{P90410_EMPLOYEE_ID} = '' OR R.EMPLOYEE_ID = TO_NUMBER($P{P90410_EMPLOYEE_ID}))
-  AND ($P{P90410_FROM_DATE} IS NULL OR R.END_DATE >= TO_DATE($P{P90410_FROM_DATE}, 'DD-MM-YYYY'))
-  AND ($P{P90410_TO_DATE} IS NULL OR R.START_DATE <= TO_DATE($P{P90410_TO_DATE}, 'DD-MM-YYYY'))
-  AND ($P{P90410_LEAVE_TYPE_ID} IS NULL OR $P{P90410_LEAVE_TYPE_ID} = '' OR R.LEAVE_TYPE_ID = TO_NUMBER($P{P90410_LEAVE_TYPE_ID}))
-  AND ($P{P90410_STATUS_ID} IS NULL OR $P{P90410_STATUS_ID} = '' OR R.STATUS_ID = TO_NUMBER($P{P90410_STATUS_ID}))
+  AND ($P{P_EMPLOYEE_ID} IS NULL OR $P{P_EMPLOYEE_ID} = '' OR R.EMPLOYEE_ID = TO_NUMBER($P{P_EMPLOYEE_ID}))
+  AND ($P{P_FROM_DATE} IS NULL OR R.END_DATE >= TO_DATE($P{P_FROM_DATE}, 'DD-MM-YYYY'))
+  AND ($P{P_TO_DATE} IS NULL OR R.START_DATE <= TO_DATE($P{P_TO_DATE}, 'DD-MM-YYYY'))
+  AND ($P{P_LEAVE_TYPE_ID} IS NULL OR $P{P_LEAVE_TYPE_ID} = '' OR R.LEAVE_TYPE_ID = TO_NUMBER($P{P_LEAVE_TYPE_ID}))
+  AND ($P{P_STATUS_ID} IS NULL OR $P{P_STATUS_ID} = '' OR R.STATUS_ID = TO_NUMBER($P{P_STATUS_ID}))
 ORDER BY R.START_DATE DESC, E.CODE ASC]]>
 	</queryString>
 	<field name="ID" class="java.math.BigDecimal"/>
@@ -240,10 +240,10 @@ ORDER BY R.START_DATE DESC, E.CODE ASC]]>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="9"/>
 				</textElement>
-				<textFieldExpression><![CDATA[($P{P90410_FROM_DATE} == null && $P{P90410_TO_DATE} == null) ? ("ar".equals($P{P_LANG}) ? "الجميع" : "All") : 
+				<textFieldExpression><![CDATA[($P{P_FROM_DATE} == null && $P{P_TO_DATE} == null) ? ("ar".equals($P{P_LANG}) ? "الجميع" : "All") : 
 (
-  ($P{P90410_FROM_DATE} != null ? ("ar".equals($P{P_LANG}) ? "من " : "From ") + $P{P90410_FROM_DATE} : "") + 
-  ($P{P90410_TO_DATE} != null ? ("ar".equals($P{P_LANG}) ? " إلى " : " to ") + $P{P90410_TO_DATE} : "")
+  ($P{P_FROM_DATE} != null ? ("ar".equals($P{P_LANG}) ? "من " : "From ") + $P{P_FROM_DATE} : "") + 
+  ($P{P_TO_DATE} != null ? ("ar".equals($P{P_LANG}) ? " إلى " : " to ") + $P{P_TO_DATE} : "")
 )]]></textFieldExpression>
 			</textField>
 			<textField>
