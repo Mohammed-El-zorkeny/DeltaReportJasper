@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.5.final using JasperReports Library version 6.20.5-3efcf2e67f959db3888d79f73dde2dbd7acb4f8e  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HR_LEAVE_DIFFERENCES_REPORT" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="15" bottomMargin="15" uuid="e8d64789-9012-4bae-8765-3456789012cd">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Delta"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<style name="HeaderStyle" mode="Opaque" forecolor="#FFFFFF" backcolor="#1F4E79" fontName="IBM Plex Sans Arabic" fontSize="9" isBold="true">
+		<box>
+			<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+		</box>
+	</style>
+	<style name="RowStyle" mode="Opaque" forecolor="#2C3E50" backcolor="#FFFFFF" fontName="IBM Plex Sans Arabic" fontSize="8">
+		<box>
+			<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+		</box>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[new Boolean($V{REPORT_COUNT}.intValue() % 2 == 0)]]></conditionExpression>
+			<style backcolor="#F9FAFB"/>
+		</conditionalStyle>
+	</style>
+	<style name="TotalStyle" mode="Opaque" forecolor="#1F4E79" backcolor="#D9E2F3" fontName="IBM Plex Sans Arabic" fontSize="9" isBold="true">
+		<box>
+			<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+		</box>
+	</style>
+	<parameter name="P_LANG" class="java.lang.String">
+		<defaultValueExpression><![CDATA["ar"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_COMP_ID" class="java.lang.String"/>
+	<parameter name="P_USERPRINT" class="java.lang.String">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[SELECT x."رقم_الموظف", x."اسم_الموظف", x."الإدارة",
+       x."عدد_الأيام", x."من_تاريخ", x."إلى_تاريخ" ,
+x.نوع_الأجازة
+FROM   LEAVE_EX_06 x
+WHERE  NOT EXISTS (
+         SELECT 1
+         FROM   HR_EMPLOYEE_LEAVE_REQUESTS r
+         JOIN   HR_EMPLOYEES e ON e.EMPLOYEE_ID = r.EMPLOYEE_ID
+         WHERE  TO_NUMBER(e.CODE) = x."رقم_الموظف"
+           AND  r.START_DATE >= DATE '2026-06-01'
+           AND  r.START_DATE <  DATE '2026-07-01'
+       )
+ORDER BY x."رقم_الموظف"]]>
+	</queryString>
+	<field name="رقم_الموظف" class="java.math.BigDecimal"/>
+	<field name="اسم_الموظف" class="java.lang.String"/>
+	<field name="الإدارة" class="java.lang.String"/>
+	<field name="عدد_الأيام" class="java.math.BigDecimal"/>
+	<field name="من_تاريخ" class="java.sql.Timestamp"/>
+	<field name="إلى_تاريخ" class="java.sql.Timestamp"/>
+	<field name="نوع_الأجازة" class="java.lang.String"/>
+	<variable name="ROW_NUM" class="java.lang.Integer" calculation="Count">
+		<variableExpression><![CDATA[$F{رقم_الموظف}]]></variableExpression>
+	</variable>
+	<pageHeader>
+		<band height="50" splitType="Stretch">
+			<subreport>
+				<reportElement positionType="Float" x="-20" y="0" width="842" height="50" uuid="cc33dd44-0001-0001-0001-000000000001"/>
+				<subreportParameter name="P_COMP_ID">
+					<subreportParameterExpression><![CDATA[$P{P_COMP_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="P_TITLE_REPORT">
+					<subreportParameterExpression><![CDATA["ar".equals($P{P_LANG}) ? "تقرير فروقات إجازات الموظفين" : "Employee Leave Differences Report"]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "HEAD_TITEL_PA_LAND.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="25" splitType="Stretch">
+			<textField>
+				<reportElement style="HeaderStyle" x="772" y="0" width="30" height="25" uuid="cc33dd44-0002-0001-0001-000000000001"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "م" : "Seq"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="HeaderStyle" x="702" y="0" width="70" height="25" uuid="cc33dd44-0002-0001-0001-000000000002"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "رقم الموظف" : "Emp Code"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="HeaderStyle" x="532" y="0" width="170" height="25" uuid="cc33dd44-0002-0001-0001-000000000003"/>
+				<box rightPadding="5" leftPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "اسم الموظف" : "Employee Name"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="HeaderStyle" x="402" y="0" width="130" height="25" uuid="cc33dd44-0002-0001-0001-000000000004"/>
+				<box rightPadding="5" leftPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "الإدارة" : "Department"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="HeaderStyle" x="292" y="0" width="110" height="25" uuid="cc33dd44-0002-0001-0001-000000000005"/>
+				<box rightPadding="5" leftPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "نوع الإجازة" : "Leave Type"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="HeaderStyle" x="202" y="0" width="90" height="25" uuid="cc33dd44-0002-0001-0001-000000000006"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "من تاريخ" : "From Date"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="HeaderStyle" x="112" y="0" width="90" height="25" uuid="cc33dd44-0002-0001-0001-000000000007"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "إلى تاريخ" : "To Date"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="HeaderStyle" x="0" y="0" width="112" height="25" uuid="cc33dd44-0002-0001-0001-000000000008"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "عدد الأيام" : "Days"]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="18" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement style="RowStyle" x="772" y="0" width="30" height="18" uuid="cc33dd44-0003-0001-0001-000000000001"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{ROW_NUM}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="RowStyle" x="702" y="0" width="70" height="18" uuid="cc33dd44-0003-0001-0001-000000000002"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{رقم_الموظف}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="RowStyle" x="532" y="0" width="170" height="18" uuid="cc33dd44-0003-0001-0001-000000000003"/>
+				<box rightPadding="5" leftPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{اسم_الموظف}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="RowStyle" x="402" y="0" width="130" height="18" uuid="cc33dd44-0003-0001-0001-000000000004"/>
+				<box rightPadding="5" leftPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{الإدارة}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="RowStyle" x="292" y="0" width="110" height="18" uuid="cc33dd44-0003-0001-0001-000000000005"/>
+				<box rightPadding="5" leftPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{نوع_الأجازة}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="RowStyle" x="202" y="0" width="90" height="18" uuid="cc33dd44-0003-0001-0001-000000000006"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{من_تاريخ} != null ? new java.text.SimpleDateFormat("dd-MM-yyyy").format($F{من_تاريخ}) : "-"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="RowStyle" x="112" y="0" width="90" height="18" uuid="cc33dd44-0003-0001-0001-000000000007"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{إلى_تاريخ} != null ? new java.text.SimpleDateFormat("dd-MM-yyyy").format($F{إلى_تاريخ}) : "-"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="RowStyle" x="0" y="0" width="112" height="18" uuid="cc33dd44-0003-0001-0001-000000000008"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{عدد_الأيام}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="40" splitType="Stretch">
+			<subreport>
+				<reportElement positionType="Float" x="-20" y="0" width="842" height="40" uuid="cc33dd44-0004-0001-0001-000000000001"/>
+				<subreportParameter name="P_USERPRINT">
+					<subreportParameterExpression><![CDATA[$P{P_USERPRINT}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="P_LANG">
+					<subreportParameterExpression><![CDATA[$P{P_LANG}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "FOOTER_TITEL_PA_LAND.jasper"]]></subreportExpression>
+			</subreport>
+			<textField>
+				<reportElement positionType="Float" x="0" y="10" width="100" height="20" uuid="cc33dd44-0004-0002-0001-000000000002"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "صفحة " + $V{PAGE_NUMBER} + " من " : "Page " + $V{PAGE_NUMBER} + " of "]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement positionType="Float" x="100" y="10" width="30" height="20" uuid="cc33dd44-0004-0002-0001-000000000003"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement positionType="Float" x="130" y="10" width="110" height="20" uuid="cc33dd44-0004-0002-0001-000000000004"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? " - عدد الصفوف: " + $V{REPORT_COUNT} : " - Rows: " + $V{REPORT_COUNT}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="20" splitType="Stretch">
+			<textField>
+				<reportElement style="TotalStyle" x="112" y="0" width="690" height="20" uuid="cc33dd44-0005-0001-0001-000000000001"/>
+				<box rightPadding="10" leftPadding="10"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "إجمالي عدد السجلات" : "Total Records"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="TotalStyle" x="0" y="0" width="112" height="20" uuid="cc33dd44-0005-0001-0001-000000000002"/>
+				<box rightPadding="10" leftPadding="10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{ROW_NUM}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>
