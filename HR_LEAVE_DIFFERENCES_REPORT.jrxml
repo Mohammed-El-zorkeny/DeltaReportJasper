@@ -48,7 +48,7 @@ WHERE  NOT EXISTS (
            AND  r.START_DATE >= DATE '2026-06-01'
            AND  r.START_DATE <  DATE '2026-07-01'
        )
-ORDER BY x."رقم_الموظف"]]>
+ORDER BY x."الإدارة", x."رقم_الموظف"]]>
 	</queryString>
 	<field name="رقم_الموظف" class="java.math.BigDecimal"/>
 	<field name="اسم_الموظف" class="java.lang.String"/>
@@ -57,9 +57,29 @@ ORDER BY x."رقم_الموظف"]]>
 	<field name="من_تاريخ" class="java.sql.Timestamp"/>
 	<field name="إلى_تاريخ" class="java.sql.Timestamp"/>
 	<field name="نوع_الأجازة" class="java.lang.String"/>
-	<variable name="ROW_NUM" class="java.lang.Integer" calculation="Count">
+	<variable name="ROW_NUM" class="java.lang.Integer" resetType="Group" resetGroup="DepartmentGroup" calculation="Count">
 		<variableExpression><![CDATA[$F{رقم_الموظف}]]></variableExpression>
 	</variable>
+	<variable name="TOTAL_COUNT" class="java.lang.Integer" calculation="Count">
+		<variableExpression><![CDATA[$F{رقم_الموظف}]]></variableExpression>
+	</variable>
+	<group name="DepartmentGroup" isStartNewPage="true">
+		<groupExpression><![CDATA[$F{الإدارة}]]></groupExpression>
+		<groupHeader>
+			<band height="25" splitType="Stretch">
+				<textField isBlankWhenNull="true">
+					<reportElement mode="Opaque" x="0" y="5" width="802" height="20" backcolor="#EAF2F8" uuid="cc33dd44-0006-0001-0001-000000000002"/>
+					<box leftPadding="5" rightPadding="5">
+						<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+					</box>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[("ar".equals($P{P_LANG}) ? "الإدارة: " : "Department: ") + ($F{الإدارة} == null ? ("ar".equals($P{P_LANG}) ? "غير محددة" : "Unspecified") : $F{الإدارة})]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+	</group>
 	<pageHeader>
 		<band height="50" splitType="Stretch">
 			<subreport>
@@ -253,7 +273,7 @@ ORDER BY x."رقم_الموظف"]]>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="9" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$V{ROW_NUM}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$V{TOTAL_COUNT}]]></textFieldExpression>
 			</textField>
 		</band>
 	</summary>
