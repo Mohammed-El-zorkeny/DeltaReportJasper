@@ -75,8 +75,10 @@ CTO_RANKED AS (
     SELECT
         CTO.EMPLOYEE_ID,
         CTO.CTO_DATE,
+        CTO.CTO_HOURS,
         ROW_NUMBER() OVER (
-            PARTITION BY CTO.EMPLOYEE_ID
+            PARTITION BY CTO.EMPLOYEE_ID,
+                         CASE WHEN CTO.CTO_HOURS = 4 THEN '400' ELSE '250' END
             ORDER BY CTO.CTO_DATE
         ) AS RN
     FROM HR_CTO_TRANSACTIONS CTO
@@ -89,22 +91,81 @@ SELECT
     VE.DEPARTMENT_NAME,
     VD.DT AS ATTENDANCE_DATE,
     NVL(A.OVERTIME_DAYS_CALCULATED, 0)                                 AS OVERTIME_DAYS_CALCULATED,
-    -- بدل الوجبة: مش يوم CTO + ساعات 400% >= 4
+    
+    -- ✅ أيام الإضافي الصافية
     CASE
-        WHEN EXISTS (SELECT 1 FROM CTO_RANKED CR WHERE CR.EMPLOYEE_ID = VE.EMPLOYEE_ID AND CR.CTO_DATE = VD.DT) THEN 0
-        WHEN NVL(A.OT_HOURS_400_CALCULATED, 0) >= 4 THEN 1
+        WHEN EXISTS (
+            SELECT 1 FROM CTO_RANKED CR
+             WHERE CR.EMPLOYEE_ID = VE.EMPLOYEE_ID
+               AND CR.CTO_DATE    = VD.DT
+               AND CR.CTO_HOURS   = 8
+        )
+        THEN 0
+        WHEN EXISTS (
+            SELECT 1 FROM CTO_RANKED CR
+             WHERE CR.EMPLOYEE_ID = VE.EMPLOYEE_ID
+               AND CR.CTO_DATE    = VD.DT
+               AND CR.CTO_HOURS   = 4
+               AND MOD(CR.RN, 2) IN (0, 1)
+        )
+        THEN 0
+        ELSE NVL(A.OVERTIME_DAYS_CALCULATED, 0)
+    END                                                                AS OVERTIME_DAYS_NET,
+
+    -- ✅ بدل الوجبة
+    CASE
+        WHEN EXISTS (
+            SELECT 1 FROM CTO_RANKED CR
+             WHERE CR.EMPLOYEE_ID = VE.EMPLOYEE_ID
+               AND CR.CTO_DATE    = VD.DT
+               AND CR.CTO_HOURS   = 4
+               AND MOD(CR.RN, 2) IN (0, 1)
+        )
+        THEN 0
+        WHEN CASE
+                 WHEN EXISTS (
+                     SELECT 1 FROM CTO_RANKED CR
+                      WHERE CR.EMPLOYEE_ID = VE.EMPLOYEE_ID
+                        AND CR.CTO_DATE    = VD.DT
+                        AND CR.CTO_HOURS   = 8
+                 )
+                 THEN NVL(A.OT_DAYS_400_CALCULATED, 0)
+                 ELSE NVL(A.OT_DAYS_400_CALCULATED, 0)
+             END >= 1.6
+        THEN 1
         ELSE 0
     END                                                                AS MEAL_ALLOWANCE_DAYS,
-    -- CTO بداية (رقم فردي = بداية يوم يعوض)
+
+    -- ✅ CTO بداية
     CASE
-        WHEN EXISTS (SELECT 1 FROM CTO_RANKED CR WHERE CR.EMPLOYEE_ID = VE.EMPLOYEE_ID AND CR.CTO_DATE = VD.DT AND MOD(CR.RN, 2) = 1) THEN 1
+        WHEN EXISTS (
+            SELECT 1 FROM CTO_RANKED CR
+             WHERE CR.EMPLOYEE_ID = VE.EMPLOYEE_ID
+               AND CR.CTO_DATE    = VD.DT
+               AND CR.CTO_HOURS   = 4
+               AND MOD(CR.RN, 2)  = 1
+        ) THEN 1
         ELSE 0
     END                                                                AS IS_CTO_START,
-    -- CTO مكتمل (رقم زوجي = اكتمل يوم يعوض)
+
+    -- ✅ CTO مكتمل
     CASE
-        WHEN EXISTS (SELECT 1 FROM CTO_RANKED CR WHERE CR.EMPLOYEE_ID = VE.EMPLOYEE_ID AND CR.CTO_DATE = VD.DT AND MOD(CR.RN, 2) = 0) THEN 1
+        WHEN EXISTS (
+            SELECT 1 FROM CTO_RANKED CR
+             WHERE CR.EMPLOYEE_ID = VE.EMPLOYEE_ID
+               AND CR.CTO_DATE    = VD.DT
+               AND CR.CTO_HOURS   = 8
+        ) THEN 1
+        WHEN EXISTS (
+            SELECT 1 FROM CTO_RANKED CR
+             WHERE CR.EMPLOYEE_ID = VE.EMPLOYEE_ID
+               AND CR.CTO_DATE    = VD.DT
+               AND CR.CTO_HOURS   = 4
+               AND MOD(CR.RN, 2)  = 0
+        ) THEN 1
         ELSE 0
     END                                                                AS IS_CTO_COMPLETED,
+
     (SELECT DECODE($P{P_LANG}, 'ar', E2.FULL_NAME_AR, E2.FULL_NAME_EN) FROM HR_EMPLOYEES E2 WHERE E2.EMPLOYEE_ID = $P{P_EMPLOYEE_ID}) AS SELECTED_EMPLOYEE_NAME,
     (SELECT DECODE($P{P_LANG}, 'ar', D2.ARABIC_NAME, D2.NAME) FROM HR_DEPARTMENT D2 WHERE D2.ID = $P{P_DEPARTMENT_ID}) AS SELECTED_DEPARTMENT_NAME
 FROM V_EMPS VE
@@ -121,6 +182,7 @@ ORDER BY VE.DEPARTMENT_NAME ASC, VE.EMPLOYEE_NAME ASC, VD.DT ASC]]>
 	<field name="DEPARTMENT_NAME" class="java.lang.String"/>
 	<field name="ATTENDANCE_DATE" class="java.sql.Timestamp"/>
 	<field name="OVERTIME_DAYS_CALCULATED" class="java.math.BigDecimal"/>
+	<field name="OVERTIME_DAYS_NET" class="java.math.BigDecimal"/>
 	<field name="MEAL_ALLOWANCE_DAYS" class="java.math.BigDecimal"/>
 	<field name="IS_CTO_START" class="java.math.BigDecimal"/>
 	<field name="IS_CTO_COMPLETED" class="java.math.BigDecimal"/>
@@ -351,24 +413,31 @@ ORDER BY VE.DEPARTMENT_NAME ASC, VE.EMPLOYEE_NAME ASC, VD.DT ASC]]>
 						</cellContents>
 					</crosstabColumnHeader>
 					<crosstabTotalColumnHeader>
-						<!-- عمودين في رأس المجموع: بدل الوجبة + إجمالي الأيام -->
+						<!-- ثلاثة أعمدة في رأس المجموع: ب.ج + ج.م + الصافي -->
 						<cellContents mode="Opaque" backcolor="#1F4E79">
 							<box>
 								<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 							</box>
 							<textField>
-								<reportElement x="0" y="0" width="55" height="25" forecolor="#FFFFFF" uuid="cc33dd44-0005-0003-0001-000000000006"/>
+								<reportElement x="0" y="0" width="40" height="25" forecolor="#FFFFFF" uuid="cc33dd44-0005-0003-0001-000000000006"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font fontName="IBM Plex Sans Arabic" size="7" isBold="true"/>
 								</textElement>
-								<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "بدل الوجبة" : "Meal Allow."]]></textFieldExpression>
+								<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "ب.ج" : "Meal Allow."]]></textFieldExpression>
 							</textField>
 							<textField>
-								<reportElement x="55" y="0" width="50" height="25" forecolor="#FFFFFF" uuid="cc33dd44-0005-0003-0001-000000000007"/>
+								<reportElement x="40" y="0" width="45" height="25" forecolor="#FFFFFF" uuid="cc33dd44-0005-0003-0001-000000000007"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font fontName="IBM Plex Sans Arabic" size="7" isBold="true"/>
 								</textElement>
-								<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "إجمالي الأيام" : "Total Days"]]></textFieldExpression>
+								<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "إجمالي الأيام\n(ج.م)" : "Gross Days\n(G)"]]></textFieldExpression>
+							</textField>
+							<textField>
+								<reportElement x="85" y="0" width="45" height="25" forecolor="#FFFFFF" uuid="cc33dd44-0005-0003-0001-000000000027"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="IBM Plex Sans Arabic" size="7" isBold="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "الصافي" : "Net"]]></textFieldExpression>
 							</textField>
 						</cellContents>
 					</crosstabTotalColumnHeader>
@@ -376,6 +445,10 @@ ORDER BY VE.DEPARTMENT_NAME ASC, VE.EMPLOYEE_NAME ASC, VD.DT ASC]]>
 				<!-- Measure 1: إجمالي الأيام -->
 				<measure name="OVERTIME_DAYS_CALCULATED_MEASURE" class="java.math.BigDecimal" calculation="Sum">
 					<measureExpression><![CDATA[$F{OVERTIME_DAYS_CALCULATED}]]></measureExpression>
+				</measure>
+				<!-- Measure 1.5: صافي الأيام -->
+				<measure name="OVERTIME_DAYS_NET_MEASURE" class="java.math.BigDecimal" calculation="Sum">
+					<measureExpression><![CDATA[$F{OVERTIME_DAYS_NET}]]></measureExpression>
 				</measure>
 				<!-- Measure 2: عدد بدل الوجبة -->
 				<measure name="MEAL_ALLOWANCE_MEASURE" class="java.math.BigDecimal" calculation="Sum">
@@ -412,10 +485,10 @@ ORDER BY VE.DEPARTMENT_NAME ASC, VE.EMPLOYEE_NAME ASC, VD.DT ASC]]>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{OVERTIME_DAYS_CALCULATED_MEASURE} == null || $V{OVERTIME_DAYS_CALCULATED_MEASURE}.doubleValue() == 0 ? "" : $V{OVERTIME_DAYS_CALCULATED_MEASURE}]]></textFieldExpression>
 						</textField>
-						<!-- خط شطب أحمر لو IS_CTO_START = 1 -->
+						<!-- خط شطب أحمر لو IS_CTO_START = 1 أو IS_CTO_COMPLETED = 1 -->
 						<line>
 							<reportElement x="1" y="10" width="16" height="1" uuid="cc33dd44-0005-c702-0001-000000000001">
-								<printWhenExpression><![CDATA[$V{IS_CTO_START_MEASURE} != null && $V{IS_CTO_START_MEASURE}.intValue() > 0]]></printWhenExpression>
+								<printWhenExpression><![CDATA[($V{IS_CTO_START_MEASURE} != null && $V{IS_CTO_START_MEASURE}.intValue() > 0) || ($V{IS_CTO_COMPLETED_MEASURE} != null && $V{IS_CTO_COMPLETED_MEASURE}.intValue() > 0)]]></printWhenExpression>
 							</reportElement>
 							<graphicElement>
 								<pen lineWidth="1.5" lineStyle="Solid" lineColor="#E74C3C"/>
@@ -423,15 +496,15 @@ ORDER BY VE.DEPARTMENT_NAME ASC, VE.EMPLOYEE_NAME ASC, VD.DT ASC]]>
 						</line>
 					</cellContents>
 				</crosstabCell>
-				<!-- خلية المجموع: بدل الوجبة + إجمالي الأيام جنب بعض -->
-				<crosstabCell width="105" height="20" columnTotalGroup="ATTENDANCE_DATE">
+				<!-- خلية المجموع: بدل الوجبة + إجمالي الأيام + الصافي جنب بعض -->
+				<crosstabCell width="130" height="20" columnTotalGroup="ATTENDANCE_DATE">
 					<cellContents mode="Opaque" backcolor="#EAFAF1">
 						<box>
 							<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 						</box>
 						<!-- بدل الوجبة أولاً (الجزء الأيسر في RTL = يظهر على اليسار) -->
 						<textField>
-							<reportElement x="0" y="0" width="55" height="20" uuid="cc33dd44-0005-0004-0001-000000000004"/>
+							<reportElement x="0" y="0" width="40" height="20" uuid="cc33dd44-0005-0004-0001-000000000004"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
 							</textElement>
@@ -439,11 +512,19 @@ ORDER BY VE.DEPARTMENT_NAME ASC, VE.EMPLOYEE_NAME ASC, VD.DT ASC]]>
 						</textField>
 						<!-- إجمالي الأيام بعده -->
 						<textField>
-							<reportElement x="55" y="0" width="50" height="20" uuid="cc33dd44-0005-0004-0001-000000000003"/>
+							<reportElement x="40" y="0" width="45" height="20" uuid="cc33dd44-0005-0004-0001-000000000003"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{OVERTIME_DAYS_CALCULATED_MEASURE} == null ? java.math.BigDecimal.ZERO : $V{OVERTIME_DAYS_CALCULATED_MEASURE}]]></textFieldExpression>
+						</textField>
+						<!-- الصافي بعده -->
+						<textField>
+							<reportElement x="85" y="0" width="45" height="20" uuid="cc33dd44-0005-0004-0001-000000000027"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{OVERTIME_DAYS_NET_MEASURE} == null ? java.math.BigDecimal.ZERO : $V{OVERTIME_DAYS_NET_MEASURE}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
