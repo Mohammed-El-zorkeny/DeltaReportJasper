@@ -112,6 +112,31 @@ SELECT
         ELSE NVL(A.OVERTIME_DAYS_CALCULATED, 0)
     END                                                                AS OVERTIME_DAYS_NET,
 
+    -- ✅ أيام 250 الصافية
+    CASE
+        WHEN EXISTS (
+            SELECT 1 FROM CTO_RANKED CR
+             WHERE CR.EMPLOYEE_ID = VE.EMPLOYEE_ID
+               AND CR.CTO_DATE    = VD.DT
+               AND CR.CTO_HOURS   = 8
+        )
+        THEN 0
+        ELSE NVL(A.OT_DAYS_250_CALCULATED, 0)
+    END                                                                AS OT_DAYS_250_NET,
+
+    -- ✅ أيام 400 الصافية
+    CASE
+        WHEN EXISTS (
+            SELECT 1 FROM CTO_RANKED CR
+             WHERE CR.EMPLOYEE_ID = VE.EMPLOYEE_ID
+               AND CR.CTO_DATE    = VD.DT
+               AND CR.CTO_HOURS   = 4
+               AND MOD(CR.RN, 2) IN (0, 1)
+        )
+        THEN 0
+        ELSE NVL(A.OT_DAYS_400_CALCULATED, 0)
+    END                                                                AS OT_DAYS_400_NET,
+
     -- ✅ بدل الوجبة
     CASE
         WHEN EXISTS (
@@ -183,6 +208,8 @@ ORDER BY VE.DEPARTMENT_NAME ASC, VE.EMPLOYEE_NAME ASC, VD.DT ASC]]>
 	<field name="ATTENDANCE_DATE" class="java.sql.Timestamp"/>
 	<field name="OVERTIME_DAYS_CALCULATED" class="java.math.BigDecimal"/>
 	<field name="OVERTIME_DAYS_NET" class="java.math.BigDecimal"/>
+	<field name="OT_DAYS_250_NET" class="java.math.BigDecimal"/>
+	<field name="OT_DAYS_400_NET" class="java.math.BigDecimal"/>
 	<field name="MEAL_ALLOWANCE_DAYS" class="java.math.BigDecimal"/>
 	<field name="IS_CTO_START" class="java.math.BigDecimal"/>
 	<field name="IS_CTO_COMPLETED" class="java.math.BigDecimal"/>
@@ -450,6 +477,14 @@ ORDER BY VE.DEPARTMENT_NAME ASC, VE.EMPLOYEE_NAME ASC, VD.DT ASC]]>
 				<measure name="OVERTIME_DAYS_NET_MEASURE" class="java.math.BigDecimal" calculation="Sum">
 					<measureExpression><![CDATA[$F{OVERTIME_DAYS_NET}]]></measureExpression>
 				</measure>
+				<!-- Measure 1.6: صافي 250% -->
+				<measure name="OT_DAYS_250_NET_MEASURE" class="java.math.BigDecimal" calculation="Sum">
+					<measureExpression><![CDATA[$F{OT_DAYS_250_NET}]]></measureExpression>
+				</measure>
+				<!-- Measure 1.7: صافي 400% -->
+				<measure name="OT_DAYS_400_NET_MEASURE" class="java.math.BigDecimal" calculation="Sum">
+					<measureExpression><![CDATA[$F{OT_DAYS_400_NET}]]></measureExpression>
+				</measure>
 				<!-- Measure 2: عدد بدل الوجبة -->
 				<measure name="MEAL_ALLOWANCE_MEASURE" class="java.math.BigDecimal" calculation="Sum">
 					<measureExpression><![CDATA[$F{MEAL_ALLOWANCE_DAYS}]]></measureExpression>
@@ -477,27 +512,53 @@ ORDER BY VE.DEPARTMENT_NAME ASC, VE.EMPLOYEE_NAME ASC, VD.DT ASC]]>
 								<pen lineWidth="0.0"/>
 							</graphicElement>
 						</rectangle>
-						<!-- القيمة -->
+						
+						<!-- القيمة العادية (تعرض لو القيمة مش 3.6) -->
 						<textField isBlankWhenNull="true">
-							<reportElement x="0" y="0" width="18" height="20" uuid="cc33dd44-0005-0004-0001-000000000002"/>
+							<reportElement x="0" y="0" width="18" height="20" uuid="cc33dd44-0005-0004-0001-000000000002">
+								<printWhenExpression><![CDATA[new Boolean($V{OVERTIME_DAYS_CALCULATED_MEASURE} == null || $V{OVERTIME_DAYS_CALCULATED_MEASURE}.doubleValue() != 3.6)]]></printWhenExpression>
+							</reportElement>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font fontName="IBM Plex Sans Arabic" size="8"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{OVERTIME_DAYS_CALCULATED_MEASURE} == null || $V{OVERTIME_DAYS_CALCULATED_MEASURE}.doubleValue() == 0 ? "" : $V{OVERTIME_DAYS_CALCULATED_MEASURE}.toString()]]></textFieldExpression>
 						</textField>
-						<!-- خط شطب أحمر مفرد لو بداية CTO (وليس 1.6) -->
+
+						<!-- القيمة المقسمة 400% (أعلى) تعرض فقط لو القيمة 3.6 -->
+						<textField isBlankWhenNull="true">
+							<reportElement x="0" y="0" width="18" height="10" uuid="cc33dd44-0005-0004-0001-000000000008">
+								<printWhenExpression><![CDATA[new Boolean($V{OVERTIME_DAYS_CALCULATED_MEASURE} != null && $V{OVERTIME_DAYS_CALCULATED_MEASURE}.doubleValue() == 3.6)]]></printWhenExpression>
+							</reportElement>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font fontName="IBM Plex Sans Arabic" size="7" isBold="true"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{OT_DAYS_400_NET_MEASURE} == null || $V{OT_DAYS_400_NET_MEASURE}.doubleValue() == 0 ? "" : $V{OT_DAYS_400_NET_MEASURE}.toString()]]></textFieldExpression>
+						</textField>
+
+						<!-- القيمة المقسمة 250% (أسفل) تعرض فقط لو القيمة 3.6 -->
+						<textField isBlankWhenNull="true">
+							<reportElement x="0" y="10" width="18" height="10" uuid="cc33dd44-0005-0004-0001-000000000009">
+								<printWhenExpression><![CDATA[new Boolean($V{OVERTIME_DAYS_CALCULATED_MEASURE} != null && $V{OVERTIME_DAYS_CALCULATED_MEASURE}.doubleValue() == 3.6)]]></printWhenExpression>
+							</reportElement>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font fontName="IBM Plex Sans Arabic" size="7" isBold="true"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{OT_DAYS_250_NET_MEASURE} == null || $V{OT_DAYS_250_NET_MEASURE}.doubleValue() == 0 ? "" : $V{OT_DAYS_250_NET_MEASURE}.toString()]]></textFieldExpression>
+						</textField>
+
+						<!-- خط شطب أحمر مفرد لو بداية CTO (وليس 1.6 أو 3.6) -->
 						<line>
 							<reportElement x="1" y="10" width="16" height="1" uuid="cc33dd44-0005-c702-0001-000000000001">
-								<printWhenExpression><![CDATA[new Boolean($V{IS_CTO_START_MEASURE} != null && $V{IS_CTO_START_MEASURE}.intValue() > 0 && $V{OVERTIME_DAYS_CALCULATED_MEASURE} != null && $V{OVERTIME_DAYS_CALCULATED_MEASURE}.doubleValue() != 1.6)]]></printWhenExpression>
+								<printWhenExpression><![CDATA[new Boolean($V{IS_CTO_START_MEASURE} != null && $V{IS_CTO_START_MEASURE}.intValue() > 0 && $V{OVERTIME_DAYS_CALCULATED_MEASURE} != null && $V{OVERTIME_DAYS_CALCULATED_MEASURE}.doubleValue() != 1.6 && $V{OVERTIME_DAYS_CALCULATED_MEASURE}.doubleValue() != 3.6)]]></printWhenExpression>
 							</reportElement>
 							<graphicElement>
 								<pen lineWidth="1.5" lineStyle="Solid" lineColor="#E74C3C"/>
 							</graphicElement>
 						</line>
-						<!-- خطان شطب أحمر لو مكتمل CTO (وليس 1.6) -->
+						<!-- خطان شطب أحمر لو مكتمل CTO (وليس 1.6 أو 3.6) -->
 						<line>
 							<reportElement x="1" y="6" width="16" height="1" uuid="cc33dd44-0005-c702-0001-000000000002">
-								<printWhenExpression><![CDATA[new Boolean($V{IS_CTO_COMPLETED_MEASURE} != null && $V{IS_CTO_COMPLETED_MEASURE}.intValue() > 0 && $V{OVERTIME_DAYS_CALCULATED_MEASURE} != null && $V{OVERTIME_DAYS_CALCULATED_MEASURE}.doubleValue() != 1.6)]]></printWhenExpression>
+								<printWhenExpression><![CDATA[new Boolean($V{IS_CTO_COMPLETED_MEASURE} != null && $V{IS_CTO_COMPLETED_MEASURE}.intValue() > 0 && $V{OVERTIME_DAYS_CALCULATED_MEASURE} != null && $V{OVERTIME_DAYS_CALCULATED_MEASURE}.doubleValue() != 1.6 && $V{OVERTIME_DAYS_CALCULATED_MEASURE}.doubleValue() != 3.6)]]></printWhenExpression>
 							</reportElement>
 							<graphicElement>
 								<pen lineWidth="1.5" lineStyle="Solid" lineColor="#E74C3C"/>
@@ -505,7 +566,34 @@ ORDER BY VE.DEPARTMENT_NAME ASC, VE.EMPLOYEE_NAME ASC, VD.DT ASC]]>
 						</line>
 						<line>
 							<reportElement x="1" y="14" width="16" height="1" uuid="cc33dd44-0005-c702-0001-000000000003">
-								<printWhenExpression><![CDATA[new Boolean($V{IS_CTO_COMPLETED_MEASURE} != null && $V{IS_CTO_COMPLETED_MEASURE}.intValue() > 0 && $V{OVERTIME_DAYS_CALCULATED_MEASURE} != null && $V{OVERTIME_DAYS_CALCULATED_MEASURE}.doubleValue() != 1.6)]]></printWhenExpression>
+								<printWhenExpression><![CDATA[new Boolean($V{IS_CTO_COMPLETED_MEASURE} != null && $V{IS_CTO_COMPLETED_MEASURE}.intValue() > 0 && $V{OVERTIME_DAYS_CALCULATED_MEASURE} != null && $V{OVERTIME_DAYS_CALCULATED_MEASURE}.doubleValue() != 1.6 && $V{OVERTIME_DAYS_CALCULATED_MEASURE}.doubleValue() != 3.6)]]></printWhenExpression>
+							</reportElement>
+							<graphicElement>
+								<pen lineWidth="1.5" lineStyle="Solid" lineColor="#E74C3C"/>
+							</graphicElement>
+						</line>
+
+						<!-- خط شطب أحمر مفرد لو بداية CTO في الخلية المقسمة (فوق الـ 2 فقط) -->
+						<line>
+							<reportElement x="1" y="15" width="16" height="1" uuid="cc33dd44-0005-c702-0001-000000000004">
+								<printWhenExpression><![CDATA[new Boolean($V{IS_CTO_START_MEASURE} != null && $V{IS_CTO_START_MEASURE}.intValue() > 0 && $V{OVERTIME_DAYS_CALCULATED_MEASURE} != null && $V{OVERTIME_DAYS_CALCULATED_MEASURE}.doubleValue() == 3.6)]]></printWhenExpression>
+							</reportElement>
+							<graphicElement>
+								<pen lineWidth="1.5" lineStyle="Solid" lineColor="#E74C3C"/>
+							</graphicElement>
+						</line>
+						<!-- خطان شطب أحمر لو مكتمل CTO في الخلية المقسمة (فوق الـ 2 فقط) -->
+						<line>
+							<reportElement x="1" y="13" width="16" height="1" uuid="cc33dd44-0005-c702-0001-000000000005">
+								<printWhenExpression><![CDATA[new Boolean($V{IS_CTO_COMPLETED_MEASURE} != null && $V{IS_CTO_COMPLETED_MEASURE}.intValue() > 0 && $V{OVERTIME_DAYS_CALCULATED_MEASURE} != null && $V{OVERTIME_DAYS_CALCULATED_MEASURE}.doubleValue() == 3.6)]]></printWhenExpression>
+							</reportElement>
+							<graphicElement>
+								<pen lineWidth="1.5" lineStyle="Solid" lineColor="#E74C3C"/>
+							</graphicElement>
+						</line>
+						<line>
+							<reportElement x="1" y="17" width="16" height="1" uuid="cc33dd44-0005-c702-0001-000000000006">
+								<printWhenExpression><![CDATA[new Boolean($V{IS_CTO_COMPLETED_MEASURE} != null && $V{IS_CTO_COMPLETED_MEASURE}.intValue() > 0 && $V{OVERTIME_DAYS_CALCULATED_MEASURE} != null && $V{OVERTIME_DAYS_CALCULATED_MEASURE}.doubleValue() == 3.6)]]></printWhenExpression>
 							</reportElement>
 							<graphicElement>
 								<pen lineWidth="1.5" lineStyle="Solid" lineColor="#E74C3C"/>
