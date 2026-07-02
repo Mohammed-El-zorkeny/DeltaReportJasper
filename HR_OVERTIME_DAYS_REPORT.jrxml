@@ -471,7 +471,7 @@ ORDER BY VE.DEPARTMENT_NAME ASC, VE.EMPLOYEE_NAME ASC, VD.DT ASC]]>
 						<!-- خلفية خضر لو IS_CTO_COMPLETED = 1 -->
 						<rectangle>
 							<reportElement mode="Opaque" x="0" y="0" width="18" height="20" backcolor="#A9DFBF" uuid="cc33dd44-0005-c701-0001-000000000001">
-								<printWhenExpression><![CDATA[$V{IS_CTO_COMPLETED_MEASURE} != null && $V{IS_CTO_COMPLETED_MEASURE}.intValue() > 0]]></printWhenExpression>
+								<printWhenExpression><![CDATA[new Boolean($V{IS_CTO_COMPLETED_MEASURE} != null && $V{IS_CTO_COMPLETED_MEASURE}.intValue() > 0)]]></printWhenExpression>
 							</reportElement>
 							<graphicElement>
 								<pen lineWidth="0.0"/>
@@ -483,12 +483,12 @@ ORDER BY VE.DEPARTMENT_NAME ASC, VE.EMPLOYEE_NAME ASC, VD.DT ASC]]>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font fontName="IBM Plex Sans Arabic" size="8"/>
 							</textElement>
-							<textFieldExpression><![CDATA[$V{OVERTIME_DAYS_CALCULATED_MEASURE} == null || $V{OVERTIME_DAYS_CALCULATED_MEASURE}.doubleValue() == 0 ? "" : $V{OVERTIME_DAYS_CALCULATED_MEASURE}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{OVERTIME_DAYS_CALCULATED_MEASURE} == null || $V{OVERTIME_DAYS_CALCULATED_MEASURE}.doubleValue() == 0 ? "" : $V{OVERTIME_DAYS_CALCULATED_MEASURE}.toString()]]></textFieldExpression>
 						</textField>
 						<!-- خط شطب أحمر لو IS_CTO_START = 1 أو IS_CTO_COMPLETED = 1 -->
 						<line>
 							<reportElement x="1" y="10" width="16" height="1" uuid="cc33dd44-0005-c702-0001-000000000001">
-								<printWhenExpression><![CDATA[($V{IS_CTO_START_MEASURE} != null && $V{IS_CTO_START_MEASURE}.intValue() > 0) || ($V{IS_CTO_COMPLETED_MEASURE} != null && $V{IS_CTO_COMPLETED_MEASURE}.intValue() > 0)]]></printWhenExpression>
+								<printWhenExpression><![CDATA[new Boolean(($V{IS_CTO_START_MEASURE} != null && $V{IS_CTO_START_MEASURE}.intValue() > 0) || ($V{IS_CTO_COMPLETED_MEASURE} != null && $V{IS_CTO_COMPLETED_MEASURE}.intValue() > 0))]]></printWhenExpression>
 							</reportElement>
 							<graphicElement>
 								<pen lineWidth="1.5" lineStyle="Solid" lineColor="#E74C3C"/>
