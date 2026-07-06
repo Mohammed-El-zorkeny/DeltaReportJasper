@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.20.5.final using JasperReports Library version 6.20.5-3efcf2e67f959db3888d79f73dde2dbd7acb4f8e  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HR_ATTENDANCE_REPORT" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="15" bottomMargin="15" uuid="e1a2b3c4-d5e6-4789-9012-345678901234">
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GSPLUS"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Delta"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
@@ -167,7 +167,7 @@ ORDER BY A.ATTENDANCE_DATE DESC, E.FULL_NAME_AR ASC]]>
 					<subreportParameterExpression><![CDATA["ar".equals($P{P_LANG}) ? "تقرير الحضور والانصراف" : "Attendance and Departure Report"]]></subreportParameterExpression>
 				</subreportParameter>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA["HEAD_TITEL_PA_LAND.jasper"]]></subreportExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "HEAD_TITEL_PA_LAND.jasper"]]></subreportExpression>
 			</subreport>
 		</band>
 	</pageHeader>
@@ -342,7 +342,11 @@ ORDER BY A.ATTENDANCE_DATE DESC, E.FULL_NAME_AR ASC]]>
 				<textFieldExpression><![CDATA[$F{DAY_TYPE_NAME} == null ? "—" : $F{DAY_TYPE_NAME}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+<<<<<<< Updated upstream
 				<reportElement style="AttendanceStatusStyle" stretchType="ContainerHeight" x="100" y="0" width="92" height="18" uuid="cc33dd44-0003-0001-0001-000000000003"/>
+=======
+				<reportElement stretchType="ContainerHeight" x="100" y="0" width="92" height="18" uuid="cc33dd44-0003-0001-0001-000000000003"/>
+>>>>>>> Stashed changes
 				<box>
 					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
 				</box>
@@ -434,7 +438,7 @@ ORDER BY A.ATTENDANCE_DATE DESC, E.FULL_NAME_AR ASC]]>
 					<subreportParameterExpression><![CDATA[$P{P_LANG}]]></subreportParameterExpression>
 				</subreportParameter>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA[ "FOOTER_TITEL_PA_LAND.jasper"]]></subreportExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "FOOTER_TITEL_PA_LAND.jasper"]]></subreportExpression>
 			</subreport>
 			<textField>
 				<reportElement positionType="Float" x="0" y="10" width="100" height="20" uuid="cc33dd44-0004-0002-0001-000000000002"/>
