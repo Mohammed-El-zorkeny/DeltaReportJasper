@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.20.5.final using JasperReports Library version 6.20.5-3efcf2e67f959db3888d79f73dde2dbd7acb4f8e  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HR_ABSENCE_BY_DEPARTMENT" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="15" bottomMargin="15" uuid="d5e64789-9012-4bae-8765-3456789012cd">
-	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="GSPLUS"/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Delta"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
@@ -142,7 +142,6 @@ LEFT JOIN (
       FROM HR_EMPLOYEE_LEAVE_REQUESTS LR
       JOIN HR_LEAVE_TYPES LT ON LT.ID = LR.LEAVE_TYPE_ID
      WHERE LR.STATUS_ID      = 4
-       AND LR.LEAVE_TYPE_ID NOT IN (29, 26, 28, 4)
  ) LV ON LV.EMPLOYEE_ID = AL_CHECK.EMPLOYEE_ID
      AND AL_CHECK.DAY_DATE BETWEEN LV.START_DATE AND LV.END_DATE
 
@@ -213,18 +212,54 @@ WHERE (
 )
 ORDER BY AL_CHECK.DEPT_ARABIC_NAME ASC, AL_CHECK.DAY_DATE DESC, AL_CHECK.FULL_NAME_AR ASC]]>
 	</queryString>
-	<field name="EMPLOYEE_ID" class="java.math.BigDecimal"/>
-	<field name="EMPLOYEE_CODE" class="java.lang.String"/>
-	<field name="DEPARTMENT_ID" class="java.math.BigDecimal"/>
-	<field name="ATTENDANCE_DATE" class="java.sql.Timestamp"/>
-	<field name="DAY_NAME" class="java.lang.String"/>
-	<field name="ATTENDANCE_STATUS" class="java.lang.String"/>
-	<field name="STATUS_CLASS" class="java.lang.String"/>
-	<field name="STATUS_ID" class="java.math.BigDecimal"/>
-	<field name="EMPLOYEE_NAME" class="java.lang.String"/>
-	<field name="DEPARTMENT_NAME" class="java.lang.String"/>
-	<field name="SELECTED_EMPLOYEE_NAME" class="java.lang.String"/>
-	<field name="SELECTED_DEPARTMENT_NAME" class="java.lang.String"/>
+	<field name="EMPLOYEE_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="EMPLOYEE_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYEE_ID"/>
+	</field>
+	<field name="EMPLOYEE_CODE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="EMPLOYEE_CODE"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYEE_CODE"/>
+	</field>
+	<field name="DEPARTMENT_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="DEPARTMENT_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="DEPARTMENT_ID"/>
+	</field>
+	<field name="ATTENDANCE_DATE" class="java.sql.Timestamp">
+		<property name="com.jaspersoft.studio.field.name" value="ATTENDANCE_DATE"/>
+		<property name="com.jaspersoft.studio.field.label" value="ATTENDANCE_DATE"/>
+	</field>
+	<field name="DAY_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DAY_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="DAY_NAME"/>
+	</field>
+	<field name="ATTENDANCE_STATUS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ATTENDANCE_STATUS"/>
+		<property name="com.jaspersoft.studio.field.label" value="ATTENDANCE_STATUS"/>
+	</field>
+	<field name="STATUS_CLASS" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="STATUS_CLASS"/>
+		<property name="com.jaspersoft.studio.field.label" value="STATUS_CLASS"/>
+	</field>
+	<field name="STATUS_ID" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.name" value="STATUS_ID"/>
+		<property name="com.jaspersoft.studio.field.label" value="STATUS_ID"/>
+	</field>
+	<field name="EMPLOYEE_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="EMPLOYEE_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="EMPLOYEE_NAME"/>
+	</field>
+	<field name="DEPARTMENT_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DEPARTMENT_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="DEPARTMENT_NAME"/>
+	</field>
+	<field name="SELECTED_EMPLOYEE_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SELECTED_EMPLOYEE_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="SELECTED_EMPLOYEE_NAME"/>
+	</field>
+	<field name="SELECTED_DEPARTMENT_NAME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="SELECTED_DEPARTMENT_NAME"/>
+		<property name="com.jaspersoft.studio.field.label" value="SELECTED_DEPARTMENT_NAME"/>
+	</field>
 	<variable name="ROW_NUM" class="java.lang.Integer" resetType="Group" resetGroup="DepartmentGroup" calculation="Count">
 		<variableExpression><![CDATA[$F{EMPLOYEE_ID}]]></variableExpression>
 	</variable>
