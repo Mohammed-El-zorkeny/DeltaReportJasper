@@ -18,9 +18,20 @@
 		<defaultValueExpression><![CDATA["ar"]]></defaultValueExpression>
 	</parameter>
 	<queryString>
-		<![CDATA[SELECT 1 AS DUMMY FROM DUAL]]>
+		<![CDATA[SELECT 
+    NVL(MAX(E.FULL_NAME_AR), $P{P_USERPRINT}) AS EMP_NAME_AR,
+    NVL(MAX(E.FULL_NAME_EN), $P{P_USERPRINT}) AS EMP_NAME_EN,
+    MAX(D.ARABIC_NAME) AS DEPT_NAME_AR,
+    MAX(D.NAME) AS DEPT_NAME_EN
+FROM DUAL
+LEFT JOIN SEC_USERS U ON U.USERNAME = $P{P_USERPRINT}
+LEFT JOIN HR_EMPLOYEES E ON E.EMPLOYEE_ID = U.REFERENCE_USER_ID
+LEFT JOIN HR_DEPARTMENT D ON D.ID = E.DEPARTMENT_ID]]>
 	</queryString>
-	<field name="DUMMY" class="java.math.BigDecimal"/>
+	<field name="EMP_NAME_AR" class="java.lang.String"/>
+	<field name="EMP_NAME_EN" class="java.lang.String"/>
+	<field name="DEPT_NAME_AR" class="java.lang.String"/>
+	<field name="DEPT_NAME_EN" class="java.lang.String"/>
 	<pageFooter>
 		<band height="30" splitType="Stretch">
 			<!-- Top horizontal divider line spanning 842 -->
@@ -39,13 +50,13 @@
 				<textFieldExpression><![CDATA["\u202B" + ("ar".equals($P{P_LANG}) ? new java.text.SimpleDateFormat("EEEE  dd/MM/yyyy  -  hh:mm a", new java.util.Locale("ar")).format(new java.util.Date()) : new java.text.SimpleDateFormat("EEEE  dd/MM/yyyy  -  hh:mm a", java.util.Locale.ENGLISH).format(new java.util.Date())) + "\u202C"]]></textFieldExpression>
 			</textField>
 			<!-- Right side: Print User (width 226, x=606) -->
-			<textField isBlankWhenNull="true">
-				<reportElement x="606" y="10" width="226" height="20" uuid="c1111111-0003-0003-0003-000000000030"/>
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement x="590" y="4" width="242" height="24" uuid="c1111111-0003-0003-0003-000000000030"/>
 				<box rightPadding="5"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle" markup="none">
-					<font fontName="IBM Plex Sans Arabic" size="9"/>
+					<font fontName="IBM Plex Sans Arabic" size="8"/>
 				</textElement>
-				<textFieldExpression><![CDATA["\u202B" + ("ar".equals($P{P_LANG}) ? "مستخدم الطباعة : " : "Printed By: ") + ($P{P_USERPRINT} == null ? "" : $P{P_USERPRINT}) + "\u202C"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["\u202B" + ("ar".equals($P{P_LANG}) ? "مستخدم الطباعة : " + ($F{EMP_NAME_AR} == null ? "" : $F{EMP_NAME_AR}) + ($F{DEPT_NAME_AR} == null ? "" : "\n" + $F{DEPT_NAME_AR}) : "Printed By: " + ($F{EMP_NAME_EN} == null ? "" : $F{EMP_NAME_EN}) + ($F{DEPT_NAME_EN} == null ? "" : "\n" + $F{DEPT_NAME_EN})) + "\u202C"]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageFooter>
