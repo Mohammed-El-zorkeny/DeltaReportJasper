@@ -49,29 +49,37 @@
     CASE
         WHEN LV.EMPLOYEE_ID  IS NOT NULL
             THEN DECODE($P{P_LANG}, 'ar', 'إجازة - ' || LV.LEAVE_TYPE_AR, 'Leave - ' || LV.LEAVE_TYPE_EN)
+        WHEN MS.EMPLOYEE_ID  IS NOT NULL
+            THEN DECODE($P{P_LANG}, 'ar', 'مأمورية - ' || MS.MISSION_TYPE_AR, 'Mission - ' || MS.MISSION_TYPE_EN)
         WHEN AB.EMPLOYEE_ID  IS NOT NULL
             THEN DECODE($P{P_LANG}, 'ar', 'غياب مسجل',    'Registered Absence')
         WHEN PH.HOLIDAY_DATE IS NOT NULL
             THEN DECODE($P{P_LANG}, 'ar', 'عطلة رسمية',   'Public Holiday')
         WHEN CD.COMP_DATE    IS NOT NULL
             THEN DECODE($P{P_LANG}, 'ar', 'راحة مستحقة',  'Compensatory Day')
+        WHEN PT.DAY_TYPE = 'PART_TIME_OFF'
+            THEN DECODE($P{P_LANG}, 'ar', 'راحة نصف وقت', 'Part-time Rest Day')
         WHEN WO.SHIFT_ID     IS NOT NULL
             THEN DECODE($P{P_LANG}, 'ar', 'راحة أسبوعية', 'Weekly Off')
         ELSE DECODE($P{P_LANG}, 'ar', 'لم يحضر',          'Not Present')
     END                                                             AS ATTENDANCE_STATUS,
     CASE
         WHEN LV.EMPLOYEE_ID  IS NOT NULL THEN 'lightBlueBadge'
+        WHEN MS.EMPLOYEE_ID  IS NOT NULL THEN 'blueBadge'
         WHEN AB.EMPLOYEE_ID  IS NOT NULL THEN 'redBadge'
         WHEN PH.HOLIDAY_DATE IS NOT NULL THEN 'grayBadge'
         WHEN CD.COMP_DATE    IS NOT NULL THEN 'grayBadge'
+        WHEN PT.DAY_TYPE = 'PART_TIME_OFF' THEN 'grayBadge'
         WHEN WO.SHIFT_ID     IS NOT NULL THEN 'grayBadge'
         ELSE                                  'redBadge'
     END                                                             AS STATUS_CLASS,
     CASE
         WHEN LV.EMPLOYEE_ID  IS NOT NULL THEN 4
+        WHEN MS.EMPLOYEE_ID  IS NOT NULL THEN 11
         WHEN AB.EMPLOYEE_ID  IS NOT NULL THEN 3
         WHEN PH.HOLIDAY_DATE IS NOT NULL THEN 6
         WHEN CD.COMP_DATE    IS NOT NULL THEN 10
+        WHEN PT.DAY_TYPE = 'PART_TIME_OFF' THEN 12
         WHEN WO.SHIFT_ID     IS NOT NULL THEN 5
         ELSE                                  7
     END                                                             AS STATUS_ID,
@@ -138,6 +146,19 @@ LEFT JOIN (
  ) LV ON LV.EMPLOYEE_ID = AL_CHECK.EMPLOYEE_ID
      AND AL_CHECK.DAY_DATE BETWEEN LV.START_DATE AND LV.END_DATE
 
+-- 🆕 المأموريات (STATUS_ID = 4 = معتمد) + اسم نوع المأمورية
+LEFT JOIN (
+    SELECT M.EMPLOYEE_ID,
+           M.START_DATE,
+           NVL(M.ACTUAL_RETURN_DATE, NVL(M.RETURN_DATE, M.END_DATE)) AS END_DATE_EFFECTIVE,
+           MT.ARABIC_NAME AS MISSION_TYPE_AR,
+           MT.NAME        AS MISSION_TYPE_EN
+      FROM HR_EMPLOYEE_MISSIONS M
+      LEFT JOIN HR_MISSION_TYPES MT ON MT.ID = M.MISSION_TYPE_ID
+     WHERE M.STATUS_ID = 4
+) MS ON MS.EMPLOYEE_ID = AL_CHECK.EMPLOYEE_ID
+     AND AL_CHECK.DAY_DATE BETWEEN MS.START_DATE AND MS.END_DATE_EFFECTIVE
+
 LEFT JOIN (
     SELECT AB.EMPLOYEE_ID,
            AB.ABSENCE_DATE,
@@ -157,6 +178,17 @@ LEFT JOIN VW_SHIFT_COMPENSATORY_DAYS CD
        ON CD.WORK_SHIFT_ID = AL_CHECK.WORK_SHIFT_ID
       AND CD.COMP_DATE     = AL_CHECK.DAY_DATE
 
+-- 🆕 راحة نصف الوقت (STATUS_ID = 2 = معتمد في HR_PART_TIME_REQUESTS)
+LEFT JOIN (
+    SELECT PC.EMPLOYEE_ID,
+           PC.CALENDAR_DATE,
+           PC.DAY_TYPE
+      FROM HR_PART_TIME_CALENDAR PC
+      JOIN HR_PART_TIME_REQUESTS PR ON PR.ID = PC.REQUEST_ID
+     WHERE PR.STATUS_ID = 2
+) PT ON PT.EMPLOYEE_ID = AL_CHECK.EMPLOYEE_ID
+     AND PT.CALENDAR_DATE = AL_CHECK.DAY_DATE
+
 LEFT JOIN (
     SELECT SD.SHIFT_ID,
            WD.DAY_NAME_EN
@@ -170,9 +202,11 @@ WHERE (
     $P{P_STATUS_ID} IS NULL
     OR CASE
            WHEN LV.EMPLOYEE_ID  IS NOT NULL THEN 4
+           WHEN MS.EMPLOYEE_ID  IS NOT NULL THEN 11
            WHEN AB.EMPLOYEE_ID  IS NOT NULL THEN 3
            WHEN PH.HOLIDAY_DATE IS NOT NULL THEN 6
            WHEN CD.COMP_DATE    IS NOT NULL THEN 10
+           WHEN PT.DAY_TYPE = 'PART_TIME_OFF' THEN 12
            WHEN WO.SHIFT_ID     IS NOT NULL THEN 5
            ELSE                                  7
        END = $P{P_STATUS_ID}
@@ -319,7 +353,6 @@ ORDER BY AL_CHECK.DEPT_ARABIC_NAME ASC, AL_CHECK.DAY_DATE DESC, AL_CHECK.FULL_NA
 				</textElement>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "م" : "Seq"]]></textFieldExpression>
 			</textField>
-			<!-- Parameter Selection Displays in Header -->
 			<textField>
 				<reportElement mode="Opaque" x="552" y="1" width="250" height="18" backcolor="#EAF2F8" uuid="cc33dd44-0001-0002-0001-000000000003"/>
 				<box>
