@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.20.5.final using JasperReports Library version 6.20.5-3efcf2e67f959db3888d79f73dde2dbd7acb4f8e  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HR_MONTHLY_ABSENCE_REPORT" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="15" bottomMargin="15" uuid="d5e64789-9012-4bae-8765-3456789012ce">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HR_MONTHLY_ABSENCE_REPORT" pageWidth="842" pageHeight="595" orientation="Landscape" isSummaryWithPageHeaderAndFooter="true" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="15" bottomMargin="15" uuid="d5e64789-9012-4bae-8765-3456789012ce">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Delta"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
@@ -42,33 +42,33 @@ absent_employees AS (
        AND NOT EXISTS (
            SELECT 1 FROM HR_ATTENDANCE_LOG AL 
             WHERE AL.EMPLOYEE_ID = E.EMPLOYEE_ID 
-              AND AL.ATTENDANCE_DATE = DR.DAY_DATE
+              AND TRUNC(AL.ATTENDANCE_DATE) = TRUNC(DR.DAY_DATE)
        )
        -- Exclude leaves
        AND NOT EXISTS (
            SELECT 1 FROM HR_EMPLOYEE_LEAVE_REQUESTS LR 
             WHERE LR.EMPLOYEE_ID = E.EMPLOYEE_ID 
               AND LR.STATUS_ID = 4 
-              AND DR.DAY_DATE BETWEEN LR.START_DATE AND LR.END_DATE
+              AND TRUNC(DR.DAY_DATE) BETWEEN TRUNC(LR.START_DATE) AND TRUNC(LR.END_DATE)
        )
        -- Exclude missions
        AND NOT EXISTS (
            SELECT 1 FROM HR_EMPLOYEE_MISSIONS M 
             WHERE M.EMPLOYEE_ID = E.EMPLOYEE_ID 
               AND M.STATUS_ID = 4 
-              AND DR.DAY_DATE BETWEEN M.START_DATE AND M.END_DATE
+              AND TRUNC(DR.DAY_DATE) BETWEEN TRUNC(M.START_DATE) AND TRUNC(M.END_DATE)
        )
        -- Exclude registered absences
        AND NOT EXISTS (
            SELECT 1 FROM HR_ABSENCE_LOG AB 
             WHERE AB.EMPLOYEE_ID = E.EMPLOYEE_ID 
               AND AB.STATUS = '1' 
-              AND DR.DAY_DATE BETWEEN AB.ABSENCE_DATE AND AB.END_DATE
+              AND TRUNC(DR.DAY_DATE) BETWEEN TRUNC(AB.ABSENCE_DATE) AND TRUNC(NVL(AB.END_DATE, AB.ABSENCE_DATE))
        )
        -- Exclude public holidays
        AND NOT EXISTS (
            SELECT 1 FROM HR_OFFICIAL_HOLIDAYS PH 
-            WHERE PH.HOLIDAY_DATE = DR.DAY_DATE 
+            WHERE TRUNC(PH.HOLIDAY_DATE) = TRUNC(DR.DAY_DATE) 
               AND PH.STATUS = 1 
               AND (PH.RELIGION_ID IS NULL OR PH.RELIGION_ID = E.RELIGION) 
               AND (PH.SHIFT_ID IS NULL OR PH.SHIFT_ID = E.WORK_SHIFT_ID)
@@ -86,7 +86,7 @@ absent_employees AS (
         AND NOT EXISTS (
             SELECT 1 FROM VW_SHIFT_COMPENSATORY_DAYS CD 
              WHERE CD.WORK_SHIFT_ID = E.WORK_SHIFT_ID 
-               AND CD.COMP_DATE = DR.DAY_DATE
+               AND TRUNC(CD.COMP_DATE) = TRUNC(DR.DAY_DATE)
         )
      GROUP BY E.EMPLOYEE_ID
 ),
@@ -119,8 +119,8 @@ SELECT
     CASE 
         -- 1. Attended
         WHEN AL.EMPLOYEE_ID IS NOT NULL THEN 1 -- Present
-        -- 2. Leave
-        WHEN LV.EMPLOYEE_ID IS NOT NULL THEN 2 -- Leave
+        -- 2. Leave / Half Day Leave (8)
+        WHEN LV.EMPLOYEE_ID IS NOT NULL THEN (CASE WHEN LV.TOTAL_LEAVE_DAYS = 0.5 THEN 8 ELSE 2 END)
         -- 3. Mission
         WHEN MS.EMPLOYEE_ID IS NOT NULL THEN 3 -- Mission
         -- 4. Registered Absence
@@ -137,30 +137,30 @@ SELECT
     (CASE WHEN $P{P_EMPLOYEE_ID} IS NOT NULL THEN (SELECT DECODE($P{P_LANG}, 'ar', E2.FULL_NAME_AR, E2.FULL_NAME_EN) FROM HR_EMPLOYEES E2 WHERE E2.EMPLOYEE_ID = TO_NUMBER($P{P_EMPLOYEE_ID})) ELSE NULL END) AS SELECTED_EMPLOYEE_NAME,
     (CASE WHEN $P{P_DEPARTMENT_ID} IS NOT NULL THEN (SELECT DECODE($P{P_LANG}, 'ar', D2.ARABIC_NAME, D2.NAME) FROM HR_DEPARTMENT D2 WHERE D2.ID = TO_NUMBER($P{P_DEPARTMENT_ID})) ELSE NULL END) AS SELECTED_DEPARTMENT_NAME
 FROM emp_days ED
-LEFT JOIN HR_ATTENDANCE_LOG AL ON AL.EMPLOYEE_ID = ED.EMPLOYEE_ID AND AL.ATTENDANCE_DATE = ED.DAY_DATE
+LEFT JOIN HR_ATTENDANCE_LOG AL ON AL.EMPLOYEE_ID = ED.EMPLOYEE_ID AND TRUNC(AL.ATTENDANCE_DATE) = TRUNC(ED.DAY_DATE)
 LEFT JOIN (
-    SELECT LR.EMPLOYEE_ID, LR.START_DATE, LR.END_DATE
+    SELECT LR.EMPLOYEE_ID, LR.START_DATE, LR.END_DATE, LR.TOTAL_LEAVE_DAYS
       FROM HR_EMPLOYEE_LEAVE_REQUESTS LR
      WHERE LR.STATUS_ID = 4
-) LV ON LV.EMPLOYEE_ID = ED.EMPLOYEE_ID AND ED.DAY_DATE BETWEEN LV.START_DATE AND LV.END_DATE
+) LV ON LV.EMPLOYEE_ID = ED.EMPLOYEE_ID AND TRUNC(ED.DAY_DATE) BETWEEN TRUNC(LV.START_DATE) AND TRUNC(LV.END_DATE)
 LEFT JOIN (
     SELECT M.EMPLOYEE_ID, M.START_DATE, M.END_DATE
       FROM HR_EMPLOYEE_MISSIONS M
      WHERE M.STATUS_ID = 4
-) MS ON MS.EMPLOYEE_ID = ED.EMPLOYEE_ID AND ED.DAY_DATE BETWEEN MS.START_DATE AND MS.END_DATE
+) MS ON MS.EMPLOYEE_ID = ED.EMPLOYEE_ID AND TRUNC(ED.DAY_DATE) BETWEEN TRUNC(MS.START_DATE) AND TRUNC(MS.END_DATE)
 LEFT JOIN (
     SELECT AB.EMPLOYEE_ID, AB.ABSENCE_DATE, NVL(AB.END_DATE, AB.ABSENCE_DATE) AS END_DATE
       FROM HR_ABSENCE_LOG AB
      WHERE AB.STATUS = '1'
-) AB ON AB.EMPLOYEE_ID = ED.EMPLOYEE_ID AND ED.DAY_DATE BETWEEN AB.ABSENCE_DATE AND AB.END_DATE
-LEFT JOIN HR_OFFICIAL_HOLIDAYS PH ON PH.HOLIDAY_DATE = ED.DAY_DATE AND PH.STATUS = 1 AND (PH.RELIGION_ID IS NULL OR PH.RELIGION_ID = ED.RELIGION) AND (PH.SHIFT_ID IS NULL OR PH.SHIFT_ID = ED.WORK_SHIFT_ID)
+) AB ON AB.EMPLOYEE_ID = ED.EMPLOYEE_ID AND TRUNC(ED.DAY_DATE) BETWEEN TRUNC(AB.ABSENCE_DATE) AND TRUNC(AB.END_DATE)
+LEFT JOIN HR_OFFICIAL_HOLIDAYS PH ON TRUNC(PH.HOLIDAY_DATE) = TRUNC(ED.DAY_DATE) AND PH.STATUS = 1 AND (PH.RELIGION_ID IS NULL OR PH.RELIGION_ID = ED.RELIGION) AND (PH.SHIFT_ID IS NULL OR PH.SHIFT_ID = ED.WORK_SHIFT_ID)
 LEFT JOIN (
     SELECT SD.SHIFT_ID, WD.DAY_NAME_EN
       FROM HR_WORK_SHIF_DAYS SD
       JOIN HR_WEEK_DAYS WD ON WD.DAY_ID = SD.DAY_ID
      WHERE SD.IS_OFF = 1
 ) WO ON WO.SHIFT_ID = ED.WORK_SHIFT_ID AND WO.DAY_NAME_EN = TRIM(TO_CHAR(ED.DAY_DATE, 'DAY', 'NLS_DATE_LANGUAGE=AMERICAN'))
-LEFT JOIN VW_SHIFT_COMPENSATORY_DAYS CD ON CD.WORK_SHIFT_ID = ED.WORK_SHIFT_ID AND CD.COMP_DATE = ED.DAY_DATE
+LEFT JOIN VW_SHIFT_COMPENSATORY_DAYS CD ON CD.WORK_SHIFT_ID = ED.WORK_SHIFT_ID AND TRUNC(CD.COMP_DATE) = TRUNC(ED.DAY_DATE)
 ORDER BY ED.EMPLOYEE_NAME, ED.DAY_DATE]]>
 	</queryString>
 	<field name="EMPLOYEE_ID" class="java.math.BigDecimal"/>
@@ -284,9 +284,9 @@ ORDER BY ED.EMPLOYEE_NAME, ED.DAY_DATE]]>
 		</band>
 	</pageFooter>
 	<summary>
-		<band height="400" splitType="Stretch">
+		<band height="50" splitType="Stretch">
 			<crosstab isRepeatColumnHeaders="true">
-				<reportElement x="0" y="10" width="802" height="380" uuid="cc33dd44-0006-0001-0001-000000000001"/>
+				<reportElement x="0" y="0" width="802" height="40" uuid="cc33dd44-0006-0001-0001-000000000001"/>
 				<rowGroup name="EmployeeGroup" width="180">
 					<bucket class="java.lang.String">
 						<bucketExpression><![CDATA[$F{EMPLOYEE_CODE} + " - " + $F{EMPLOYEE_NAME}]]></bucketExpression>
@@ -353,6 +353,16 @@ ORDER BY ED.EMPLOYEE_NAME, ED.DAY_DATE]]>
 								<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
 							</textElement>
 							<textFieldExpression><![CDATA["إ"]]></textFieldExpression>
+						</textField>
+						<!-- Half Day Leave (8) -->
+						<textField isBlankWhenNull="true">
+							<reportElement mode="Opaque" x="0" y="0" width="20" height="20" backcolor="#FEF9E7" forecolor="#D35400" uuid="cc33dd44-0006-0004-0001-000000000009">
+								<printWhenExpression><![CDATA[new Boolean($V{StatusMeasure} != null && $V{StatusMeasure}.intValue() == 8)]]></printWhenExpression>
+							</reportElement>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
+							</textElement>
+							<textFieldExpression><![CDATA["ن"]]></textFieldExpression>
 						</textField>
 						<!-- Mission (3) -->
 						<textField isBlankWhenNull="true">
