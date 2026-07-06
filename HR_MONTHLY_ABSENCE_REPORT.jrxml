@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.5.final using JasperReports Library version 6.20.5-3efcf2e67f959db3888d79f73dde2dbd7acb4f8e  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HR_MONTHLY_ABSENCE_REPORT" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="15" bottomMargin="15" uuid="d5e64789-9012-4bae-8765-3456789012ce">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Delta"/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<parameter name="P_LANG" class="java.lang.String">
+		<defaultValueExpression><![CDATA["ar"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_COMP_ID" class="java.lang.String"/>
+	<parameter name="P_BRANCH_ID" class="java.lang.String"/>
+	<parameter name="P_USERPRINT" class="java.lang.String">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_EMPLOYEE_ID" class="java.lang.String"/>
+	<parameter name="P_DEPARTMENT_ID" class="java.lang.String"/>
+	<parameter name="P_FROM_DATE" class="java.lang.String"/>
+	<parameter name="P_TO_DATE" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[WITH date_range AS (
+    SELECT TO_DATE($P{P_FROM_DATE}, 'DD-MM-YYYY') + LEVEL - 1 AS DAY_DATE
+      FROM DUAL
+     WHERE $P{P_FROM_DATE} IS NOT NULL
+       AND $P{P_TO_DATE}   IS NOT NULL
+    CONNECT BY LEVEL <= (
+        TO_DATE($P{P_TO_DATE},   'DD-MM-YYYY')
+      - TO_DATE($P{P_FROM_DATE}, 'DD-MM-YYYY') + 1
+    )
+),
+emp_days AS (
+    SELECT E.EMPLOYEE_ID,
+           E.CODE AS EMPLOYEE_CODE,
+           E.FULL_NAME_AR AS EMPLOYEE_NAME,
+           E.DEPARTMENT_ID,
+           E.WORK_SHIFT_ID,
+           E.RELIGION,
+           DR.DAY_DATE
+      FROM date_range DR
+      CROSS JOIN HR_EMPLOYEES E
+     WHERE E.EMPLOYMENT_STATUS = 1
+       AND E.WORK_SHIFT_TYPE_ID = 2
+       AND ($P{P_EMPLOYEE_ID} IS NULL OR E.EMPLOYEE_ID = TO_NUMBER($P{P_EMPLOYEE_ID}))
+       AND ($P{P_DEPARTMENT_ID} IS NULL OR E.DEPARTMENT_ID IN (
+           SELECT ID FROM HR_DEPARTMENT
+            START WITH ID = TO_NUMBER($P{P_DEPARTMENT_ID})
+           CONNECT BY PRIOR ID = PARENT_ID
+       ))
+)
+SELECT 
+    ED.EMPLOYEE_ID,
+    ED.EMPLOYEE_CODE,
+    ED.EMPLOYEE_NAME,
+    ED.DAY_DATE,
+    EXTRACT(DAY FROM ED.DAY_DATE) AS DAY_NUM,
+    CASE 
+        -- 1. Attended
+        WHEN AL.EMPLOYEE_ID IS NOT NULL THEN 1 -- Present
+        -- 2. Leave
+        WHEN LV.EMPLOYEE_ID IS NOT NULL THEN 2 -- Leave
+        -- 3. Mission
+        WHEN MS.EMPLOYEE_ID IS NOT NULL THEN 3 -- Mission
+        -- 4. Registered Absence
+        WHEN AB.EMPLOYEE_ID IS NOT NULL THEN 4 -- Registered Absence
+        -- 5. Public Holiday
+        WHEN PH.HOLIDAY_DATE IS NOT NULL THEN 5 -- Public Holiday
+        -- 6. Weekly Off
+        WHEN WO.SHIFT_ID IS NOT NULL THEN 6 -- Weekly Off
+        -- 7. Not Present (Unexcused Absence)
+        ELSE 7 -- Not Present (لم يحضر)
+    END AS STATUS_ID,
+    (CASE WHEN $P{P_EMPLOYEE_ID} IS NOT NULL THEN (SELECT DECODE($P{P_LANG}, 'ar', E2.FULL_NAME_AR, E2.FULL_NAME_EN) FROM HR_EMPLOYEES E2 WHERE E2.EMPLOYEE_ID = TO_NUMBER($P{P_EMPLOYEE_ID})) ELSE NULL END) AS SELECTED_EMPLOYEE_NAME,
+    (CASE WHEN $P{P_DEPARTMENT_ID} IS NOT NULL THEN (SELECT DECODE($P{P_LANG}, 'ar', D2.ARABIC_NAME, D2.NAME) FROM HR_DEPARTMENT D2 WHERE D2.ID = TO_NUMBER($P{P_DEPARTMENT_ID})) ELSE NULL END) AS SELECTED_DEPARTMENT_NAME
+FROM emp_days ED
+LEFT JOIN HR_ATTENDANCE_LOG AL ON AL.EMPLOYEE_ID = ED.EMPLOYEE_ID AND AL.ATTENDANCE_DATE = ED.DAY_DATE
+LEFT JOIN (
+    SELECT LR.EMPLOYEE_ID, LR.START_DATE, LR.END_DATE
+      FROM HR_EMPLOYEE_LEAVE_REQUESTS LR
+     WHERE LR.STATUS_ID = 4
+) LV ON LV.EMPLOYEE_ID = ED.EMPLOYEE_ID AND ED.DAY_DATE BETWEEN LV.START_DATE AND LV.END_DATE
+LEFT JOIN (
+    SELECT M.EMPLOYEE_ID, M.START_DATE, M.END_DATE
+      FROM HR_EMPLOYEE_MISSIONS M
+     WHERE M.STATUS_ID = 4
+) MS ON MS.EMPLOYEE_ID = ED.EMPLOYEE_ID AND ED.DAY_DATE BETWEEN MS.START_DATE AND MS.END_DATE
+LEFT JOIN (
+    SELECT AB.EMPLOYEE_ID, AB.ABSENCE_DATE, NVL(AB.END_DATE, AB.ABSENCE_DATE) AS END_DATE
+      FROM HR_ABSENCE_LOG AB
+     WHERE AB.STATUS = '1'
+) AB ON AB.EMPLOYEE_ID = ED.EMPLOYEE_ID AND ED.DAY_DATE BETWEEN AB.ABSENCE_DATE AND AB.END_DATE
+LEFT JOIN HR_OFFICIAL_HOLIDAYS PH ON PH.HOLIDAY_DATE = ED.DAY_DATE AND PH.STATUS = 1 AND (PH.RELIGION_ID IS NULL OR PH.RELIGION_ID = ED.RELIGION) AND (PH.SHIFT_ID IS NULL OR PH.SHIFT_ID = ED.WORK_SHIFT_ID)
+LEFT JOIN (
+    SELECT SD.SHIFT_ID, WD.DAY_NAME_EN
+      FROM HR_WORK_SHIF_DAYS SD
+      JOIN HR_WEEK_DAYS WD ON WD.DAY_ID = SD.DAY_ID
+     WHERE SD.IS_OFF = 1
+) WO ON WO.SHIFT_ID = ED.WORK_SHIFT_ID AND WO.DAY_NAME_EN = TRIM(TO_CHAR(ED.DAY_DATE, 'DAY', 'NLS_DATE_LANGUAGE=AMERICAN'))
+ORDER BY ED.EMPLOYEE_NAME, ED.DAY_DATE]]>
+	</queryString>
+	<field name="EMPLOYEE_ID" class="java.math.BigDecimal"/>
+	<field name="EMPLOYEE_CODE" class="java.lang.String"/>
+	<field name="EMPLOYEE_NAME" class="java.lang.String"/>
+	<field name="DAY_DATE" class="java.sql.Timestamp"/>
+	<field name="DAY_NUM" class="java.math.BigDecimal"/>
+	<field name="STATUS_ID" class="java.math.BigDecimal"/>
+	<field name="SELECTED_EMPLOYEE_NAME" class="java.lang.String"/>
+	<field name="SELECTED_DEPARTMENT_NAME" class="java.lang.String"/>
+	<pageHeader>
+		<band height="50" splitType="Stretch">
+			<subreport>
+				<reportElement positionType="Float" x="-20" y="0" width="842" height="50" uuid="cc33dd44-0001-0001-0001-000000000001"/>
+				<subreportParameter name="P_COMP_ID">
+					<subreportParameterExpression><![CDATA[$P{P_COMP_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="P_TITLE_REPORT">
+					<subreportParameterExpression><![CDATA["ar".equals($P{P_LANG}) ? "تقرير الغياب الشهري للموظفين" : "Monthly Absence Grid Report"]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "HEAD_TITEL_PA_LAND.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="40" splitType="Stretch">
+			<textField>
+				<reportElement mode="Opaque" x="552" y="1" width="250" height="18" backcolor="#EAF2F8" uuid="cc33dd44-0001-0002-0001-000000000003"/>
+				<box>
+					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "الموظف" : "Employee"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="552" y="19" width="250" height="18" uuid="cc33dd44-0001-0003-0001-000000000003"/>
+				<box>
+					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SELECTED_EMPLOYEE_NAME} != null ? $F{SELECTED_EMPLOYEE_NAME} : ("ar".equals($P{P_LANG}) ? "الجميع" : "All")]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="302" y="19" width="250" height="18" uuid="cc33dd44-0001-0003-0001-000000000004"/>
+				<box>
+					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SELECTED_DEPARTMENT_NAME} != null ? $F{SELECTED_DEPARTMENT_NAME} : ("ar".equals($P{P_LANG}) ? "الجميع" : "All")]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Opaque" x="302" y="1" width="250" height="18" backcolor="#EAF2F8" uuid="cc33dd44-0001-0002-0001-000000000004"/>
+				<box>
+					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "القسم" : "Department"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="19" width="302" height="18" uuid="cc33dd44-0001-0003-0001-000000000005"/>
+				<box>
+					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[($P{P_FROM_DATE} == null && $P{P_TO_DATE} == null) ? ("ar".equals($P{P_LANG}) ? "الجميع" : "All") : 
+(
+  ($P{P_FROM_DATE} != null ? ("ar".equals($P{P_LANG}) ? "من " : "From ") + $P{P_FROM_DATE} : "") + 
+  ($P{P_TO_DATE} != null ? ("ar".equals($P{P_LANG}) ? " إلى " : " to ") + $P{P_TO_DATE} : "")
+)]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Opaque" x="0" y="1" width="302" height="18" backcolor="#EAF2F8" uuid="cc33dd44-0001-0002-0001-000000000005"/>
+				<box>
+					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "فترة البحث" : "Search Period"]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnHeader>
+	<pageFooter>
+		<band height="40" splitType="Stretch">
+			<subreport>
+				<reportElement positionType="Float" x="-20" y="0" width="842" height="40" uuid="cc33dd44-0004-0001-0001-000000000001"/>
+				<subreportParameter name="P_USERPRINT">
+					<subreportParameterExpression><![CDATA[$P{P_USERPRINT}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="P_LANG">
+					<subreportParameterExpression><![CDATA[$P{P_LANG}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "FOOTER_TITEL_PA_LAND.jasper"]]></subreportExpression>
+			</subreport>
+			<textField>
+				<reportElement positionType="Float" x="0" y="10" width="100" height="20" uuid="cc33dd44-0004-0002-0001-000000000002"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "صفحة " + $V{PAGE_NUMBER} + " من " : "Page " + $V{PAGE_NUMBER} + " of "]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement positionType="Float" x="100" y="10" width="30" height="20" uuid="cc33dd44-0004-0002-0001-000000000003"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="400" splitType="Stretch">
+			<crosstab isRepeatColumnHeaders="true">
+				<reportElement x="0" y="10" width="802" height="380" uuid="cc33dd44-0006-0001-0001-000000000001"/>
+				<rowGroup name="EmployeeGroup" width="180">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{EMPLOYEE_CODE} + " - " + $F{EMPLOYEE_NAME}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents>
+							<box>
+								<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+							</box>
+							<textField isBlankWhenNull="true">
+								<reportElement mode="Opaque" x="0" y="0" width="180" height="20" backcolor="#F9FAFB" uuid="cc33dd44-0006-0002-0001-000000000001"/>
+								<box rightPadding="5"/>
+								<textElement textAlignment="Right" verticalAlignment="Middle">
+									<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{EmployeeGroup}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+				</rowGroup>
+				<columnGroup name="DayGroup" height="25">
+					<bucket class="java.sql.Timestamp">
+						<bucketExpression><![CDATA[$F{DAY_DATE}]]></bucketExpression>
+					</bucket>
+					<crosstabColumnHeader>
+						<cellContents>
+							<box>
+								<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+							</box>
+							<textField>
+								<reportElement mode="Opaque" x="0" y="0" width="20" height="25" backcolor="#1F4E79" forecolor="#FFFFFF" uuid="cc33dd44-0006-0003-0001-000000000001"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[new java.text.SimpleDateFormat("dd").format($V{DayGroup})]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabColumnHeader>
+				</columnGroup>
+				<measure name="StatusMeasure" class="java.lang.Integer" calculation="First">
+					<measureExpression><![CDATA[new java.lang.Integer($F{STATUS_ID}.intValue())]]></measureExpression>
+				</measure>
+				<crosstabCell width="20" height="20">
+					<cellContents>
+						<box>
+							<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+						</box>
+						<textField isBlankWhenNull="true">
+							<reportElement mode="Transparent" x="0" y="0" width="20" height="20" uuid="cc33dd44-0006-0004-0001-000000000001">
+								<printWhenExpression><![CDATA[new Boolean($V{StatusMeasure} == null || $V{StatusMeasure}.intValue() != 7)]]></printWhenExpression>
+							</reportElement>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font fontName="IBM Plex Sans Arabic" size="8"/>
+							</textElement>
+							<textFieldExpression><![CDATA[""]]></textFieldExpression>
+						</textField>
+						<textField isBlankWhenNull="true">
+							<reportElement mode="Opaque" x="0" y="0" width="20" height="20" backcolor="#C0392B" forecolor="#FFFFFF" uuid="cc33dd44-0006-0004-0001-000000000002">
+								<printWhenExpression><![CDATA[new Boolean($V{StatusMeasure} != null && $V{StatusMeasure}.intValue() == 7)]]></printWhenExpression>
+							</reportElement>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
+							</textElement>
+							<textFieldExpression><![CDATA["غ"]]></textFieldExpression>
+						</textField>
+					</cellContents>
+				</crosstabCell>
+			</crosstab>
+		</band>
+	</summary>
+</jasperReport>
