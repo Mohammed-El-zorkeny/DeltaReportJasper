@@ -325,15 +325,67 @@ ORDER BY ED.EMPLOYEE_NAME, ED.DAY_DATE]]>
 						<box>
 							<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 						</box>
+						<!-- Present or Null -->
 						<textField isBlankWhenNull="true">
 							<reportElement mode="Transparent" x="0" y="0" width="20" height="20" uuid="cc33dd44-0006-0004-0001-000000000001">
-								<printWhenExpression><![CDATA[new Boolean($V{StatusMeasure} == null || $V{StatusMeasure}.intValue() != 7)]]></printWhenExpression>
+								<printWhenExpression><![CDATA[new Boolean($V{StatusMeasure} == null || $V{StatusMeasure}.intValue() == 1)]]></printWhenExpression>
 							</reportElement>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font fontName="IBM Plex Sans Arabic" size="8"/>
 							</textElement>
 							<textFieldExpression><![CDATA[""]]></textFieldExpression>
 						</textField>
+						<!-- Leave (2) -->
+						<textField isBlankWhenNull="true">
+							<reportElement mode="Opaque" x="0" y="0" width="20" height="20" backcolor="#EBF5FB" forecolor="#2980B9" uuid="cc33dd44-0006-0004-0001-000000000003">
+								<printWhenExpression><![CDATA[new Boolean($V{StatusMeasure} != null && $V{StatusMeasure}.intValue() == 2)]]></printWhenExpression>
+							</reportElement>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
+							</textElement>
+							<textFieldExpression><![CDATA["إ"]]></textFieldExpression>
+						</textField>
+						<!-- Mission (3) -->
+						<textField isBlankWhenNull="true">
+							<reportElement mode="Opaque" x="0" y="0" width="20" height="20" backcolor="#E8F8F5" forecolor="#117A65" uuid="cc33dd44-0006-0004-0001-000000000004">
+								<printWhenExpression><![CDATA[new Boolean($V{StatusMeasure} != null && $V{StatusMeasure}.intValue() == 3)]]></printWhenExpression>
+							</reportElement>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
+							</textElement>
+							<textFieldExpression><![CDATA["م"]]></textFieldExpression>
+						</textField>
+						<!-- Registered Absence (4) -->
+						<textField isBlankWhenNull="true">
+							<reportElement mode="Opaque" x="0" y="0" width="20" height="20" backcolor="#FDEDEC" forecolor="#C0392B" uuid="cc33dd44-0006-0004-0001-000000000005">
+								<printWhenExpression><![CDATA[new Boolean($V{StatusMeasure} != null && $V{StatusMeasure}.intValue() == 4)]]></printWhenExpression>
+							</reportElement>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
+							</textElement>
+							<textFieldExpression><![CDATA["خ"]]></textFieldExpression>
+						</textField>
+						<!-- Public Holiday (5) -->
+						<textField isBlankWhenNull="true">
+							<reportElement mode="Opaque" x="0" y="0" width="20" height="20" backcolor="#F2F3F4" forecolor="#7F8C8D" uuid="cc33dd44-0006-0004-0001-000000000006">
+								<printWhenExpression><![CDATA[new Boolean($V{StatusMeasure} != null && $V{StatusMeasure}.intValue() == 5)]]></printWhenExpression>
+							</reportElement>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
+							</textElement>
+							<textFieldExpression><![CDATA["ع"]]></textFieldExpression>
+						</textField>
+						<!-- Weekly Off (6) -->
+						<textField isBlankWhenNull="true">
+							<reportElement mode="Opaque" x="0" y="0" width="20" height="20" backcolor="#F2F3F4" forecolor="#7F8C8D" uuid="cc33dd44-0006-0004-0001-000000000007">
+								<printWhenExpression><![CDATA[new Boolean($V{StatusMeasure} != null && $V{StatusMeasure}.intValue() == 6)]]></printWhenExpression>
+							</reportElement>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
+							</textElement>
+							<textFieldExpression><![CDATA["ر"]]></textFieldExpression>
+						</textField>
+						<!-- Not Present (7) -->
 						<textField isBlankWhenNull="true">
 							<reportElement mode="Opaque" x="0" y="0" width="20" height="20" backcolor="#C0392B" forecolor="#FFFFFF" uuid="cc33dd44-0006-0004-0001-000000000002">
 								<printWhenExpression><![CDATA[new Boolean($V{StatusMeasure} != null && $V{StatusMeasure}.intValue() == 7)]]></printWhenExpression>
