@@ -32,6 +32,58 @@
       - TO_DATE($P{P_FROM_DATE}, 'DD-MM-YYYY') + 1
     )
 ),
+absent_employees AS (
+    SELECT E.EMPLOYEE_ID
+      FROM HR_EMPLOYEES E
+      CROSS JOIN date_range DR
+     WHERE E.EMPLOYMENT_STATUS = 1
+       AND E.WORK_SHIFT_TYPE_ID = 2
+       -- Exclude actual attendance
+       AND NOT EXISTS (
+           SELECT 1 FROM HR_ATTENDANCE_LOG AL 
+            WHERE AL.EMPLOYEE_ID = E.EMPLOYEE_ID 
+              AND AL.ATTENDANCE_DATE = DR.DAY_DATE
+       )
+       -- Exclude leaves
+       AND NOT EXISTS (
+           SELECT 1 FROM HR_EMPLOYEE_LEAVE_REQUESTS LR 
+            WHERE LR.EMPLOYEE_ID = E.EMPLOYEE_ID 
+              AND LR.STATUS_ID = 4 
+              AND DR.DAY_DATE BETWEEN LR.START_DATE AND LR.END_DATE
+       )
+       -- Exclude missions
+       AND NOT EXISTS (
+           SELECT 1 FROM HR_EMPLOYEE_MISSIONS M 
+            WHERE M.EMPLOYEE_ID = E.EMPLOYEE_ID 
+              AND M.STATUS_ID = 4 
+              AND DR.DAY_DATE BETWEEN M.START_DATE AND M.END_DATE
+       )
+       -- Exclude registered absences
+       AND NOT EXISTS (
+           SELECT 1 FROM HR_ABSENCE_LOG AB 
+            WHERE AB.EMPLOYEE_ID = E.EMPLOYEE_ID 
+              AND AB.STATUS = '1' 
+              AND DR.DAY_DATE BETWEEN AB.ABSENCE_DATE AND AB.END_DATE
+       )
+       -- Exclude public holidays
+       AND NOT EXISTS (
+           SELECT 1 FROM HR_OFFICIAL_HOLIDAYS PH 
+            WHERE PH.HOLIDAY_DATE = DR.DAY_DATE 
+              AND PH.STATUS = 1 
+              AND (PH.RELIGION_ID IS NULL OR PH.RELIGION_ID = E.RELIGION) 
+              AND (PH.SHIFT_ID IS NULL OR PH.SHIFT_ID = E.WORK_SHIFT_ID)
+       )
+       -- Exclude weekly offs
+       AND NOT EXISTS (
+           SELECT 1 
+             FROM HR_WORK_SHIF_DAYS SD
+             JOIN HR_WEEK_DAYS WD ON WD.DAY_ID = SD.DAY_ID
+            WHERE SD.SHIFT_ID = E.WORK_SHIFT_ID 
+              AND SD.IS_OFF = 1 
+              AND WD.DAY_NAME_EN = TRIM(TO_CHAR(DR.DAY_DATE, 'DAY', 'NLS_DATE_LANGUAGE=AMERICAN'))
+       )
+     GROUP BY E.EMPLOYEE_ID
+),
 emp_days AS (
     SELECT E.EMPLOYEE_ID,
            E.CODE AS EMPLOYEE_CODE,
@@ -42,6 +94,7 @@ emp_days AS (
            DR.DAY_DATE
       FROM date_range DR
       CROSS JOIN HR_EMPLOYEES E
+      JOIN absent_employees AE ON AE.EMPLOYEE_ID = E.EMPLOYEE_ID
      WHERE E.EMPLOYMENT_STATUS = 1
        AND E.WORK_SHIFT_TYPE_ID = 2
        AND ($P{P_EMPLOYEE_ID} IS NULL OR E.EMPLOYEE_ID = TO_NUMBER($P{P_EMPLOYEE_ID}))
