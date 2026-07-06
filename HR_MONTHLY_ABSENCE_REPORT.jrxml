@@ -82,6 +82,12 @@ absent_employees AS (
               AND SD.IS_OFF = 1 
               AND WD.DAY_NAME_EN = TRIM(TO_CHAR(DR.DAY_DATE, 'DAY', 'NLS_DATE_LANGUAGE=AMERICAN'))
        )
+        -- Exclude compensatory rest days
+        AND NOT EXISTS (
+            SELECT 1 FROM VW_SHIFT_COMPENSATORY_DAYS CD 
+             WHERE CD.WORK_SHIFT_ID = E.WORK_SHIFT_ID 
+               AND CD.COMP_DATE = DR.DAY_DATE
+        )
      GROUP BY E.EMPLOYEE_ID
 ),
 emp_days AS (
@@ -123,6 +129,8 @@ SELECT
         WHEN PH.HOLIDAY_DATE IS NOT NULL THEN 5 -- Public Holiday
         -- 6. Weekly Off
         WHEN WO.SHIFT_ID IS NOT NULL THEN 6 -- Weekly Off
+        -- 10. Compensatory Day
+        WHEN CD.COMP_DATE IS NOT NULL THEN 10 -- Compensatory Day
         -- 7. Not Present (Unexcused Absence)
         ELSE 7 -- Not Present (لم يحضر)
     END AS STATUS_ID,
@@ -152,6 +160,7 @@ LEFT JOIN (
       JOIN HR_WEEK_DAYS WD ON WD.DAY_ID = SD.DAY_ID
      WHERE SD.IS_OFF = 1
 ) WO ON WO.SHIFT_ID = ED.WORK_SHIFT_ID AND WO.DAY_NAME_EN = TRIM(TO_CHAR(ED.DAY_DATE, 'DAY', 'NLS_DATE_LANGUAGE=AMERICAN'))
+LEFT JOIN VW_SHIFT_COMPENSATORY_DAYS CD ON CD.WORK_SHIFT_ID = ED.WORK_SHIFT_ID AND CD.COMP_DATE = ED.DAY_DATE
 ORDER BY ED.EMPLOYEE_NAME, ED.DAY_DATE]]>
 	</queryString>
 	<field name="EMPLOYEE_ID" class="java.math.BigDecimal"/>
@@ -384,6 +393,16 @@ ORDER BY ED.EMPLOYEE_NAME, ED.DAY_DATE]]>
 								<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
 							</textElement>
 							<textFieldExpression><![CDATA["ر"]]></textFieldExpression>
+						</textField>
+						<!-- Compensatory Rest Day (10) -->
+						<textField isBlankWhenNull="true">
+							<reportElement mode="Opaque" x="0" y="0" width="20" height="20" backcolor="#F2F3F4" forecolor="#7F8C8D" uuid="cc33dd44-0006-0004-0001-000000000008">
+								<printWhenExpression><![CDATA[new Boolean($V{StatusMeasure} != null && $V{StatusMeasure}.intValue() == 10)]]></printWhenExpression>
+							</reportElement>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
+							</textElement>
+							<textFieldExpression><![CDATA["ر.م"]]></textFieldExpression>
 						</textField>
 						<!-- Not Present (7) -->
 						<textField isBlankWhenNull="true">
