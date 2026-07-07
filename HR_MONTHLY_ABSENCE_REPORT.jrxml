@@ -317,7 +317,7 @@ ORDER BY ED.EMPLOYEE_NAME, ED.DAY_DATE]]>
 	</pageFooter>
 	<summary>
 		<band height="50" splitType="Stretch">
-			<crosstab isRepeatColumnHeaders="true">
+			<crosstab isRepeatColumnHeaders="true" runDirection="RTL">
 				<reportElement x="0" y="0" width="802" height="40" uuid="cc33dd44-0006-0001-0001-000000000001"/>
 				<rowGroup name="EmployeeGroup" width="180">
 					<bucket class="java.lang.String">
