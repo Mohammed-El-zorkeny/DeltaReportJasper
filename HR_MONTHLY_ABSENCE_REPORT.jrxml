@@ -116,6 +116,9 @@ ORDER BY ED.EMPLOYEE_NAME, ED.DAY_DATE]]>
 	<field name="SELECTED_EMPLOYEE_NAME" class="java.lang.String"/>
 	<field name="SELECTED_DEPARTMENT_NAME" class="java.lang.String"/>
 	<field name="SELECTED_CATEGORY_NAME" class="java.lang.String"/>
+	<variable name="V_TOTAL_EMPLOYEES" class="java.lang.Integer" calculation="DistinctCount">
+		<variableExpression><![CDATA[$F{EMPLOYEE_ID}]]></variableExpression>
+	</variable>
 	<pageHeader>
 		<band height="50" splitType="Stretch">
 			<subreport>
@@ -256,9 +259,16 @@ ORDER BY ED.EMPLOYEE_NAME, ED.DAY_DATE]]>
 		</band>
 	</pageFooter>
 	<summary>
-		<band height="50" splitType="Stretch">
+		<band height="75" splitType="Stretch">
+			<textField evaluationTime="Report" isBlankWhenNull="true">
+				<reportElement x="602" y="5" width="200" height="20" uuid="cc33dd44-0006-0007-0001-000000000001"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "إجمالي عدد الموظفين: " + $V{V_TOTAL_EMPLOYEES} : "Total Employees: " + $V{V_TOTAL_EMPLOYEES}]]></textFieldExpression>
+			</textField>
 			<crosstab isRepeatColumnHeaders="true" runDirection="RTL">
-				<reportElement x="0" y="0" width="802" height="40" uuid="cc33dd44-0006-0001-0001-000000000001"/>
+				<reportElement x="0" y="30" width="802" height="40" uuid="cc33dd44-0006-0001-0001-000000000001"/>
 				<rowGroup name="EmployeeGroup" width="180">
 					<bucket class="java.lang.String">
 						<bucketExpression><![CDATA[$F{EMPLOYEE_CODE} + " - " + $F{EMPLOYEE_NAME}]]></bucketExpression>
