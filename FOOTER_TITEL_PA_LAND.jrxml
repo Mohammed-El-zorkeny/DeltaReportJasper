@@ -22,7 +22,8 @@
     NVL(MAX(E.FULL_NAME_AR), $P{P_USERPRINT}) AS EMP_NAME_AR,
     NVL(MAX(E.FULL_NAME_EN), $P{P_USERPRINT}) AS EMP_NAME_EN,
     MAX(D.ARABIC_NAME) AS DEPT_NAME_AR,
-    MAX(D.NAME) AS DEPT_NAME_EN
+    MAX(D.NAME) AS DEPT_NAME_EN,
+    MAX(GET_STORAGE_DIRECTORY_URL || E.SIGNATURE_IMAGE_PATH) AS SIGNATURE_URL
 FROM DUAL
 LEFT JOIN SEC_USERS U ON UPPER(U.USERNAME) = UPPER($P{P_USERPRINT})
 LEFT JOIN HR_EMPLOYEES E ON E.EMPLOYEE_ID = U.REFERENCE_USER_ID
@@ -32,6 +33,7 @@ LEFT JOIN HR_DEPARTMENT D ON D.ID = E.DEPARTMENT_ID]]>
 	<field name="EMP_NAME_EN" class="java.lang.String"/>
 	<field name="DEPT_NAME_AR" class="java.lang.String"/>
 	<field name="DEPT_NAME_EN" class="java.lang.String"/>
+	<field name="SIGNATURE_URL" class="java.lang.String"/>
 	<pageFooter>
 		<band height="30" splitType="Stretch">
 			<!-- Top horizontal divider line spanning 842 -->
@@ -58,6 +60,12 @@ LEFT JOIN HR_DEPARTMENT D ON D.ID = E.DEPARTMENT_ID]]>
 				</textElement>
 				<textFieldExpression><![CDATA["\u202B" + ("ar".equals($P{P_LANG}) ? "مستخدم الطباعة : " + ($F{EMP_NAME_AR} == null ? "" : $F{EMP_NAME_AR}) + ($F{DEPT_NAME_AR} == null ? "" : "\n" + $F{DEPT_NAME_AR}) : "Printed By: " + ($F{EMP_NAME_EN} == null ? "" : $F{EMP_NAME_EN}) + ($F{DEPT_NAME_EN} == null ? "" : "\n" + $F{DEPT_NAME_EN})) + "\u202C"]]></textFieldExpression>
 			</textField>
+			<image scaleImage="RetainShape" hAlign="Right" vAlign="Middle" isUsingCache="true" onErrorType="Blank">
+				<reportElement x="520" y="4" width="65" height="24" uuid="c1111111-0004-0004-0004-000000000040">
+					<printWhenExpression><![CDATA[new Boolean($F{SIGNATURE_URL} != null && !$F{SIGNATURE_URL}.trim().isEmpty())]]></printWhenExpression>
+				</reportElement>
+				<imageExpression><![CDATA[$F{SIGNATURE_URL}]]></imageExpression>
+			</image>
 		</band>
 	</pageFooter>
 </jasperReport>
