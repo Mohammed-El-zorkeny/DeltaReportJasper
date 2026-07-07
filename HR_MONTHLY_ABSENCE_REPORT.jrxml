@@ -19,6 +19,7 @@
 	</parameter>
 	<parameter name="P_EMPLOYEE_ID" class="java.lang.String"/>
 	<parameter name="P_DEPARTMENT_ID" class="java.lang.String"/>
+	<parameter name="P_EMPLOYEE_CATEGORY_ID" class="java.lang.String"/>
 	<parameter name="P_FROM_DATE" class="java.lang.String"/>
 	<parameter name="P_TO_DATE" class="java.lang.String"/>
 	<queryString>
@@ -38,6 +39,7 @@ absent_employees AS (
       CROSS JOIN date_range DR
      WHERE E.EMPLOYMENT_STATUS = 1
        AND E.WORK_SHIFT_TYPE_ID = 2
+       AND ($P{P_EMPLOYEE_CATEGORY_ID} IS NULL OR E.EMPLOYEE_CATEGORY_ID = TO_NUMBER($P{P_EMPLOYEE_CATEGORY_ID}))
        -- Exclude actual attendance
        AND NOT EXISTS (
            SELECT 1 FROM HR_ATTENDANCE_LOG AL 
@@ -103,6 +105,7 @@ emp_days AS (
       JOIN absent_employees AE ON AE.EMPLOYEE_ID = E.EMPLOYEE_ID
      WHERE E.EMPLOYMENT_STATUS = 1
        AND E.WORK_SHIFT_TYPE_ID = 2
+       AND ($P{P_EMPLOYEE_CATEGORY_ID} IS NULL OR E.EMPLOYEE_CATEGORY_ID = TO_NUMBER($P{P_EMPLOYEE_CATEGORY_ID}))
        AND ($P{P_EMPLOYEE_ID} IS NULL OR E.EMPLOYEE_ID = TO_NUMBER($P{P_EMPLOYEE_ID}))
        AND ($P{P_DEPARTMENT_ID} IS NULL OR E.DEPARTMENT_ID IN (
            SELECT ID FROM HR_DEPARTMENT
@@ -135,7 +138,8 @@ SELECT
         ELSE 7 -- Not Present (لم يحضر)
     END AS STATUS_ID,
     (CASE WHEN $P{P_EMPLOYEE_ID} IS NOT NULL THEN (SELECT DECODE($P{P_LANG}, 'ar', E2.FULL_NAME_AR, E2.FULL_NAME_EN) FROM HR_EMPLOYEES E2 WHERE E2.EMPLOYEE_ID = TO_NUMBER($P{P_EMPLOYEE_ID})) ELSE NULL END) AS SELECTED_EMPLOYEE_NAME,
-    (CASE WHEN $P{P_DEPARTMENT_ID} IS NOT NULL THEN (SELECT DECODE($P{P_LANG}, 'ar', D2.ARABIC_NAME, D2.NAME) FROM HR_DEPARTMENT D2 WHERE D2.ID = TO_NUMBER($P{P_DEPARTMENT_ID})) ELSE NULL END) AS SELECTED_DEPARTMENT_NAME
+    (CASE WHEN $P{P_DEPARTMENT_ID} IS NOT NULL THEN (SELECT DECODE($P{P_LANG}, 'ar', D2.ARABIC_NAME, D2.NAME) FROM HR_DEPARTMENT D2 WHERE D2.ID = TO_NUMBER($P{P_DEPARTMENT_ID})) ELSE NULL END) AS SELECTED_DEPARTMENT_NAME,
+    (CASE WHEN $P{P_EMPLOYEE_CATEGORY_ID} IS NOT NULL THEN (SELECT DECODE($P{P_LANG}, 'ar', C2.ARABIC_NAME, C2.NAME) FROM HR_EMPLOYEE_CATEGORIES C2 WHERE C2.ID = TO_NUMBER($P{P_EMPLOYEE_CATEGORY_ID})) ELSE NULL END) AS SELECTED_CATEGORY_NAME
 FROM emp_days ED
 LEFT JOIN HR_ATTENDANCE_LOG AL ON AL.EMPLOYEE_ID = ED.EMPLOYEE_ID AND TRUNC(AL.ATTENDANCE_DATE) = TRUNC(ED.DAY_DATE)
 LEFT JOIN (
@@ -171,6 +175,7 @@ ORDER BY ED.EMPLOYEE_NAME, ED.DAY_DATE]]>
 	<field name="STATUS_ID" class="java.math.BigDecimal"/>
 	<field name="SELECTED_EMPLOYEE_NAME" class="java.lang.String"/>
 	<field name="SELECTED_DEPARTMENT_NAME" class="java.lang.String"/>
+	<field name="SELECTED_CATEGORY_NAME" class="java.lang.String"/>
 	<pageHeader>
 		<band height="50" splitType="Stretch">
 			<subreport>
@@ -188,8 +193,9 @@ ORDER BY ED.EMPLOYEE_NAME, ED.DAY_DATE]]>
 	</pageHeader>
 	<columnHeader>
 		<band height="40" splitType="Stretch">
+			<!-- Employee (602 to 802, width 200) -->
 			<textField>
-				<reportElement mode="Opaque" x="552" y="1" width="250" height="18" backcolor="#EAF2F8" uuid="cc33dd44-0001-0002-0001-000000000003"/>
+				<reportElement mode="Opaque" x="602" y="1" width="200" height="18" backcolor="#EAF2F8" uuid="cc33dd44-0001-0002-0001-000000000003"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 				</box>
@@ -199,7 +205,7 @@ ORDER BY ED.EMPLOYEE_NAME, ED.DAY_DATE]]>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "الموظف" : "Employee"]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="552" y="19" width="250" height="18" uuid="cc33dd44-0001-0003-0001-000000000003"/>
+				<reportElement x="602" y="19" width="200" height="18" uuid="cc33dd44-0001-0003-0001-000000000003"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 				</box>
@@ -208,18 +214,10 @@ ORDER BY ED.EMPLOYEE_NAME, ED.DAY_DATE]]>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{SELECTED_EMPLOYEE_NAME} != null ? $F{SELECTED_EMPLOYEE_NAME} : ("ar".equals($P{P_LANG}) ? "الجميع" : "All")]]></textFieldExpression>
 			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement x="302" y="19" width="250" height="18" uuid="cc33dd44-0001-0003-0001-000000000004"/>
-				<box>
-					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="9"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$F{SELECTED_DEPARTMENT_NAME} != null ? $F{SELECTED_DEPARTMENT_NAME} : ("ar".equals($P{P_LANG}) ? "الجميع" : "All")]]></textFieldExpression>
-			</textField>
+
+			<!-- Department (402 to 602, width 200) -->
 			<textField>
-				<reportElement mode="Opaque" x="302" y="1" width="250" height="18" backcolor="#EAF2F8" uuid="cc33dd44-0001-0002-0001-000000000004"/>
+				<reportElement mode="Opaque" x="402" y="1" width="200" height="18" backcolor="#EAF2F8" uuid="cc33dd44-0001-0002-0001-000000000004"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 				</box>
@@ -229,7 +227,51 @@ ORDER BY ED.EMPLOYEE_NAME, ED.DAY_DATE]]>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "القسم" : "Department"]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="0" y="19" width="302" height="18" uuid="cc33dd44-0001-0003-0001-000000000005"/>
+				<reportElement x="402" y="19" width="200" height="18" uuid="cc33dd44-0001-0003-0001-000000000004"/>
+				<box>
+					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SELECTED_DEPARTMENT_NAME} != null ? $F{SELECTED_DEPARTMENT_NAME} : ("ar".equals($P{P_LANG}) ? "الجميع" : "All")]]></textFieldExpression>
+			</textField>
+
+			<!-- Category (202 to 402, width 200) -->
+			<textField>
+				<reportElement mode="Opaque" x="202" y="1" width="200" height="18" backcolor="#EAF2F8" uuid="cc33dd44-0001-0002-0001-000000000006"/>
+				<box>
+					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "الفئة" : "Category"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="202" y="19" width="200" height="18" uuid="cc33dd44-0001-0003-0001-000000000006"/>
+				<box>
+					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SELECTED_CATEGORY_NAME} != null ? $F{SELECTED_CATEGORY_NAME} : ("ar".equals($P{P_LANG}) ? "الجميع" : "All")]]></textFieldExpression>
+			</textField>
+
+			<!-- Search Period (0 to 202, width 202) -->
+			<textField>
+				<reportElement mode="Opaque" x="0" y="1" width="202" height="18" backcolor="#EAF2F8" uuid="cc33dd44-0001-0002-0001-000000000005"/>
+				<box>
+					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "فترة البحث" : "Search Period"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="0" y="19" width="202" height="18" uuid="cc33dd44-0001-0003-0001-000000000005"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 				</box>
@@ -241,16 +283,6 @@ ORDER BY ED.EMPLOYEE_NAME, ED.DAY_DATE]]>
   ($P{P_FROM_DATE} != null ? ("ar".equals($P{P_LANG}) ? "من " : "From ") + $P{P_FROM_DATE} : "") + 
   ($P{P_TO_DATE} != null ? ("ar".equals($P{P_LANG}) ? " إلى " : " to ") + $P{P_TO_DATE} : "")
 )]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement mode="Opaque" x="0" y="1" width="302" height="18" backcolor="#EAF2F8" uuid="cc33dd44-0001-0002-0001-000000000005"/>
-				<box>
-					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
-				</box>
-				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "فترة البحث" : "Search Period"]]></textFieldExpression>
 			</textField>
 		</band>
 	</columnHeader>
