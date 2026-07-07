@@ -33,65 +33,6 @@
       - TO_DATE($P{P_FROM_DATE}, 'DD-MM-YYYY') + 1
     )
 ),
-absent_employees AS (
-    SELECT E.EMPLOYEE_ID
-      FROM HR_EMPLOYEES E
-      CROSS JOIN date_range DR
-     WHERE E.EMPLOYMENT_STATUS = 1
-       AND E.WORK_SHIFT_TYPE_ID = 2
-       AND ($P{P_EMPLOYEE_CATEGORY_ID} IS NULL OR E.EMPLOYEE_CATEGORY_ID = TO_NUMBER($P{P_EMPLOYEE_CATEGORY_ID}))
-       -- Exclude actual attendance
-       AND NOT EXISTS (
-           SELECT 1 FROM HR_ATTENDANCE_LOG AL 
-            WHERE AL.EMPLOYEE_ID = E.EMPLOYEE_ID 
-              AND TRUNC(AL.ATTENDANCE_DATE) = TRUNC(DR.DAY_DATE)
-       )
-       -- Exclude leaves
-       AND NOT EXISTS (
-           SELECT 1 FROM HR_EMPLOYEE_LEAVE_REQUESTS LR 
-            WHERE LR.EMPLOYEE_ID = E.EMPLOYEE_ID 
-              AND LR.STATUS_ID = 4 
-              AND TRUNC(DR.DAY_DATE) BETWEEN TRUNC(LR.START_DATE) AND TRUNC(LR.END_DATE)
-       )
-       -- Exclude missions
-       AND NOT EXISTS (
-           SELECT 1 FROM HR_EMPLOYEE_MISSIONS M 
-            WHERE M.EMPLOYEE_ID = E.EMPLOYEE_ID 
-              AND M.STATUS_ID = 4 
-              AND TRUNC(DR.DAY_DATE) BETWEEN TRUNC(M.START_DATE) AND TRUNC(M.END_DATE)
-       )
-       -- Exclude registered absences
-       AND NOT EXISTS (
-           SELECT 1 FROM HR_ABSENCE_LOG AB 
-            WHERE AB.EMPLOYEE_ID = E.EMPLOYEE_ID 
-              AND AB.STATUS = '1' 
-              AND TRUNC(DR.DAY_DATE) BETWEEN TRUNC(AB.ABSENCE_DATE) AND TRUNC(NVL(AB.END_DATE, AB.ABSENCE_DATE))
-       )
-       -- Exclude public holidays
-       AND NOT EXISTS (
-           SELECT 1 FROM HR_OFFICIAL_HOLIDAYS PH 
-            WHERE TRUNC(PH.HOLIDAY_DATE) = TRUNC(DR.DAY_DATE) 
-              AND PH.STATUS = 1 
-              AND (PH.RELIGION_ID IS NULL OR PH.RELIGION_ID = E.RELIGION) 
-              AND (PH.SHIFT_ID IS NULL OR PH.SHIFT_ID = E.WORK_SHIFT_ID)
-       )
-       -- Exclude weekly offs
-       AND NOT EXISTS (
-           SELECT 1 
-             FROM HR_WORK_SHIF_DAYS SD
-             JOIN HR_WEEK_DAYS WD ON WD.DAY_ID = SD.DAY_ID
-            WHERE SD.SHIFT_ID = E.WORK_SHIFT_ID 
-              AND SD.IS_OFF = 1 
-              AND WD.DAY_NAME_EN = TRIM(TO_CHAR(DR.DAY_DATE, 'DAY', 'NLS_DATE_LANGUAGE=AMERICAN'))
-       )
-        -- Exclude compensatory rest days
-        AND NOT EXISTS (
-            SELECT 1 FROM VW_SHIFT_COMPENSATORY_DAYS CD 
-             WHERE CD.WORK_SHIFT_ID = E.WORK_SHIFT_ID 
-               AND TRUNC(CD.COMP_DATE) = TRUNC(DR.DAY_DATE)
-        )
-     GROUP BY E.EMPLOYEE_ID
-),
 emp_days AS (
     SELECT E.EMPLOYEE_ID,
            E.CODE AS EMPLOYEE_CODE,
@@ -102,7 +43,6 @@ emp_days AS (
            DR.DAY_DATE
       FROM date_range DR
       CROSS JOIN HR_EMPLOYEES E
-      JOIN absent_employees AE ON AE.EMPLOYEE_ID = E.EMPLOYEE_ID
      WHERE E.EMPLOYMENT_STATUS = 1
        AND E.WORK_SHIFT_TYPE_ID = 2
        AND ($P{P_EMPLOYEE_CATEGORY_ID} IS NULL OR E.EMPLOYEE_CATEGORY_ID = TO_NUMBER($P{P_EMPLOYEE_CATEGORY_ID}))
