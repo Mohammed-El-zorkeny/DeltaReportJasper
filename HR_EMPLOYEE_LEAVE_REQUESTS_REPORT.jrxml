@@ -287,7 +287,7 @@ ORDER BY R.START_DATE DESC, E.CODE ASC]]>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "اسم الموظف" : "Employee Name"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement style="HeaderStyle" x="462" y="40" width="100" height="25" uuid="cc33dd44-0002-0001-0001-000000000004"/>
+				<reportElement style="HeaderStyle" x="400" y="40" width="162" height="25" uuid="cc33dd44-0002-0001-0001-000000000004"/>
 				<box rightPadding="5" leftPadding="5"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="9" isBold="true"/>
@@ -295,35 +295,35 @@ ORDER BY R.START_DATE DESC, E.CODE ASC]]>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "نوع الإجازة" : "Leave Type"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement style="HeaderStyle" x="382" y="40" width="80" height="25" uuid="cc33dd44-0002-0001-0001-000000000005"/>
+				<reportElement style="HeaderStyle" x="320" y="40" width="80" height="25" uuid="cc33dd44-0002-0001-0001-000000000005"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="9" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "تاريخ البدء" : "Start Date"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement style="HeaderStyle" x="302" y="40" width="80" height="25" uuid="cc33dd44-0002-0001-0001-000000000006"/>
+				<reportElement style="HeaderStyle" x="240" y="40" width="80" height="25" uuid="cc33dd44-0002-0001-0001-000000000006"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="9" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "تاريخ الانتهاء" : "End Date"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement style="HeaderStyle" x="242" y="40" width="60" height="25" uuid="cc33dd44-0002-0001-0001-000000000007"/>
+				<reportElement style="HeaderStyle" x="180" y="40" width="60" height="25" uuid="cc33dd44-0002-0001-0001-000000000007"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="9" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "الأيام" : "Days"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement style="HeaderStyle" x="142" y="40" width="100" height="25" uuid="cc33dd44-0002-0001-0001-000000000008"/>
+				<reportElement style="HeaderStyle" x="80" y="40" width="100" height="25" uuid="cc33dd44-0002-0001-0001-000000000008"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="9" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "العودة الفعلي" : "Actual Return"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement style="HeaderStyle" x="0" y="40" width="142" height="25" uuid="cc33dd44-0002-0001-0001-000000000009"/>
+				<reportElement style="HeaderStyle" x="0" y="40" width="80" height="25" uuid="cc33dd44-0002-0001-0001-000000000009"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="9" isBold="true"/>
 				</textElement>
@@ -356,7 +356,7 @@ ORDER BY R.START_DATE DESC, E.CODE ASC]]>
 				<textFieldExpression><![CDATA[$F{EMPLOYEE_NAME}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement style="RowStyle" x="462" y="0" width="100" height="18" uuid="cc33dd44-0003-0001-0001-000000000004"/>
+				<reportElement style="RowStyle" x="400" y="0" width="162" height="18" uuid="cc33dd44-0003-0001-0001-000000000004"/>
 				<box rightPadding="5" leftPadding="5"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8"/>
@@ -364,35 +364,35 @@ ORDER BY R.START_DATE DESC, E.CODE ASC]]>
 				<textFieldExpression><![CDATA[$F{LEAVE_TYPE_NAME}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement style="RowStyle" x="382" y="0" width="80" height="18" uuid="cc33dd44-0003-0001-0001-000000000005"/>
+				<reportElement style="RowStyle" x="320" y="0" width="80" height="18" uuid="cc33dd44-0003-0001-0001-000000000005"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{START_DATE} != null ? new java.text.SimpleDateFormat("dd-MM-yyyy").format($F{START_DATE}) : "-"]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement style="RowStyle" x="302" y="0" width="80" height="18" uuid="cc33dd44-0003-0001-0001-000000000006"/>
+				<reportElement style="RowStyle" x="240" y="0" width="80" height="18" uuid="cc33dd44-0003-0001-0001-000000000006"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{END_DATE} != null ? new java.text.SimpleDateFormat("dd-MM-yyyy").format($F{END_DATE}) : "-"]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement style="RowStyle" x="242" y="0" width="60" height="18" uuid="cc33dd44-0003-0001-0001-000000000007"/>
+				<reportElement style="RowStyle" x="180" y="0" width="60" height="18" uuid="cc33dd44-0003-0001-0001-000000000007"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{TOTAL_LEAVE_DAYS}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement style="RowStyle" x="142" y="0" width="100" height="18" uuid="cc33dd44-0003-0001-0001-000000000008"/>
+				<reportElement style="RowStyle" x="80" y="0" width="100" height="18" uuid="cc33dd44-0003-0001-0001-000000000008"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{ACTUAL_RETURN_DATE} != null ? new java.text.SimpleDateFormat("dd-MM-yyyy").format($F{ACTUAL_RETURN_DATE}) : "-"]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement style="RowStyle" x="0" y="0" width="142" height="18" uuid="cc33dd44-0003-0001-0001-000000000009"/>
+				<reportElement style="RowStyle" x="0" y="0" width="80" height="18" uuid="cc33dd44-0003-0001-0001-000000000009"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
