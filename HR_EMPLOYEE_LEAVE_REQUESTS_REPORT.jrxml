@@ -36,6 +36,7 @@
 		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
 	</parameter>
 	<parameter name="P_EMPLOYEE_ID" class="java.lang.String"/>
+	<parameter name="P_DEPARTMENT_ID" class="java.lang.String"/>
 	<parameter name="P_FROM_DATE" class="java.lang.String"/>
 	<parameter name="P_TO_DATE" class="java.lang.String"/>
 	<parameter name="P_LEAVE_TYPE_ID" class="java.lang.String"/>
@@ -48,6 +49,7 @@
     R.EMPLOYEE_ID,
     E.CODE AS EMPLOYEE_CODE,
     DECODE(LOWER($P{P_LANG}), 'ar', E.FULL_NAME_AR, E.FULL_NAME_EN) AS EMPLOYEE_NAME,
+    DECODE(LOWER($P{P_LANG}), 'ar', D.ARABIC_NAME, D.NAME) AS DEPARTMENT_NAME,
     DECODE(LOWER($P{P_LANG}), 'ar', LT.ARABIC_NAME, LT.NAME) AS LEAVE_TYPE_NAME,
     R.REQUEST_DATE,
     R.START_DATE,
@@ -82,10 +84,12 @@
     R.MODIFIED_DATE,
     R.CREATED_DATE,
     (CASE WHEN $P{P_EMPLOYEE_ID} IS NOT NULL THEN (SELECT DECODE($P{P_LANG}, 'ar', E2.FULL_NAME_AR, E2.FULL_NAME_EN) FROM HR_EMPLOYEES E2 WHERE E2.EMPLOYEE_ID = TO_NUMBER($P{P_EMPLOYEE_ID})) ELSE NULL END) AS SELECTED_EMPLOYEE_NAME,
+    (CASE WHEN ($P{P_DEPARTMENT_ID} IS NOT NULL AND $P{P_DEPARTMENT_ID} != '') THEN (SELECT DECODE($P{P_LANG}, 'ar', D2.ARABIC_NAME, D2.NAME) FROM HR_DEPARTMENT D2 WHERE D2.ID = TO_NUMBER($P{P_DEPARTMENT_ID})) ELSE NULL END) AS SELECTED_DEPARTMENT_NAME,
     (CASE WHEN ($P{P_LEAVE_TYPE_ID} IS NOT NULL AND $P{P_LEAVE_TYPE_ID} != '') THEN (SELECT LISTAGG(DECODE($P{P_LANG}, 'ar', LT2.ARABIC_NAME, LT2.NAME), ', ') WITHIN GROUP (ORDER BY LT2.ID) FROM HR_LEAVE_TYPES LT2 WHERE LT2.ID IN (SELECT TO_NUMBER(COLUMN_VALUE) FROM APEX_STRING.SPLIT($P{P_LEAVE_TYPE_ID}, ','))) ELSE NULL END) AS SELECTED_LEAVE_TYPE_NAME,
     (CASE WHEN $P{P_STATUS_ID} IS NOT NULL THEN (SELECT DECODE($P{P_LANG}, 'ar', NVL(RS2.ARABIC_NAME, RS2.NAME), RS2.NAME) FROM HR_LEAVE_STATUS RS2 WHERE RS2.ID = TO_NUMBER($P{P_STATUS_ID})) ELSE NULL END) AS SELECTED_STATUS_NAME
 FROM HR_EMPLOYEE_LEAVE_REQUESTS R
 LEFT JOIN HR_EMPLOYEES E ON R.EMPLOYEE_ID = E.EMPLOYEE_ID
+LEFT JOIN HR_DEPARTMENT D ON E.DEPARTMENT_ID = D.ID
 LEFT JOIN HR_EMPLOYEES SUB ON R.SUBSTITUTE_EMP_ID = SUB.EMPLOYEE_ID
 LEFT JOIN HR_LEAVE_TYPES LT ON R.LEAVE_TYPE_ID = LT.ID
 JOIN (
@@ -103,6 +107,11 @@ LEFT JOIN (
 ) SG ON R.STAGE_ID = SG.STAGE_ID
 WHERE ($P{P_COMP_ID} IS NULL OR E.COMPANY_ID = $P{P_COMP_ID})
   AND (R.EMPLOYEE_ID = TO_NUMBER($P{P_EMPLOYEE_ID}) OR $P{P_EMPLOYEE_ID} IS NULL OR $P{P_EMPLOYEE_ID} = '')
+  AND ($P{P_DEPARTMENT_ID} IS NULL OR $P{P_DEPARTMENT_ID} = '' OR E.DEPARTMENT_ID IN (
+      SELECT ID FROM HR_DEPARTMENT
+       START WITH ID = TO_NUMBER($P{P_DEPARTMENT_ID})
+      CONNECT BY PRIOR ID = PARENT_ID
+  ))
   AND (
     $P{P_LEAVE_TYPE_ID} IS NULL OR $P{P_LEAVE_TYPE_ID} = ''
     OR R.LEAVE_TYPE_ID IN (
@@ -121,6 +130,7 @@ ORDER BY R.START_DATE DESC, E.CODE ASC]]>
 	<field name="EMPLOYEE_ID" class="java.math.BigDecimal"/>
 	<field name="EMPLOYEE_CODE" class="java.lang.String"/>
 	<field name="EMPLOYEE_NAME" class="java.lang.String"/>
+	<field name="DEPARTMENT_NAME" class="java.lang.String"/>
 	<field name="LEAVE_TYPE_NAME" class="java.lang.String"/>
 	<field name="REQUEST_DATE" class="java.sql.Timestamp"/>
 	<field name="START_DATE" class="java.sql.Timestamp"/>
@@ -155,6 +165,7 @@ ORDER BY R.START_DATE DESC, E.CODE ASC]]>
 	<field name="MODIFIED_DATE" class="java.sql.Timestamp"/>
 	<field name="CREATED_DATE" class="java.sql.Timestamp"/>
 	<field name="SELECTED_EMPLOYEE_NAME" class="java.lang.String"/>
+	<field name="SELECTED_DEPARTMENT_NAME" class="java.lang.String"/>
 	<field name="SELECTED_LEAVE_TYPE_NAME" class="java.lang.String"/>
 	<field name="SELECTED_STATUS_NAME" class="java.lang.String"/>
 	<variable name="ROW_NUM" class="java.lang.Integer" calculation="Count">
@@ -179,7 +190,7 @@ ORDER BY R.START_DATE DESC, E.CODE ASC]]>
 		<band height="65" splitType="Stretch">
 			<!-- Parameter Selection Displays in Header -->
 			<textField>
-				<reportElement mode="Opaque" x="602" y="1" width="200" height="18" backcolor="#EAF2F8" uuid="cc33dd44-0001-0002-0001-000000000003"/>
+				<reportElement mode="Opaque" x="642" y="1" width="160" height="18" backcolor="#EAF2F8" uuid="cc33dd44-0001-0002-0001-000000000003"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 				</box>
@@ -189,7 +200,7 @@ ORDER BY R.START_DATE DESC, E.CODE ASC]]>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "الموظف" : "Employee"]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="602" y="19" width="200" height="18" uuid="cc33dd44-0001-0003-0001-000000000003"/>
+				<reportElement x="642" y="19" width="160" height="18" uuid="cc33dd44-0001-0003-0001-000000000003"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 				</box>
@@ -199,7 +210,27 @@ ORDER BY R.START_DATE DESC, E.CODE ASC]]>
 				<textFieldExpression><![CDATA[$F{SELECTED_EMPLOYEE_NAME} != null ? $F{SELECTED_EMPLOYEE_NAME} : ("ar".equals($P{P_LANG}) ? "الجميع" : "All")]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement mode="Opaque" x="402" y="1" width="200" height="18" backcolor="#EAF2F8" uuid="cc33dd44-0001-0002-0001-000000000021"/>
+				<reportElement mode="Opaque" x="482" y="1" width="160" height="18" backcolor="#EAF2F8" uuid="cc33dd44-0001-0002-0001-000000000051"/>
+				<box>
+					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "الإدارة" : "Department"]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="482" y="19" width="160" height="18" uuid="cc33dd44-0001-0003-0001-000000000052"/>
+				<box>
+					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="9"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{SELECTED_DEPARTMENT_NAME} != null ? $F{SELECTED_DEPARTMENT_NAME} : ("ar".equals($P{P_LANG}) ? "الجميع" : "All")]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Opaque" x="322" y="1" width="160" height="18" backcolor="#EAF2F8" uuid="cc33dd44-0001-0002-0001-000000000021"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 				</box>
@@ -209,7 +240,7 @@ ORDER BY R.START_DATE DESC, E.CODE ASC]]>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "نوع الإجازة" : "Leave Type"]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="402" y="19" width="200" height="18" uuid="cc33dd44-0001-0003-0001-000000000022"/>
+				<reportElement x="322" y="19" width="160" height="18" uuid="cc33dd44-0001-0003-0001-000000000022"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 				</box>
@@ -219,7 +250,7 @@ ORDER BY R.START_DATE DESC, E.CODE ASC]]>
 				<textFieldExpression><![CDATA[$F{SELECTED_LEAVE_TYPE_NAME} != null ? $F{SELECTED_LEAVE_TYPE_NAME} : ("ar".equals($P{P_LANG}) ? "الجميع" : "All")]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement mode="Opaque" x="202" y="1" width="200" height="18" backcolor="#EAF2F8" uuid="cc33dd44-0001-0002-0001-000000000023"/>
+				<reportElement mode="Opaque" x="162" y="1" width="160" height="18" backcolor="#EAF2F8" uuid="cc33dd44-0001-0002-0001-000000000023"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 				</box>
@@ -229,7 +260,7 @@ ORDER BY R.START_DATE DESC, E.CODE ASC]]>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "الحالة" : "Status"]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="202" y="19" width="200" height="18" uuid="cc33dd44-0001-0003-0001-000000000024"/>
+				<reportElement x="162" y="19" width="160" height="18" uuid="cc33dd44-0001-0003-0001-000000000024"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 				</box>
@@ -239,7 +270,7 @@ ORDER BY R.START_DATE DESC, E.CODE ASC]]>
 				<textFieldExpression><![CDATA[$F{SELECTED_STATUS_NAME} != null ? $F{SELECTED_STATUS_NAME} : ("ar".equals($P{P_LANG}) ? "الجميع" : "All")]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="0" y="19" width="202" height="18" uuid="cc33dd44-0001-0003-0001-000000000005"/>
+				<reportElement x="0" y="19" width="162" height="18" uuid="cc33dd44-0001-0003-0001-000000000005"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 				</box>
@@ -253,7 +284,7 @@ ORDER BY R.START_DATE DESC, E.CODE ASC]]>
 )]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement mode="Opaque" x="0" y="1" width="202" height="18" backcolor="#EAF2F8" uuid="cc33dd44-0001-0002-0001-000000000005"/>
+				<reportElement mode="Opaque" x="0" y="1" width="162" height="18" backcolor="#EAF2F8" uuid="cc33dd44-0001-0002-0001-000000000005"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 				</box>
@@ -272,14 +303,14 @@ ORDER BY R.START_DATE DESC, E.CODE ASC]]>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "م" : "Seq"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement style="HeaderStyle" x="712" y="40" width="60" height="25" uuid="cc33dd44-0002-0001-0001-000000000002"/>
+				<reportElement style="HeaderStyle" x="717" y="40" width="55" height="25" uuid="cc33dd44-0002-0001-0001-000000000002"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="9" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "كود الموظف" : "Emp Code"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement style="HeaderStyle" x="562" y="40" width="150" height="25" uuid="cc33dd44-0002-0001-0001-000000000003"/>
+				<reportElement style="HeaderStyle" x="580" y="40" width="137" height="25" uuid="cc33dd44-0002-0001-0001-000000000003"/>
 				<box rightPadding="5" leftPadding="5"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="9" isBold="true"/>
@@ -287,7 +318,15 @@ ORDER BY R.START_DATE DESC, E.CODE ASC]]>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "اسم الموظف" : "Employee Name"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement style="HeaderStyle" x="400" y="40" width="162" height="25" uuid="cc33dd44-0002-0001-0001-000000000004"/>
+				<reportElement style="HeaderStyle" x="470" y="40" width="110" height="25" uuid="cc33dd44-0002-0001-0001-000000000033"/>
+				<box rightPadding="5" leftPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="9" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "الإدارة" : "Department"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement style="HeaderStyle" x="340" y="40" width="130" height="25" uuid="cc33dd44-0002-0001-0001-000000000004"/>
 				<box rightPadding="5" leftPadding="5"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="9" isBold="true"/>
@@ -295,35 +334,35 @@ ORDER BY R.START_DATE DESC, E.CODE ASC]]>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "نوع الإجازة" : "Leave Type"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement style="HeaderStyle" x="320" y="40" width="80" height="25" uuid="cc33dd44-0002-0001-0001-000000000005"/>
+				<reportElement style="HeaderStyle" x="270" y="40" width="70" height="25" uuid="cc33dd44-0002-0001-0001-000000000005"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="9" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "تاريخ البدء" : "Start Date"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement style="HeaderStyle" x="240" y="40" width="80" height="25" uuid="cc33dd44-0002-0001-0001-000000000006"/>
+				<reportElement style="HeaderStyle" x="200" y="40" width="70" height="25" uuid="cc33dd44-0002-0001-0001-000000000006"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="9" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "تاريخ الانتهاء" : "End Date"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement style="HeaderStyle" x="180" y="40" width="60" height="25" uuid="cc33dd44-0002-0001-0001-000000000007"/>
+				<reportElement style="HeaderStyle" x="165" y="40" width="35" height="25" uuid="cc33dd44-0002-0001-0001-000000000007"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="9" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "الأيام" : "Days"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement style="HeaderStyle" x="80" y="40" width="100" height="25" uuid="cc33dd44-0002-0001-0001-000000000008"/>
+				<reportElement style="HeaderStyle" x="85" y="40" width="80" height="25" uuid="cc33dd44-0002-0001-0001-000000000008"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="9" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "العودة الفعلي" : "Actual Return"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement style="HeaderStyle" x="0" y="40" width="80" height="25" uuid="cc33dd44-0002-0001-0001-000000000009"/>
+				<reportElement style="HeaderStyle" x="0" y="40" width="85" height="25" uuid="cc33dd44-0002-0001-0001-000000000009"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="9" isBold="true"/>
 				</textElement>
@@ -341,14 +380,14 @@ ORDER BY R.START_DATE DESC, E.CODE ASC]]>
 				<textFieldExpression><![CDATA[$V{ROW_NUM}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement style="RowStyle" x="712" y="0" width="60" height="18" uuid="cc33dd44-0003-0001-0001-000000000002"/>
+				<reportElement style="RowStyle" x="717" y="0" width="55" height="18" uuid="cc33dd44-0003-0001-0001-000000000002"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{EMPLOYEE_CODE}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement style="RowStyle" x="562" y="0" width="150" height="18" uuid="cc33dd44-0003-0001-0001-000000000003"/>
+				<reportElement style="RowStyle" x="580" y="0" width="137" height="18" uuid="cc33dd44-0003-0001-0001-000000000003"/>
 				<box rightPadding="5" leftPadding="5"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8"/>
@@ -356,7 +395,15 @@ ORDER BY R.START_DATE DESC, E.CODE ASC]]>
 				<textFieldExpression><![CDATA[$F{EMPLOYEE_NAME}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement style="RowStyle" x="400" y="0" width="162" height="18" uuid="cc33dd44-0003-0001-0001-000000000004"/>
+				<reportElement style="RowStyle" x="470" y="0" width="110" height="18" uuid="cc33dd44-0003-0001-0001-000000000033"/>
+				<box rightPadding="5" leftPadding="5"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{DEPARTMENT_NAME}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="RowStyle" x="340" y="0" width="130" height="18" uuid="cc33dd44-0003-0001-0001-000000000004"/>
 				<box rightPadding="5" leftPadding="5"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font size="8"/>
@@ -364,35 +411,35 @@ ORDER BY R.START_DATE DESC, E.CODE ASC]]>
 				<textFieldExpression><![CDATA[$F{LEAVE_TYPE_NAME}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement style="RowStyle" x="320" y="0" width="80" height="18" uuid="cc33dd44-0003-0001-0001-000000000005"/>
+				<reportElement style="RowStyle" x="270" y="0" width="70" height="18" uuid="cc33dd44-0003-0001-0001-000000000005"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{START_DATE} != null ? new java.text.SimpleDateFormat("dd-MM-yyyy").format($F{START_DATE}) : "-"]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement style="RowStyle" x="240" y="0" width="80" height="18" uuid="cc33dd44-0003-0001-0001-000000000006"/>
+				<reportElement style="RowStyle" x="200" y="0" width="70" height="18" uuid="cc33dd44-0003-0001-0001-000000000006"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{END_DATE} != null ? new java.text.SimpleDateFormat("dd-MM-yyyy").format($F{END_DATE}) : "-"]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement style="RowStyle" x="180" y="0" width="60" height="18" uuid="cc33dd44-0003-0001-0001-000000000007"/>
+				<reportElement style="RowStyle" x="165" y="0" width="35" height="18" uuid="cc33dd44-0003-0001-0001-000000000007"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{TOTAL_LEAVE_DAYS}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement style="RowStyle" x="80" y="0" width="100" height="18" uuid="cc33dd44-0003-0001-0001-000000000008"/>
+				<reportElement style="RowStyle" x="85" y="0" width="80" height="18" uuid="cc33dd44-0003-0001-0001-000000000008"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{ACTUAL_RETURN_DATE} != null ? new java.text.SimpleDateFormat("dd-MM-yyyy").format($F{ACTUAL_RETURN_DATE}) : "-"]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement style="RowStyle" x="0" y="0" width="80" height="18" uuid="cc33dd44-0003-0001-0001-000000000009"/>
+				<reportElement style="RowStyle" x="0" y="0" width="85" height="18" uuid="cc33dd44-0003-0001-0001-000000000009"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8"/>
 				</textElement>
