@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.20.5.final using JasperReports Library version 6.20.5-3efcf2e67f959db3888d79f73dde2dbd7acb4f8e  -->
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HR_OVERTIME_SUMMARY_REPORT" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="15" bottomMargin="15" uuid="e2f3a4b5-c6d7-4e8f-90ab-1234567890cf">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HR_OVERTIME_SUMMARY_REPORT" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="15" bottomMargin="15" uuid="e2f3a4b5-c6d7-4e8f-90ab-1234567890cf">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Delta"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
@@ -25,12 +25,15 @@
 	<parameter name="P_TO_DATE" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[WITH EMP_OT_DAYS AS (
-    -- الفئة الأولى: الأيام التي حضروا فيها من الـ View
+    -- الفئة الأولى: الأيام التي حضروا فيها من الـ View (شاملة التسويات لأيام الحضور ولكن باستبعاد الـ 250 في العطلات)
     SELECT
         A.EMPLOYEE_ID,
         A.ATTENDANCE_DATE,
-        A.OVERTIME_DAYS_CALCULATED AS OT_DAYS,
-        A.OT_DAYS_250_CALCULATED AS OT_DAYS_250,
+        CASE 
+            WHEN A.DAY_TYPE = 'HOLIDAY' 
+            THEN A.OVERTIME_DAYS_CALCULATED - NVL(A.OT_DAYS_250_CALCULATED, 0)
+            ELSE A.OVERTIME_DAYS_CALCULATED 
+        END AS OT_DAYS,
         CASE WHEN NVL(A.OT_DAYS_400_CALCULATED, 0) >= 1.6 THEN 1 ELSE 0 END AS MEAL_ALLOWANCE,
         CASE 
             WHEN A.DAY_TYPE = 'HOLIDAY' 
@@ -49,33 +52,40 @@
     
     UNION ALL
     
-    -- الفئة الثانية: تسويات الأيام التي لم يحضروا فيها أصلاً
+    -- الفئة الثانية: تسويات الأيام التي لم يحضروا فيها أصلاً (سواء كانت أيام راحة أو غياب)
     SELECT
         OA.EMPLOYEE_ID,
         OA.ATTENDANCE_DATE,
-        -- إجمالي أيام التسوية (250 + 400)
+        -- إجمالي أيام التسوية المضافة أو المخصومة (باستبعاد الـ 250 في العطلات الرسمية)
         SUM(
-            CASE OA.ADJUSTMENT_TYPE 
-                WHEN 1 THEN NVL(OA.DAYS, 0) 
-                WHEN 2 THEN -NVL(OA.DAYS, 0) 
-            END
-        ) AS OT_DAYS,
-        -- أيام 250 فقط
-        SUM(
-            CASE WHEN OA.OT_TYPE = 1 THEN
+            CASE WHEN EXISTS (
+                SELECT 1 FROM HR_OFFICIAL_HOLIDAYS OH
+                WHERE OH.HOLIDAY_DATE = OA.ATTENDANCE_DATE
+                  AND OH.STATUS = '1'
+            ) THEN
+                -- عطلة رسمية: نأخذ فقط تسويات الـ 400 (OT_TYPE = 2) ونستبعد الـ 250 (OT_TYPE = 1)
+                CASE WHEN OA.OT_TYPE = 2 THEN
+                    CASE OA.ADJUSTMENT_TYPE 
+                        WHEN 1 THEN NVL(OA.DAYS, 0) 
+                        WHEN 2 THEN -NVL(OA.DAYS, 0) 
+                    END
+                ELSE 0 END
+            ELSE
+                -- ليس عطلة: نأخذ كل التسويات كالمعتاد
                 CASE OA.ADJUSTMENT_TYPE 
                     WHEN 1 THEN NVL(OA.DAYS, 0) 
                     WHEN 2 THEN -NVL(OA.DAYS, 0) 
                 END
-            ELSE 0 END
-        ) AS OT_DAYS_250,
+            END
+        ) AS OT_DAYS,
+        0 AS OT_DAYS_250,
         0 AS MEAL_ALLOWANCE,
         0 AS IS_HOLIDAY_OT
     FROM HR_OVERTIME_ADJUSTMENTS OA
     WHERE OA.STATUS = 1
       AND ($P{P_FROM_DATE} IS NULL OR OA.ATTENDANCE_DATE >= TO_DATE($P{P_FROM_DATE}, 'DD-MM-YYYY'))
       AND ($P{P_TO_DATE}   IS NULL OR OA.ATTENDANCE_DATE <= TO_DATE($P{P_TO_DATE},   'DD-MM-YYYY'))
-      -- استبعاد الأيام التي حضروا فيها لأنها محسوبة بالفعل في الجزء الأول
+      -- استبعاد الأيام التي حضروا فيها لأنها مسجلة ومحسوبة بالفعل في الفئة الأولى أعلاه
       AND NOT EXISTS (
           SELECT 1 
           FROM VW_OVERTIME_LOG A 
@@ -92,7 +102,10 @@ SELECT
     E.CODE AS EMPLOYEE_CODE,
     DECODE($P{P_LANG}, 'ar', E.FULL_NAME_AR, E.FULL_NAME_EN) AS EMPLOYEE_NAME,
     SUM(OD.MEAL_ALLOWANCE) AS MEAL_ALLOWANCE_COUNT,
-    GREATEST(SUM(OD.OT_DAYS), 0) AS TOTAL_OVERTIME_DAYS,
+    
+    -- إجمالي أيام الإضافي بحد أقصى 45
+    LEAST(GREATEST(SUM(OD.OT_DAYS), 0), 45) AS TOTAL_OVERTIME_DAYS,
+    
     SUM(OD.IS_HOLIDAY_OT) AS HOLIDAY_COUNT,
     (SELECT DECODE($P{P_LANG}, 'ar', E2.FULL_NAME_AR, E2.FULL_NAME_EN) FROM HR_EMPLOYEES E2 WHERE E2.EMPLOYEE_ID = $P{P_EMPLOYEE_ID}) AS SELECTED_EMPLOYEE_NAME,
     (SELECT DECODE($P{P_LANG}, 'ar', D2.ARABIC_NAME, D2.NAME) FROM HR_DEPARTMENT D2 WHERE D2.ID = $P{P_DEPARTMENT_ID}) AS SELECTED_DEPARTMENT_NAME
@@ -112,6 +125,8 @@ GROUP BY
     E.CODE,
     E.FULL_NAME_AR,
     E.FULL_NAME_EN
+-- لا يظهر الموظفون الذين ليس لديهم إضافي نهائياً بعد استبعاد العطلات
+HAVING SUM(OD.OT_DAYS) > 0
 ORDER BY 
     EMPLOYEE_NAME]]>
 	</queryString>
@@ -138,7 +153,7 @@ ORDER BY
 	<pageHeader>
 		<band height="50" splitType="Stretch">
 			<subreport>
-				<reportElement positionType="Float" x="-20" y="0" width="842" height="50" uuid="cc33dd44-0001-0001-0001-000000000001"/>
+				<reportElement positionType="Float" x="-20" y="0" width="595" height="50" uuid="cc33dd44-0001-0001-0001-000000000001"/>
 				<subreportParameter name="P_COMP_ID">
 					<subreportParameterExpression><![CDATA[$P{P_COMP_ID}]]></subreportParameterExpression>
 				</subreportParameter>
@@ -146,126 +161,126 @@ ORDER BY
 					<subreportParameterExpression><![CDATA["ar".equals($P{P_LANG}) ? "ملخص ساعات العمل الإضافي" : "Overtime Summary Report"]]></subreportParameterExpression>
 				</subreportParameter>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA["HEAD_TITEL_PA_LAND.jasper"]]></subreportExpression>
+				<subreportExpression><![CDATA["HEAD_TITEL_PA.jasper"]]></subreportExpression>
 			</subreport>
 		</band>
 	</pageHeader>
 	<columnHeader>
-		<band height="65" splitType="Stretch">
+		<band height="60" splitType="Stretch">
 			<!-- Col 6: Holiday Count -->
 			<textField>
-				<reportElement mode="Opaque" x="0" y="40" width="132" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000002"/>
+				<reportElement mode="Opaque" x="0" y="40" width="80" height="20" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000002"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
+					<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "عدد العطلات" : "Holidays Count"]]></textFieldExpression>
 			</textField>
 			<!-- Col 5: Meals Count -->
 			<textField>
-				<reportElement mode="Opaque" x="132" y="40" width="130" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000003"/>
+				<reportElement mode="Opaque" x="80" y="40" width="80" height="20" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000003"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
+					<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "عدد الوجبات" : "Meals Count"]]></textFieldExpression>
 			</textField>
 			<!-- Col 4: Total OT Days -->
 			<textField>
-				<reportElement mode="Opaque" x="262" y="40" width="140" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000004"/>
+				<reportElement mode="Opaque" x="160" y="40" width="90" height="20" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000004"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
+					<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "إجمالي أيام الإضافي" : "Total OT Days"]]></textFieldExpression>
 			</textField>
 			<!-- Col 3: Employee Name -->
 			<textField>
-				<reportElement mode="Opaque" x="402" y="40" width="290" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000005"/>
+				<reportElement mode="Opaque" x="250" y="40" width="215" height="20" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000005"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
+					<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "اسم الموظف" : "Employee Name"]]></textFieldExpression>
 			</textField>
 			<!-- Col 2: Code -->
 			<textField>
-				<reportElement mode="Opaque" x="692" y="40" width="80" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000006"/>
+				<reportElement mode="Opaque" x="465" y="40" width="60" height="20" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000006"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
+					<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "الكود" : "Code"]]></textFieldExpression>
 			</textField>
 			<!-- Col 1: Seq -->
 			<textField>
-				<reportElement mode="Opaque" x="772" y="40" width="30" height="25" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000007"/>
+				<reportElement mode="Opaque" x="525" y="40" width="30" height="20" forecolor="#FFFFFF" backcolor="#1F4E79" uuid="cc33dd44-0002-0001-0001-000000000007"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#000000"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
+					<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "م" : "Seq"]]></textFieldExpression>
 			</textField>
-			<!-- Parameter Selection Displays in Header -->
+			<!-- Parameter Selection Displays in Header (Capped at 555) -->
 			<textField>
-				<reportElement mode="Opaque" x="552" y="1" width="250" height="18" backcolor="#EAF2F8" uuid="cc33dd44-0001-0002-0001-000000000008"/>
+				<reportElement mode="Opaque" x="370" y="1" width="185" height="18" backcolor="#EAF2F8" uuid="cc33dd44-0001-0002-0001-000000000008"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
+					<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "الموظف" : "Employee"]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="552" y="19" width="250" height="18" uuid="cc33dd44-0001-0003-0001-000000000009"/>
+				<reportElement x="370" y="19" width="185" height="18" uuid="cc33dd44-0001-0003-0001-000000000009"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="9"/>
+					<font fontName="IBM Plex Sans Arabic" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{SELECTED_EMPLOYEE_NAME} != null ? $F{SELECTED_EMPLOYEE_NAME} : ("ar".equals($P{P_LANG}) ? "الجميع" : "All")]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="302" y="19" width="250" height="18" uuid="cc33dd44-0001-0003-0001-000000000010"/>
+				<reportElement x="185" y="19" width="185" height="18" uuid="cc33dd44-0001-0003-0001-000000000010"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="9"/>
+					<font fontName="IBM Plex Sans Arabic" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{SELECTED_DEPARTMENT_NAME} != null ? $F{SELECTED_DEPARTMENT_NAME} : ("ar".equals($P{P_LANG}) ? "الجميع" : "All")]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement mode="Opaque" x="302" y="1" width="250" height="18" backcolor="#EAF2F8" uuid="cc33dd44-0001-0002-0001-000000000011"/>
+				<reportElement mode="Opaque" x="185" y="1" width="185" height="18" backcolor="#EAF2F8" uuid="cc33dd44-0001-0002-0001-000000000011"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
+					<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "القسم" : "Department"]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement x="0" y="19" width="302" height="18" uuid="cc33dd44-0001-0003-0001-000000000012"/>
+				<reportElement x="0" y="19" width="185" height="18" uuid="cc33dd44-0001-0003-0001-000000000012"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="9"/>
+					<font fontName="IBM Plex Sans Arabic" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[($P{P_FROM_DATE} == null && $P{P_TO_DATE} == null) ? ("ar".equals($P{P_LANG}) ? "الجميع" : "All") : 
 (
@@ -274,82 +289,82 @@ ORDER BY
 )]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement mode="Opaque" x="0" y="1" width="302" height="18" backcolor="#EAF2F8" uuid="cc33dd44-0001-0002-0001-000000000013"/>
+				<reportElement mode="Opaque" x="0" y="1" width="185" height="18" backcolor="#EAF2F8" uuid="cc33dd44-0001-0002-0001-000000000013"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="9" isBold="true"/>
+					<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA["ar".equals($P{P_LANG}) ? "فترة البحث" : "Search Period"]]></textFieldExpression>
 			</textField>
 		</band>
 	</columnHeader>
 	<detail>
-		<band height="18" splitType="Stretch">
+		<band height="14" splitType="Stretch">
 			<!-- Col 6: Holiday Count -->
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement stretchType="ContainerHeight" x="0" y="0" width="132" height="18" uuid="cc33dd44-0003-0001-0001-000000000002"/>
+				<reportElement stretchType="ContainerHeight" x="0" y="0" width="80" height="14" uuid="cc33dd44-0003-0001-0001-000000000002"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="9"/>
+					<font fontName="IBM Plex Sans Arabic" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{HOLIDAY_COUNT} == null || $F{HOLIDAY_COUNT}.doubleValue() == 0 ? "—" : $F{HOLIDAY_COUNT}]]></textFieldExpression>
 			</textField>
 			<!-- Col 5: Meals Count -->
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement stretchType="ContainerHeight" x="132" y="0" width="130" height="18" uuid="cc33dd44-0003-0001-0001-000000000003"/>
+				<reportElement stretchType="ContainerHeight" x="80" y="0" width="80" height="14" uuid="cc33dd44-0003-0001-0001-000000000003"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="9"/>
+					<font fontName="IBM Plex Sans Arabic" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{MEAL_ALLOWANCE_COUNT} == null || $F{MEAL_ALLOWANCE_COUNT}.doubleValue() == 0 ? "—" : $F{MEAL_ALLOWANCE_COUNT}]]></textFieldExpression>
 			</textField>
 			<!-- Col 4: Total OT Days -->
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement stretchType="ContainerHeight" x="262" y="0" width="140" height="18" uuid="cc33dd44-0003-0001-0001-000000000004"/>
+				<reportElement stretchType="ContainerHeight" x="160" y="0" width="90" height="14" uuid="cc33dd44-0003-0001-0001-000000000004"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="9"/>
+					<font fontName="IBM Plex Sans Arabic" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{TOTAL_OVERTIME_DAYS} == null || $F{TOTAL_OVERTIME_DAYS}.doubleValue() == 0 ? "—" : $F{TOTAL_OVERTIME_DAYS}]]></textFieldExpression>
 			</textField>
 			<!-- Col 3: Employee Name -->
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement stretchType="ContainerHeight" x="402" y="0" width="290" height="18" uuid="cc33dd44-0003-0001-0001-000000000005"/>
-				<box topPadding="2" leftPadding="4" bottomPadding="2" rightPadding="4">
+				<reportElement stretchType="ContainerHeight" x="250" y="0" width="215" height="14" uuid="cc33dd44-0003-0001-0001-000000000005"/>
+				<box topPadding="1" leftPadding="4" bottomPadding="1" rightPadding="4">
 					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
 				</box>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="9"/>
+					<font fontName="IBM Plex Sans Arabic" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{EMPLOYEE_NAME}]]></textFieldExpression>
 			</textField>
 			<!-- Col 2: Code -->
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement stretchType="ContainerHeight" x="692" y="0" width="80" height="18" uuid="cc33dd44-0003-0001-0001-000000000006"/>
+				<reportElement stretchType="ContainerHeight" x="465" y="0" width="60" height="14" uuid="cc33dd44-0003-0001-0001-000000000006"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="9"/>
+					<font fontName="IBM Plex Sans Arabic" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{EMPLOYEE_CODE}]]></textFieldExpression>
 			</textField>
 			<!-- Col 1: Seq -->
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement stretchType="ContainerHeight" x="772" y="0" width="30" height="18" uuid="cc33dd44-0003-0001-0001-000000000007"/>
+				<reportElement stretchType="ContainerHeight" x="525" y="0" width="30" height="14" uuid="cc33dd44-0003-0001-0001-000000000007"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="9"/>
+					<font fontName="IBM Plex Sans Arabic" size="8"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$V{ROW_NUM}]]></textFieldExpression>
 			</textField>
@@ -358,7 +373,7 @@ ORDER BY
 	<pageFooter>
 		<band height="40" splitType="Stretch">
 			<subreport>
-				<reportElement x="-20" y="0" width="842" height="40" uuid="cc33dd44-0004-0001-0001-000000000001"/>
+				<reportElement x="-20" y="0" width="595" height="40" uuid="cc33dd44-0004-0001-0001-000000000001"/>
 				<subreportParameter name="P_USERPRINT">
 					<subreportParameterExpression><![CDATA[$P{P_USERPRINT}]]></subreportParameterExpression>
 				</subreportParameter>
@@ -366,19 +381,19 @@ ORDER BY
 					<subreportParameterExpression><![CDATA[$P{P_LANG}]]></subreportParameterExpression>
 				</subreportParameter>
 				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
-				<subreportExpression><![CDATA["FOOTER_TITEL_PA_LAND.jasper"]]></subreportExpression>
+				<subreportExpression><![CDATA["FOOTER_TITEL_PA.jasper"]]></subreportExpression>
 			</subreport>
 		</band>
 	</pageFooter>
 	<summary>
 		<band height="20" splitType="Stretch">
 			<frame>
-				<reportElement mode="Opaque" x="0" y="0" width="802" height="20" backcolor="#F9F9F9" uuid="cc33dd44-0006-0002-0001-000000000001"/>
+				<reportElement mode="Opaque" x="0" y="0" width="555" height="20" backcolor="#F9F9F9" uuid="cc33dd44-0006-0002-0001-000000000001"/>
 				<box>
 					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 				</box>
 				<textField>
-					<reportElement x="402" y="0" width="400" height="20" uuid="cc33dd44-0006-0002-0001-000000000002"/>
+					<reportElement x="250" y="0" width="305" height="20" uuid="cc33dd44-0006-0002-0001-000000000002"/>
 					<box rightPadding="10"/>
 					<textElement textAlignment="Right" verticalAlignment="Middle">
 						<font fontName="IBM Plex Sans Arabic" size="8" isBold="true"/>
@@ -387,7 +402,7 @@ ORDER BY
 				</textField>
 				<!-- Total OT Days Sum -->
 				<textField isBlankWhenNull="true">
-					<reportElement mode="Opaque" x="262" y="0" width="140" height="20" backcolor="#EAFAF1" uuid="cc33dd44-0006-0002-0001-000000000004"/>
+					<reportElement mode="Opaque" x="160" y="0" width="90" height="20" backcolor="#EAFAF1" uuid="cc33dd44-0006-0002-0001-000000000004"/>
 					<box>
 						<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 					</box>
@@ -398,7 +413,7 @@ ORDER BY
 				</textField>
 				<!-- Total Meals Count Sum -->
 				<textField isBlankWhenNull="true">
-					<reportElement mode="Opaque" x="132" y="0" width="130" height="20" backcolor="#EAFAF1" uuid="cc33dd44-0006-0002-0001-000000000003"/>
+					<reportElement mode="Opaque" x="80" y="0" width="80" height="20" backcolor="#EAFAF1" uuid="cc33dd44-0006-0002-0001-000000000003"/>
 					<box>
 						<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 					</box>
@@ -409,7 +424,7 @@ ORDER BY
 				</textField>
 				<!-- Total Holidays Count Sum -->
 				<textField isBlankWhenNull="true">
-					<reportElement mode="Opaque" x="0" y="0" width="132" height="20" backcolor="#EAFAF1" uuid="cc33dd44-0006-0002-0001-000000000005"/>
+					<reportElement mode="Opaque" x="0" y="0" width="80" height="20" backcolor="#EAFAF1" uuid="cc33dd44-0006-0002-0001-000000000005"/>
 					<box>
 						<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 					</box>
