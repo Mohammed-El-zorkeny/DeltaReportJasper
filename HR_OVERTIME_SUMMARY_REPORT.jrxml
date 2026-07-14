@@ -78,7 +78,6 @@
                 END
             END
         ) AS OT_DAYS,
-        0 AS OT_DAYS_250,
         0 AS MEAL_ALLOWANCE,
         0 AS IS_HOLIDAY_OT
     FROM HR_OVERTIME_ADJUSTMENTS OA
