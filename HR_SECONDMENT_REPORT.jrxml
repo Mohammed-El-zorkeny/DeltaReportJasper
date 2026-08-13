@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.5.final using JasperReports Library version 6.20.5-3efcf2e67f959db3888d79f73dde2dbd7acb4f8e  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HR_SECONDMENT_REPORT" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="e7b89a12-8240-4ad7-82e4-dc6d0e7a5999">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="Delta"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.unit.pageSize" value="A4"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<style name="TitleStyle" mode="Opaque" forecolor="#1F4E79" backcolor="#F2F4F7" hTextAlign="Center" vTextAlign="Middle" fontName="IBM Plex Sans Arabic" fontSize="18" isBold="true">
+		<box>
+			<topPen lineWidth="1.0" lineColor="#1F4E79"/>
+			<leftPen lineWidth="1.0" lineColor="#1F4E79"/>
+			<bottomPen lineWidth="1.0" lineColor="#1F4E79"/>
+			<rightPen lineWidth="1.0" lineColor="#1F4E79"/>
+		</box>
+	</style>
+	<style name="DecisionTextStyle" mode="Transparent" forecolor="#2C3E50" hTextAlign="Right" vTextAlign="Top" fontName="IBM Plex Sans Arabic" fontSize="14">
+		<box topPadding="15" leftPadding="15" bottomPadding="15" rightPadding="15">
+			<topPen lineWidth="0.5" lineColor="#BDC3C7"/>
+			<leftPen lineWidth="0.5" lineColor="#BDC3C7"/>
+			<bottomPen lineWidth="0.5" lineColor="#BDC3C7"/>
+			<rightPen lineWidth="0.5" lineColor="#BDC3C7"/>
+		</box>
+	</style>
+	<style name="HeaderStyle" mode="Opaque" forecolor="#FFFFFF" backcolor="#1F4E79" hTextAlign="Center" vTextAlign="Middle" fontName="IBM Plex Sans Arabic" fontSize="11" isBold="true">
+		<box>
+			<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+		</box>
+	</style>
+	<style name="RowStyle" mode="Opaque" forecolor="#2C3E50" backcolor="#FFFFFF" hTextAlign="Center" vTextAlign="Middle" fontName="IBM Plex Sans Arabic" fontSize="11">
+		<box>
+			<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+		</box>
+	</style>
+
+	<parameter name="P_ID" class="java.lang.String"/>
+	<parameter name="P_LANG" class="java.lang.String">
+		<defaultValueExpression><![CDATA["ar"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="P_COMP_ID" class="java.lang.String"/>
+	<parameter name="P_USERPRINT" class="java.lang.String">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA[""]]></defaultValueExpression>
+	</parameter>
+
+	<queryString>
+		<![CDATA[SELECT 
+    S.ID,
+    S.CODE AS SECONDMENT_CODE,
+    S.EMPLOYEE_ID,
+    E.CODE AS EMPLOYEE_CODE,
+    DECODE(LOWER(NVL($P{P_LANG}, 'ar')), 'ar', NVL(E.FULL_NAME_AR, E.FULL_NAME_EN), NVL(E.FULL_NAME_EN, E.FULL_NAME_AR)) AS EMPLOYEE_NAME,
+    
+    -- Approver Employee Name
+    S.APPROVER_EMPLOYEE_ID,
+    DECODE(LOWER(NVL($P{P_LANG}, 'ar')), 'ar', NVL(APPR.FULL_NAME_AR, APPR.FULL_NAME_EN), NVL(APPR.FULL_NAME_EN, APPR.FULL_NAME_AR)) AS APPROVER_EMPLOYEE_NAME,
+    
+    -- Current Dept
+    S.FROM_DEPARTMENT_ID,
+    DECODE(LOWER(NVL($P{P_LANG}, 'ar')), 'ar', NVL(FD.ARABIC_NAME, FD.NAME), NVL(FD.NAME, FD.ARABIC_NAME)) AS FROM_DEPARTMENT_NAME,
+    NVL(
+        DECODE(LOWER(NVL($P{P_LANG}, 'ar')), 'ar', NVL(FPD.ARABIC_NAME, FPD.NAME), NVL(FPD.NAME, FPD.ARABIC_NAME)),
+        DECODE(LOWER(NVL($P{P_LANG}, 'ar')), 'ar', NVL(FD.ARABIC_NAME, FD.NAME), NVL(FD.NAME, FD.ARABIC_NAME))
+    ) AS FROM_GENERAL_DEPT_NAME,
+    
+    -- Current Job Title & Grade
+    S.FROM_JOB_ID,
+    DECODE(LOWER(NVL($P{P_LANG}, 'ar')), 'ar', NVL(FJ.ARABIC_NAME, FJ.NAME), NVL(FJ.NAME, FJ.ARABIC_NAME)) AS FROM_JOB_NAME,
+    S.FROM_JOB_GRADE_ID,
+    DECODE(LOWER(NVL($P{P_LANG}, 'ar')), 'ar', NVL(FG.ARABIC_NAME, FG.NAME), NVL(FG.NAME, FG.ARABIC_NAME)) AS FROM_GRADE_NAME,
+    
+    -- Seconded To Dept
+    S.TO_DEPARTMENT_ID,
+    DECODE(LOWER(NVL($P{P_LANG}, 'ar')), 'ar', NVL(TD.ARABIC_NAME, TD.NAME), NVL(TD.NAME, TD.ARABIC_NAME)) AS TO_DEPARTMENT_NAME,
+    NVL(
+        DECODE(LOWER(NVL($P{P_LANG}, 'ar')), 'ar', NVL(TPD.ARABIC_NAME, TPD.NAME), NVL(TPD.NAME, TPD.ARABIC_NAME)),
+        DECODE(LOWER(NVL($P{P_LANG}, 'ar')), 'ar', NVL(TD.ARABIC_NAME, TD.NAME), NVL(TD.NAME, TD.ARABIC_NAME))
+    ) AS TO_GENERAL_DEPT_NAME,
+    
+    -- Seconded To Job & Grade
+    S.TO_JOB_ID,
+    DECODE(LOWER(NVL($P{P_LANG}, 'ar')), 'ar', NVL(TJ.ARABIC_NAME, TJ.NAME), NVL(TJ.NAME, TJ.ARABIC_NAME)) AS TO_JOB_NAME,
+    S.TO_JOB_GRADE_ID,
+    DECODE(LOWER(NVL($P{P_LANG}, 'ar')), 'ar', NVL(TG.ARABIC_NAME, TG.NAME), NVL(TG.NAME, TG.ARABIC_NAME)) AS TO_GRADE_NAME,
+    
+    -- Manager during secondment
+    S.TO_MANAGER_ID,
+    DECODE(LOWER(NVL($P{P_LANG}, 'ar')), 'ar', NVL(TM.FULL_NAME_AR, TM.FULL_NAME_EN), NVL(TM.FULL_NAME_EN, TM.FULL_NAME_AR)) AS TO_MANAGER_NAME,
+    
+    -- External Secondment
+    NVL(S.IS_EXTERNAL, '0') AS IS_EXTERNAL,
+    S.EXTERNAL_ENTITY_NAME,
+    
+    -- Dates & Duration
+    S.REQUEST_DATE,
+    TO_CHAR(S.REQUEST_DATE, 'YYYY/MM/DD') AS REQUEST_DATE_STR,
+    TO_CHAR(NVL(S.REQUEST_DATE, SYSDATE), 'YYYY/MM/DD') AS PRINT_DATE_STR,
+    S.START_DATE,
+    TO_CHAR(S.START_DATE, 'YYYY/MM/DD') AS START_DATE_STR,
+    S.END_DATE,
+    TO_CHAR(S.END_DATE, 'YYYY/MM/DD') AS END_DATE_STR,
+    S.DURATION_DAYS,
+    
+    -- Extension & Return
+    NVL(S.IS_EXTENDED, '0') AS IS_EXTENDED,
+    S.ORIGINAL_END_DATE,
+    TO_CHAR(S.ORIGINAL_END_DATE, 'YYYY/MM/DD') AS ORIGINAL_END_DATE_STR,
+    S.ACTUAL_RETURN_DATE,
+    TO_CHAR(S.ACTUAL_RETURN_DATE, 'YYYY/MM/DD') AS ACTUAL_RETURN_DATE_STR,
+    NVL(S.IS_RETURNED, '0') AS IS_RETURNED,
+    
+    -- Reason & Decision & Notes
+    S.REASON,
+    S.JOB_DESCRIPTION,
+    S.DECISION_NO,
+    S.DECISION_DATE,
+    TO_CHAR(S.DECISION_DATE, 'YYYY/MM/DD') AS DECISION_DATE_STR,
+    S.STATUS,
+    S.NOTES,
+    
+    -- Creation audit
+    S.CREATED_BY
+FROM HR_SECONDMENTS S
+LEFT JOIN HR_EMPLOYEES E ON E.EMPLOYEE_ID = S.EMPLOYEE_ID
+LEFT JOIN HR_EMPLOYEES APPR ON APPR.EMPLOYEE_ID = S.APPROVER_EMPLOYEE_ID
+LEFT JOIN HR_DEPARTMENT FD ON FD.ID = S.FROM_DEPARTMENT_ID
+LEFT JOIN HR_DEPARTMENT FPD ON FPD.ID = FD.PARENT_ID
+LEFT JOIN HR_JOB_TITLE FJ ON FJ.ID = S.FROM_JOB_ID
+LEFT JOIN HR_JOB_GRADES FG ON FG.ID = S.FROM_JOB_GRADE_ID
+
+LEFT JOIN HR_DEPARTMENT TD ON TD.ID = S.TO_DEPARTMENT_ID
+LEFT JOIN HR_DEPARTMENT TPD ON TPD.ID = TD.PARENT_ID
+LEFT JOIN HR_JOB_TITLE TJ ON TJ.ID = S.TO_JOB_ID
+LEFT JOIN HR_JOB_GRADES TG ON TG.ID = S.TO_JOB_GRADE_ID
+LEFT JOIN HR_EMPLOYEES TM ON TM.EMPLOYEE_ID = S.TO_MANAGER_ID
+WHERE ($P{P_ID} IS NULL OR $P{P_ID} = '' OR S.ID = TO_NUMBER($P{P_ID}))
+  AND ($P{P_COMP_ID} IS NULL OR $P{P_COMP_ID} = '' OR S.COMPANY_ID = TO_NUMBER($P{P_COMP_ID}))
+  AND ROWNUM = 1]]>
+	</queryString>
+
+	<field name="ID" class="java.math.BigDecimal"/>
+	<field name="SECONDMENT_CODE" class="java.lang.String"/>
+	<field name="EMPLOYEE_ID" class="java.math.BigDecimal"/>
+	<field name="EMPLOYEE_CODE" class="java.lang.String"/>
+	<field name="EMPLOYEE_NAME" class="java.lang.String"/>
+	<field name="APPROVER_EMPLOYEE_ID" class="java.math.BigDecimal"/>
+	<field name="APPROVER_EMPLOYEE_NAME" class="java.lang.String"/>
+	<field name="FROM_DEPARTMENT_ID" class="java.math.BigDecimal"/>
+	<field name="FROM_DEPARTMENT_NAME" class="java.lang.String"/>
+	<field name="FROM_GENERAL_DEPT_NAME" class="java.lang.String"/>
+	<field name="FROM_JOB_ID" class="java.math.BigDecimal"/>
+	<field name="FROM_JOB_NAME" class="java.lang.String"/>
+	<field name="FROM_JOB_GRADE_ID" class="java.math.BigDecimal"/>
+	<field name="FROM_GRADE_NAME" class="java.lang.String"/>
+	<field name="TO_DEPARTMENT_ID" class="java.math.BigDecimal"/>
+	<field name="TO_DEPARTMENT_NAME" class="java.lang.String"/>
+	<field name="TO_GENERAL_DEPT_NAME" class="java.lang.String"/>
+	<field name="TO_JOB_ID" class="java.math.BigDecimal"/>
+	<field name="TO_JOB_NAME" class="java.lang.String"/>
+	<field name="TO_JOB_GRADE_ID" class="java.math.BigDecimal"/>
+	<field name="TO_GRADE_NAME" class="java.lang.String"/>
+	<field name="TO_MANAGER_ID" class="java.math.BigDecimal"/>
+	<field name="TO_MANAGER_NAME" class="java.lang.String"/>
+	<field name="IS_EXTERNAL" class="java.lang.String"/>
+	<field name="EXTERNAL_ENTITY_NAME" class="java.lang.String"/>
+	<field name="REQUEST_DATE" class="java.sql.Timestamp"/>
+	<field name="REQUEST_DATE_STR" class="java.lang.String"/>
+	<field name="PRINT_DATE_STR" class="java.lang.String"/>
+	<field name="START_DATE" class="java.sql.Timestamp"/>
+	<field name="START_DATE_STR" class="java.lang.String"/>
+	<field name="END_DATE" class="java.sql.Timestamp"/>
+	<field name="END_DATE_STR" class="java.lang.String"/>
+	<field name="DURATION_DAYS" class="java.math.BigDecimal"/>
+	<field name="IS_EXTENDED" class="java.lang.String"/>
+	<field name="ORIGINAL_END_DATE" class="java.sql.Timestamp"/>
+	<field name="ORIGINAL_END_DATE_STR" class="java.lang.String"/>
+	<field name="ACTUAL_RETURN_DATE" class="java.sql.Timestamp"/>
+	<field name="ACTUAL_RETURN_DATE_STR" class="java.lang.String"/>
+	<field name="IS_RETURNED" class="java.lang.String"/>
+	<field name="REASON" class="java.lang.String"/>
+	<field name="JOB_DESCRIPTION" class="java.lang.String"/>
+	<field name="DECISION_NO" class="java.lang.String"/>
+	<field name="DECISION_DATE" class="java.sql.Timestamp"/>
+	<field name="DECISION_DATE_STR" class="java.lang.String"/>
+	<field name="STATUS" class="java.lang.String"/>
+	<field name="NOTES" class="java.lang.String"/>
+	<field name="CREATED_BY" class="java.lang.String"/>
+
+	<!-- ============ PAGE HEADER ============ -->
+	<pageHeader>
+		<band height="140" splitType="Stretch">
+			<subreport>
+				<reportElement positionType="Float" x="0" y="0" width="555" height="135" uuid="cc33dd44-0001-0001-0001-000000000001"/>
+				<subreportParameter name="P_COMP_ID">
+					<subreportParameterExpression><![CDATA[$P{P_COMP_ID}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="P_TITLE_REPORT">
+					<subreportParameterExpression><![CDATA["ar".equals($P{P_LANG}) ? "قرار إداري - الانتداب" : "Administrative Decision - Secondment"]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "HEAD_TITEL_PA.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</pageHeader>
+
+	<!-- ============ DETAIL BAND (DOCUMENT BODY) ============ -->
+	<detail>
+		<band height="550" splitType="Stretch">
+			<staticText>
+				<reportElement style="TitleStyle" x="127" y="15" width="300" height="40" uuid="d1111111-0001-0001-0001-000000000001"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="IBM Plex Sans Arabic" size="16" isBold="true"/>
+				</textElement>
+				<text><![CDATA[السيد / مدير إدارة المواظبة]]></text>
+			</staticText>
+
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement style="DecisionTextStyle" positionType="Float" x="0" y="75" width="555" height="260" uuid="d1111111-0001-0001-0001-000000000005">
+					<property name="net.sf.jasperreports.style.markup" value="html"/>
+				</reportElement>
+				<textElement textAlignment="Right" verticalAlignment="Top" markup="html">
+					<font fontName="IBM Plex Sans Arabic" size="14"/>
+					<paragraph lineSpacing="1_1_2"/>
+				</textElement>
+				<textFieldExpression><![CDATA["بالإشارة إلى ( المذكرة / الطلب ) الوارد إلينا واعتماد السيد / <b>" + ($F{APPROVER_EMPLOYEE_NAME} != null ? $F{APPROVER_EMPLOYEE_NAME} : ($F{CREATED_BY} != null ? $F{CREATED_BY} : "")) + "</b><br/><br/>" +
+"فقد تقرر انتداب السيد / <b>" + ($F{EMPLOYEE_NAME} != null ? $F{EMPLOYEE_NAME} : "") + "</b> رقم :- <b>" + ($F{EMPLOYEE_CODE} != null ? $F{EMPLOYEE_CODE} : "") + "</b><br/>" +
+"وظيفة : <b>" + ($F{FROM_JOB_NAME} != null ? $F{FROM_JOB_NAME} : "") + "</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;مستوى الوظائف : <b>" + ($F{FROM_GRADE_NAME} != null ? $F{FROM_GRADE_NAME} : "") + "</b><br/>" +
+"بإدارة : <b>" + ($F{FROM_DEPARTMENT_NAME} != null ? $F{FROM_DEPARTMENT_NAME} : "") + "</b>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;الإدارة العامة : <b>" + ($F{FROM_GENERAL_DEPT_NAME} != null ? $F{FROM_GENERAL_DEPT_NAME} : "") + "</b><br/><br/>" +
+"للعمل بإدارة : <b>" + ("1".equals($F{IS_EXTERNAL}) ? ($F{EXTERNAL_ENTITY_NAME} != null ? $F{EXTERNAL_ENTITY_NAME} : "جهة خارجية") : ($F{TO_DEPARTMENT_NAME} != null ? $F{TO_DEPARTMENT_NAME} : "")) + "</b>" + ("1".equals($F{IS_EXTERNAL}) && ($F{TO_GENERAL_DEPT_NAME} == null || $F{TO_GENERAL_DEPT_NAME}.isEmpty()) ? "" : ("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;الإدارة العامة : <b>" + ($F{TO_GENERAL_DEPT_NAME} != null ? $F{TO_GENERAL_DEPT_NAME} : "") + "</b>")) + "<br/>" +
+"بوظيفة : <b>" + ($F{TO_JOB_NAME} != null ? $F{TO_JOB_NAME} : "") + "</b>" + ($F{TO_GRADE_NAME} != null ? ("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;مستوى الوظائف : <b>" + $F{TO_GRADE_NAME} + "</b>") : "") + "<br/><br/>" +
+"وذلك اعتباراً من : <b>" + ($F{START_DATE_STR} != null ? $F{START_DATE_STR} : "") + "</b>" + ($F{END_DATE_STR} != null ? (" إلى <b>" + $F{END_DATE_STR} + "</b>") : "") + ($F{DURATION_DAYS} != null ? (" ( لمدة <b>" + $F{DURATION_DAYS} + "</b> يوم )") : "") + "<br/><br/>" +
+"للعلم والتنبيه بعمل اللازم لحين موافاتكم بالقرار الإداري الصادر بذلك الشأن.<br/>" +
+"وتفضلوا بقبول وافر التحية ،،،،،"]]></textFieldExpression>
+			</textField>
+
+			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
+				<reportElement positionType="Float" x="0" y="350" width="555" height="32" isRemoveLineWhenBlank="true" uuid="d1111111-0001-0001-0001-000000000014"/>
+				<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5">
+					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Top">
+					<font fontName="IBM Plex Sans Arabic" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{NOTES} != null && !$F{NOTES}.trim().isEmpty() ? "ملاحظات: " + $F{NOTES} : null]]></textFieldExpression>
+			</textField>
+
+			<frame>
+				<reportElement positionType="Float" x="0" y="415" width="555" height="110" uuid="d1111111-0001-0001-0001-000000000015"/>
+				<staticText>
+					<reportElement x="280" y="10" width="260" height="28" forecolor="#1F4E79" uuid="d1111111-0001-0001-0001-000000000016"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="IBM Plex Sans Arabic" size="14" isBold="true"/>
+					</textElement>
+					<text><![CDATA[مدير إدارة شئون العاملين]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="280" y="40" width="260" height="24" forecolor="#555555" uuid="d1111111-0001-0001-0001-000000000017"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="IBM Plex Sans Arabic" size="11"/>
+					</textElement>
+					<text><![CDATA[التوقيع: ............................................]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="280" y="68" width="260" height="24" forecolor="#555555" uuid="d1111111-0001-0001-0001-000000000018"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font fontName="IBM Plex Sans Arabic" size="11"/>
+					</textElement>
+					<text><![CDATA[التاريخ: ...... / ...... / 2026 م]]></text>
+				</staticText>
+			</frame>
+		</band>
+	</detail>
+
+	<!-- ============ PAGE FOOTER ============ -->
+	<pageFooter>
+		<band height="45" splitType="Stretch">
+			<subreport>
+				<reportElement x="0" y="0" width="555" height="40" uuid="cc33dd44-0002-0002-0002-000000000002"/>
+				<subreportParameter name="P_USERPRINT">
+					<subreportParameterExpression><![CDATA[$P{P_USERPRINT}]]></subreportParameterExpression>
+				</subreportParameter>
+				<subreportParameter name="PAGE_NUMBER">
+					<subreportParameterExpression><![CDATA[$V{PAGE_NUMBER}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "FOOTER_TITEL_PA.jasper"]]></subreportExpression>
+			</subreport>
+		</band>
+	</pageFooter>
+</jasperReport>
