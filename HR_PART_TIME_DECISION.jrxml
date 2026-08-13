@@ -13,7 +13,7 @@
 	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
 
-	<style name="TitleStyle" mode="Opaque" forecolor="#1F4E79" backcolor="#F2F4F7" fontName="IBM Plex Sans Arabic" fontSize="16" isBold="true" hTextAlign="Center" vTextAlign="Middle">
+	<style name="TitleStyle" mode="Opaque" forecolor="#1F4E79" backcolor="#F2F4F7" fontName="IBM Plex Sans Arabic" fontSize="18" isBold="true" hTextAlign="Center" vTextAlign="Middle">
 		<box>
 			<topPen lineWidth="1.0" lineColor="#1F4E79"/>
 			<leftPen lineWidth="1.0" lineColor="#1F4E79"/>
@@ -21,7 +21,7 @@
 			<rightPen lineWidth="1.0" lineColor="#1F4E79"/>
 		</box>
 	</style>
-	<style name="DecisionTextStyle" mode="Transparent" forecolor="#2C3E50" fontName="IBM Plex Sans Arabic" fontSize="13" hTextAlign="Right" vTextAlign="Top">
+	<style name="DecisionTextStyle" mode="Transparent" forecolor="#2C3E50" fontName="IBM Plex Sans Arabic" fontSize="15" hTextAlign="Right" vTextAlign="Top">
 		<box topPadding="15" leftPadding="15" bottomPadding="15" rightPadding="15">
 			<topPen lineWidth="0.5" lineColor="#BDC3C7"/>
 			<leftPen lineWidth="0.5" lineColor="#BDC3C7"/>
@@ -29,12 +29,12 @@
 			<rightPen lineWidth="0.5" lineColor="#BDC3C7"/>
 		</box>
 	</style>
-	<style name="HeaderStyle" mode="Opaque" forecolor="#FFFFFF" backcolor="#1F4E79" fontName="IBM Plex Sans Arabic" fontSize="10" isBold="true" hTextAlign="Center" vTextAlign="Middle">
+	<style name="HeaderStyle" mode="Opaque" forecolor="#FFFFFF" backcolor="#1F4E79" fontName="IBM Plex Sans Arabic" fontSize="11" isBold="true" hTextAlign="Center" vTextAlign="Middle">
 		<box>
 			<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 		</box>
 	</style>
-	<style name="RowStyle" mode="Opaque" forecolor="#2C3E50" backcolor="#FFFFFF" fontName="IBM Plex Sans Arabic" fontSize="10" hTextAlign="Center" vTextAlign="Middle">
+	<style name="RowStyle" mode="Opaque" forecolor="#2C3E50" backcolor="#FFFFFF" fontName="IBM Plex Sans Arabic" fontSize="11" hTextAlign="Center" vTextAlign="Middle">
 		<box>
 			<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 		</box>
@@ -132,44 +132,20 @@ WHERE A.ID = TO_NUMBER($P{P_REQUEST_ID})]]>
 		<band height="550" splitType="Stretch">
 			<!-- Title Banner -->
 			<staticText>
-				<reportElement style="TitleStyle" x="140" y="10" width="275" height="35" uuid="d1111111-0001-0001-0001-000000000001"/>
+				<reportElement style="TitleStyle" x="140" y="15" width="275" height="40" uuid="d1111111-0001-0001-0001-000000000001"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="14" isBold="true"/>
+					<font fontName="IBM Plex Sans Arabic" size="16" isBold="true"/>
 				</textElement>
 				<text><![CDATA[قـــرار إداري]]></text>
 			</staticText>
 
-			<!-- Request Number & Date Header Info -->
-			<textField isBlankWhenNull="true">
-				<reportElement x="0" y="55" width="200" height="20" uuid="d1111111-0001-0001-0001-000000000002"/>
-				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="10" isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA["رقم القرار / الطلب: " + ($F{REQUEST_ID} != null ? $F{REQUEST_ID} : "")]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement x="355" y="55" width="200" height="20" uuid="d1111111-0001-0001-0001-000000000003"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="10" isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA["التاريخ: " + ($F{CREATED_DATE} != null ? new java.text.SimpleDateFormat("yyyy/MM/dd").format($F{CREATED_DATE}) : "")]]></textFieldExpression>
-			</textField>
-
-			<!-- Separator Line -->
-			<line>
-				<reportElement x="0" y="80" width="555" height="1" uuid="d1111111-0001-0001-0001-000000000004"/>
-				<graphicElement>
-					<pen lineWidth="1.0" lineColor="#1F4E79"/>
-				</graphicElement>
-			</line>
-
-			<!-- Decision Main Text Box -->
+			<!-- Decision Main Text Box (Large Font Size) -->
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="DecisionTextStyle" positionType="Float" x="0" y="95" width="555" height="150" uuid="d1111111-0001-0001-0001-000000000005">
+				<reportElement style="DecisionTextStyle" positionType="Float" x="0" y="75" width="555" height="160" uuid="d1111111-0001-0001-0001-000000000005">
 					<property name="net.sf.jasperreports.style.markup" value="html"/>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Top" markup="html">
-					<font fontName="IBM Plex Sans Arabic" size="13"/>
+					<font fontName="IBM Plex Sans Arabic" size="15"/>
 					<paragraph lineSpacing="1_1_2"/>
 				</textElement>
 				<textFieldExpression><![CDATA["اعتباراً من <b>" + ($F{START_DATE_STR} != null ? $F{START_DATE_STR} : "--------") + "</b> يعمل السيد / السيدة <b>" + ($F{EMPLOYEE_NAME} != null ? $F{EMPLOYEE_NAME} : "------------") + "</b> رقم <b>" + ($F{EMPLOYEE_CODE} != null ? $F{EMPLOYEE_CODE} : "-----") + "</b> بإدارة <b>" + ($F{DEPARTMENT_NAME} != null ? $F{DEPARTMENT_NAME} : "-------") + "</b> بنظام <b>" + ($F{REQUEST_TYPE_NAME} != null ? $F{REQUEST_TYPE_NAME} : "-------") + "</b> ينتهي في <b>" + ($F{END_DATE_STR} != null ? $F{END_DATE_STR} : "---------") + "</b>.<br/><br/>على أن يُخصم منه / منها نصف المستحقات المالية وكذلك الإجازات السنوية."]]></textFieldExpression>
@@ -177,93 +153,77 @@ WHERE A.ID = TO_NUMBER($P{P_REQUEST_ID})]]>
 
 			<!-- Details Table: Work / Off Days Schedule -->
 			<staticText>
-				<reportElement positionType="Float" x="400" y="260" width="155" height="20" forecolor="#1F4E79" uuid="d1111111-0001-0001-0001-000000000006"/>
+				<reportElement positionType="Float" x="380" y="255" width="175" height="22" forecolor="#1F4E79" uuid="d1111111-0001-0001-0001-000000000006"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="11" isBold="true"/>
+					<font fontName="IBM Plex Sans Arabic" size="12" isBold="true"/>
 				</textElement>
 				<text><![CDATA[تفاصيل أيام العمل والإجازات:]]></text>
 			</staticText>
 
 			<staticText>
-				<reportElement style="HeaderStyle" positionType="Float" x="277" y="285" width="278" height="25" uuid="d1111111-0001-0001-0001-000000000007"/>
+				<reportElement style="HeaderStyle" positionType="Float" x="277" y="282" width="278" height="28" uuid="d1111111-0001-0001-0001-000000000007"/>
 				<text><![CDATA[الأسبوع الأول]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="HeaderStyle" positionType="Float" x="0" y="285" width="277" height="25" uuid="d1111111-0001-0001-0001-000000000008"/>
+				<reportElement style="HeaderStyle" positionType="Float" x="0" y="282" width="277" height="28" uuid="d1111111-0001-0001-0001-000000000008"/>
 				<text><![CDATA[الأسبوع الثاني]]></text>
 			</staticText>
 
 			<textField isBlankWhenNull="true">
-				<reportElement style="RowStyle" positionType="Float" x="416" y="310" width="139" height="25" uuid="d1111111-0001-0001-0001-000000000009"/>
+				<reportElement style="RowStyle" positionType="Float" x="416" y="310" width="139" height="28" uuid="d1111111-0001-0001-0001-000000000009"/>
 				<textFieldExpression><![CDATA["أيام العمل: " + ($F{WEEK1_WORK_DAYS} != null ? $F{WEEK1_WORK_DAYS} : 0)]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement style="RowStyle" positionType="Float" x="277" y="310" width="139" height="25" uuid="d1111111-0001-0001-0001-000000000010"/>
+				<reportElement style="RowStyle" positionType="Float" x="277" y="310" width="139" height="28" uuid="d1111111-0001-0001-0001-000000000010"/>
 				<textFieldExpression><![CDATA["أيام الراحة: " + ($F{WEEK1_OFF_DAYS} != null ? $F{WEEK1_OFF_DAYS} : 0)]]></textFieldExpression>
 			</textField>
 
 			<textField isBlankWhenNull="true">
-				<reportElement style="RowStyle" positionType="Float" x="138" y="310" width="139" height="25" uuid="d1111111-0001-0001-0001-000000000011"/>
+				<reportElement style="RowStyle" positionType="Float" x="138" y="310" width="139" height="28" uuid="d1111111-0001-0001-0001-000000000011"/>
 				<textFieldExpression><![CDATA["أيام العمل: " + ($F{WEEK2_WORK_DAYS} != null ? $F{WEEK2_WORK_DAYS} : 0)]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement style="RowStyle" positionType="Float" x="0" y="310" width="138" height="25" uuid="d1111111-0001-0001-0001-000000000012"/>
+				<reportElement style="RowStyle" positionType="Float" x="0" y="310" width="138" height="28" uuid="d1111111-0001-0001-0001-000000000012"/>
 				<textFieldExpression><![CDATA["أيام الراحة: " + ($F{WEEK2_OFF_DAYS} != null ? $F{WEEK2_OFF_DAYS} : 0)]]></textFieldExpression>
 			</textField>
 
 			<!-- Notes & Remarks (If present) -->
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement positionType="Float" x="0" y="345" width="555" height="30" isRemoveLineWhenBlank="true" uuid="d1111111-0001-0001-0001-000000000013"/>
+				<reportElement positionType="Float" x="0" y="350" width="555" height="32" isRemoveLineWhenBlank="true" uuid="d1111111-0001-0001-0001-000000000013"/>
 				<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5">
 					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 				</box>
 				<textElement textAlignment="Right" verticalAlignment="Top">
-					<font fontName="IBM Plex Sans Arabic" size="10"/>
+					<font fontName="IBM Plex Sans Arabic" size="11"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{NOTES} != null && !$F{NOTES}.trim().isEmpty() ? "ملاحظات: " + $F{NOTES} : null]]></textFieldExpression>
 			</textField>
 
-			<!-- Signature Section: مدير إدارة شئون العاملين -->
+			<!-- Signature Section: مدير إدارة شئون العاملين فقط -->
 			<frame>
-				<reportElement positionType="Float" x="0" y="410" width="555" height="120" uuid="d1111111-0001-0001-0001-000000000014"/>
+				<reportElement positionType="Float" x="0" y="415" width="555" height="110" uuid="d1111111-0001-0001-0001-000000000014"/>
 				<staticText>
-					<reportElement x="320" y="10" width="220" height="25" forecolor="#1F4E79" uuid="d1111111-0001-0001-0001-000000000015"/>
+					<reportElement x="280" y="10" width="260" height="28" forecolor="#1F4E79" uuid="d1111111-0001-0001-0001-000000000015"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font fontName="IBM Plex Sans Arabic" size="12" isBold="true"/>
+						<font fontName="IBM Plex Sans Arabic" size="14" isBold="true"/>
 					</textElement>
 					<text><![CDATA[مدير إدارة شئون العاملين]]></text>
 				</staticText>
 
 				<staticText>
-					<reportElement x="320" y="35" width="220" height="20" forecolor="#7F8C8D" uuid="d1111111-0001-0001-0001-000000000016"/>
+					<reportElement x="280" y="40" width="260" height="24" forecolor="#555555" uuid="d1111111-0001-0001-0001-000000000016"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font fontName="IBM Plex Sans Arabic" size="10"/>
+						<font fontName="IBM Plex Sans Arabic" size="11"/>
 					</textElement>
 					<text><![CDATA[التوقيع: ............................................]]></text>
 				</staticText>
 
 				<staticText>
-					<reportElement x="320" y="65" width="220" height="20" forecolor="#7F8C8D" uuid="d1111111-0001-0001-0001-000000000017"/>
+					<reportElement x="280" y="68" width="260" height="24" forecolor="#555555" uuid="d1111111-0001-0001-0001-000000000017"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font fontName="IBM Plex Sans Arabic" size="10"/>
+						<font fontName="IBM Plex Sans Arabic" size="11"/>
 					</textElement>
 					<text><![CDATA[التاريخ: ...... / ...... / 2026 م]]></text>
-				</staticText>
-
-				<staticText>
-					<reportElement x="20" y="10" width="200" height="25" forecolor="#1F4E79" uuid="d1111111-0001-0001-0001-000000000018"/>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font fontName="IBM Plex Sans Arabic" size="12" isBold="true"/>
-					</textElement>
-					<text><![CDATA[اعتماد المدير العام]]></text>
-				</staticText>
-
-				<staticText>
-					<reportElement x="20" y="35" width="200" height="20" forecolor="#7F8C8D" uuid="d1111111-0001-0001-0001-000000000019"/>
-					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font fontName="IBM Plex Sans Arabic" size="10"/>
-					</textElement>
-					<text><![CDATA[التوقيع: ............................................]]></text>
 				</staticText>
 			</frame>
 		</band>
