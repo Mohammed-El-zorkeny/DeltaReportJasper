@@ -110,7 +110,7 @@ WHERE A.ID = TO_NUMBER($P{P_REQUEST_ID})]]>
 	<pageHeader>
 		<band height="140" splitType="Stretch">
 			<subreport>
-				<reportElement positionType="Float" x="-20" y="0" width="575" height="135" uuid="cc33dd44-0001-0001-0001-000000000001"/>
+				<reportElement positionType="Float" x="0" y="0" width="555" height="135" uuid="cc33dd44-0001-0001-0001-000000000001"/>
 				<subreportParameter name="P_COMP_ID">
 					<subreportParameterExpression><![CDATA[$P{P_COMP_ID}]]></subreportParameterExpression>
 				</subreportParameter>
