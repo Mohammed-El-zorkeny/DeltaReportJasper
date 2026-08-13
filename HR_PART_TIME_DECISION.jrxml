@@ -177,9 +177,9 @@ WHERE A.ID = TO_NUMBER($P{P_REQUEST_ID})]]>
 
 			<!-- Details Table: Work / Off Days Schedule -->
 			<staticText>
-				<reportElement positionType="Float" x="400" y="260" width="155" height="20" uuid="d1111111-0001-0001-0001-000000000006"/>
+				<reportElement positionType="Float" x="400" y="260" width="155" height="20" forecolor="#1F4E79" uuid="d1111111-0001-0001-0001-000000000006"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="11" isBold="true" forecolor="#1F4E79"/>
+					<font fontName="IBM Plex Sans Arabic" size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[تفاصيل أيام العمل والإجازات:]]></text>
 			</staticText>
@@ -227,41 +227,41 @@ WHERE A.ID = TO_NUMBER($P{P_REQUEST_ID})]]>
 			<frame>
 				<reportElement positionType="Float" x="0" y="410" width="555" height="120" uuid="d1111111-0001-0001-0001-000000000014"/>
 				<staticText>
-					<reportElement x="320" y="10" width="220" height="25" uuid="d1111111-0001-0001-0001-000000000015"/>
+					<reportElement x="320" y="10" width="220" height="25" forecolor="#1F4E79" uuid="d1111111-0001-0001-0001-000000000015"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font fontName="IBM Plex Sans Arabic" size="12" isBold="true" forecolor="#1F4E79"/>
+						<font fontName="IBM Plex Sans Arabic" size="12" isBold="true"/>
 					</textElement>
 					<text><![CDATA[مدير إدارة شئون العاملين]]></text>
 				</staticText>
 
 				<staticText>
-					<reportElement x="320" y="35" width="220" height="20" uuid="d1111111-0001-0001-0001-000000000016"/>
+					<reportElement x="320" y="35" width="220" height="20" forecolor="#7F8C8D" uuid="d1111111-0001-0001-0001-000000000016"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font fontName="IBM Plex Sans Arabic" size="10" forecolor="#7F8C8D"/>
+						<font fontName="IBM Plex Sans Arabic" size="10"/>
 					</textElement>
 					<text><![CDATA[التوقيع: ............................................]]></text>
 				</staticText>
 
 				<staticText>
-					<reportElement x="320" y="65" width="220" height="20" uuid="d1111111-0001-0001-0001-000000000017"/>
+					<reportElement x="320" y="65" width="220" height="20" forecolor="#7F8C8D" uuid="d1111111-0001-0001-0001-000000000017"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font fontName="IBM Plex Sans Arabic" size="10" forecolor="#7F8C8D"/>
+						<font fontName="IBM Plex Sans Arabic" size="10"/>
 					</textElement>
 					<text><![CDATA[التاريخ: ...... / ...... / 2026 م]]></text>
 				</staticText>
 
 				<staticText>
-					<reportElement x="20" y="10" width="200" height="25" uuid="d1111111-0001-0001-0001-000000000018"/>
+					<reportElement x="20" y="10" width="200" height="25" forecolor="#1F4E79" uuid="d1111111-0001-0001-0001-000000000018"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font fontName="IBM Plex Sans Arabic" size="12" isBold="true" forecolor="#1F4E79"/>
+						<font fontName="IBM Plex Sans Arabic" size="12" isBold="true"/>
 					</textElement>
 					<text><![CDATA[اعتماد المدير العام]]></text>
 				</staticText>
 
 				<staticText>
-					<reportElement x="20" y="35" width="200" height="20" uuid="d1111111-0001-0001-0001-000000000019"/>
+					<reportElement x="20" y="35" width="200" height="20" forecolor="#7F8C8D" uuid="d1111111-0001-0001-0001-000000000019"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font fontName="IBM Plex Sans Arabic" size="10" forecolor="#7F8C8D"/>
+						<font fontName="IBM Plex Sans Arabic" size="10"/>
 					</textElement>
 					<text><![CDATA[التوقيع: ............................................]]></text>
 				</staticText>
