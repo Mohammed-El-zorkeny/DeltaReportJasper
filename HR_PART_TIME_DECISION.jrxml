@@ -132,14 +132,14 @@ WHERE A.ID = TO_NUMBER($P{P_REQUEST_ID})]]>
 		<band height="550" splitType="Stretch">
 			<!-- Title Banner -->
 			<staticText>
-				<reportElement style="TitleStyle" x="140" y="15" width="275" height="40" uuid="d1111111-0001-0001-0001-000000000001"/>
+				<reportElement style="TitleStyle" x="127" y="15" width="300" height="40" uuid="d1111111-0001-0001-0001-000000000001"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="IBM Plex Sans Arabic" size="16" isBold="true"/>
 				</textElement>
-				<text><![CDATA[قـــرار إداري]]></text>
+				<text><![CDATA[السيد / مدير إدارة المواظبة]]></text>
 			</staticText>
 
-			<!-- Decision Main Text Box (Large Font Size) -->
+			<!-- Decision Main Text Box (Dynamic entitlement fraction: ربع / نصف) -->
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement style="DecisionTextStyle" positionType="Float" x="0" y="75" width="555" height="160" uuid="d1111111-0001-0001-0001-000000000005">
 					<property name="net.sf.jasperreports.style.markup" value="html"/>
@@ -148,48 +148,53 @@ WHERE A.ID = TO_NUMBER($P{P_REQUEST_ID})]]>
 					<font fontName="IBM Plex Sans Arabic" size="15"/>
 					<paragraph lineSpacing="1_1_2"/>
 				</textElement>
-				<textFieldExpression><![CDATA["اعتباراً من <b>" + ($F{START_DATE_STR} != null ? $F{START_DATE_STR} : "--------") + "</b> يعمل السيد / السيدة <b>" + ($F{EMPLOYEE_NAME} != null ? $F{EMPLOYEE_NAME} : "------------") + "</b> رقم <b>" + ($F{EMPLOYEE_CODE} != null ? $F{EMPLOYEE_CODE} : "-----") + "</b> بإدارة <b>" + ($F{DEPARTMENT_NAME} != null ? $F{DEPARTMENT_NAME} : "-------") + "</b> بنظام <b>" + ($F{REQUEST_TYPE_NAME} != null ? $F{REQUEST_TYPE_NAME} : "-------") + "</b> ينتهي في <b>" + ($F{END_DATE_STR} != null ? $F{END_DATE_STR} : "---------") + "</b>.<br/><br/>على أن يُخصم منه / منها نصف المستحقات المالية وكذلك الإجازات السنوية."]]></textFieldExpression>
+				<textFieldExpression><![CDATA["اعتباراً من <b>" + ($F{START_DATE_STR} != null ? $F{START_DATE_STR} : "--------") + "</b> يعمل السيد / السيدة <b>" + ($F{EMPLOYEE_NAME} != null ? $F{EMPLOYEE_NAME} : "------------") + "</b> رقم <b>" + ($F{EMPLOYEE_CODE} != null ? $F{EMPLOYEE_CODE} : "-----") + "</b> بإدارة <b>" + ($F{DEPARTMENT_NAME} != null ? $F{DEPARTMENT_NAME} : "-------") + "</b> بنظام <b>" + ($F{REQUEST_TYPE_NAME} != null ? $F{REQUEST_TYPE_NAME} : "-------") + "</b> ينتهي في <b>" + ($F{END_DATE_STR} != null ? $F{END_DATE_STR} : "---------") + "</b>.<br/><br/>على أن يُخصم منه / منها <b>" + (($F{REQUEST_TYPE_NAME} != null && ($F{REQUEST_TYPE_NAME}.contains("ربع") || $F{REQUEST_TYPE_NAME}.toLowerCase().contains("quarter"))) ? "ربع" : "نصف") + "</b> المستحقات المالية وكذلك الإجازات السنوية."]]></textFieldExpression>
 			</textField>
 
-			<!-- Details Table: Work / Off Days Schedule -->
-			<staticText>
-				<reportElement positionType="Float" x="380" y="255" width="175" height="22" forecolor="#1F4E79" uuid="d1111111-0001-0001-0001-000000000006"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="IBM Plex Sans Arabic" size="12" isBold="true"/>
-				</textElement>
-				<text><![CDATA[تفاصيل أيام العمل والإجازات:]]></text>
-			</staticText>
+			<!-- Details Table: Work / Off Days Schedule (Hidden when Quarter Time / ربع الوقت) -->
+			<frame>
+				<reportElement positionType="Float" x="0" y="250" width="555" height="90" isRemoveLineWhenBlank="true" uuid="d1111111-0001-0001-0001-000000000006">
+					<printWhenExpression><![CDATA[Boolean.valueOf($F{REQUEST_TYPE_NAME} == null || (!$F{REQUEST_TYPE_NAME}.contains("ربع") && !$F{REQUEST_TYPE_NAME}.toLowerCase().contains("quarter")))]]></printWhenExpression>
+				</reportElement>
+				<staticText>
+					<reportElement positionType="Float" x="380" y="5" width="175" height="22" forecolor="#1F4E79" uuid="d1111111-0001-0001-0001-000000000007"/>
+					<textElement textAlignment="Right" verticalAlignment="Middle">
+						<font fontName="IBM Plex Sans Arabic" size="12" isBold="true"/>
+					</textElement>
+					<text><![CDATA[تفاصيل أيام العمل والإجازات:]]></text>
+				</staticText>
 
-			<staticText>
-				<reportElement style="HeaderStyle" positionType="Float" x="277" y="282" width="278" height="28" uuid="d1111111-0001-0001-0001-000000000007"/>
-				<text><![CDATA[الأسبوع الأول]]></text>
-			</staticText>
-			<staticText>
-				<reportElement style="HeaderStyle" positionType="Float" x="0" y="282" width="277" height="28" uuid="d1111111-0001-0001-0001-000000000008"/>
-				<text><![CDATA[الأسبوع الثاني]]></text>
-			</staticText>
+				<staticText>
+					<reportElement style="HeaderStyle" positionType="Float" x="277" y="32" width="278" height="28" uuid="d1111111-0001-0001-0001-000000000008"/>
+					<text><![CDATA[الأسبوع الأول]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="HeaderStyle" positionType="Float" x="0" y="32" width="277" height="28" uuid="d1111111-0001-0001-0001-000000000009"/>
+					<text><![CDATA[الأسبوع الثاني]]></text>
+				</staticText>
 
-			<textField isBlankWhenNull="true">
-				<reportElement style="RowStyle" positionType="Float" x="416" y="310" width="139" height="28" uuid="d1111111-0001-0001-0001-000000000009"/>
-				<textFieldExpression><![CDATA["أيام العمل: " + ($F{WEEK1_WORK_DAYS} != null ? $F{WEEK1_WORK_DAYS} : 0)]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement style="RowStyle" positionType="Float" x="277" y="310" width="139" height="28" uuid="d1111111-0001-0001-0001-000000000010"/>
-				<textFieldExpression><![CDATA["أيام الراحة: " + ($F{WEEK1_OFF_DAYS} != null ? $F{WEEK1_OFF_DAYS} : 0)]]></textFieldExpression>
-			</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement style="RowStyle" positionType="Float" x="416" y="60" width="139" height="28" uuid="d1111111-0001-0001-0001-000000000010"/>
+					<textFieldExpression><![CDATA["أيام العمل: " + ($F{WEEK1_WORK_DAYS} != null ? $F{WEEK1_WORK_DAYS} : 0)]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement style="RowStyle" positionType="Float" x="277" y="60" width="139" height="28" uuid="d1111111-0001-0001-0001-000000000011"/>
+					<textFieldExpression><![CDATA["أيام الراحة: " + ($F{WEEK1_OFF_DAYS} != null ? $F{WEEK1_OFF_DAYS} : 0)]]></textFieldExpression>
+				</textField>
 
-			<textField isBlankWhenNull="true">
-				<reportElement style="RowStyle" positionType="Float" x="138" y="310" width="139" height="28" uuid="d1111111-0001-0001-0001-000000000011"/>
-				<textFieldExpression><![CDATA["أيام العمل: " + ($F{WEEK2_WORK_DAYS} != null ? $F{WEEK2_WORK_DAYS} : 0)]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement style="RowStyle" positionType="Float" x="0" y="310" width="138" height="28" uuid="d1111111-0001-0001-0001-000000000012"/>
-				<textFieldExpression><![CDATA["أيام الراحة: " + ($F{WEEK2_OFF_DAYS} != null ? $F{WEEK2_OFF_DAYS} : 0)]]></textFieldExpression>
-			</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement style="RowStyle" positionType="Float" x="138" y="60" width="139" height="28" uuid="d1111111-0001-0001-0001-000000000012"/>
+					<textFieldExpression><![CDATA["أيام العمل: " + ($F{WEEK2_WORK_DAYS} != null ? $F{WEEK2_WORK_DAYS} : 0)]]></textFieldExpression>
+				</textField>
+				<textField isBlankWhenNull="true">
+					<reportElement style="RowStyle" positionType="Float" x="0" y="60" width="138" height="28" uuid="d1111111-0001-0001-0001-000000000013"/>
+					<textFieldExpression><![CDATA["أيام الراحة: " + ($F{WEEK2_OFF_DAYS} != null ? $F{WEEK2_OFF_DAYS} : 0)]]></textFieldExpression>
+				</textField>
+			</frame>
 
 			<!-- Notes & Remarks (If present) -->
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement positionType="Float" x="0" y="350" width="555" height="32" isRemoveLineWhenBlank="true" uuid="d1111111-0001-0001-0001-000000000013"/>
+				<reportElement positionType="Float" x="0" y="350" width="555" height="32" isRemoveLineWhenBlank="true" uuid="d1111111-0001-0001-0001-000000000014"/>
 				<box topPadding="5" leftPadding="5" bottomPadding="5" rightPadding="5">
 					<pen lineWidth="0.5" lineColor="#BDC3C7"/>
 				</box>
@@ -201,9 +206,9 @@ WHERE A.ID = TO_NUMBER($P{P_REQUEST_ID})]]>
 
 			<!-- Signature Section: مدير إدارة شئون العاملين فقط -->
 			<frame>
-				<reportElement positionType="Float" x="0" y="415" width="555" height="110" uuid="d1111111-0001-0001-0001-000000000014"/>
+				<reportElement positionType="Float" x="0" y="415" width="555" height="110" uuid="d1111111-0001-0001-0001-000000000015"/>
 				<staticText>
-					<reportElement x="280" y="10" width="260" height="28" forecolor="#1F4E79" uuid="d1111111-0001-0001-0001-000000000015"/>
+					<reportElement x="280" y="10" width="260" height="28" forecolor="#1F4E79" uuid="d1111111-0001-0001-0001-000000000016"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="IBM Plex Sans Arabic" size="14" isBold="true"/>
 					</textElement>
@@ -211,7 +216,7 @@ WHERE A.ID = TO_NUMBER($P{P_REQUEST_ID})]]>
 				</staticText>
 
 				<staticText>
-					<reportElement x="280" y="40" width="260" height="24" forecolor="#555555" uuid="d1111111-0001-0001-0001-000000000016"/>
+					<reportElement x="280" y="40" width="260" height="24" forecolor="#555555" uuid="d1111111-0001-0001-0001-000000000017"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="IBM Plex Sans Arabic" size="11"/>
 					</textElement>
@@ -219,7 +224,7 @@ WHERE A.ID = TO_NUMBER($P{P_REQUEST_ID})]]>
 				</staticText>
 
 				<staticText>
-					<reportElement x="280" y="68" width="260" height="24" forecolor="#555555" uuid="d1111111-0001-0001-0001-000000000017"/>
+					<reportElement x="280" y="68" width="260" height="24" forecolor="#555555" uuid="d1111111-0001-0001-0001-000000000018"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="IBM Plex Sans Arabic" size="11"/>
 					</textElement>
