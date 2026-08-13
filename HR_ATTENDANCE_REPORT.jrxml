@@ -342,11 +342,7 @@ ORDER BY A.ATTENDANCE_DATE DESC, E.FULL_NAME_AR ASC]]>
 				<textFieldExpression><![CDATA[$F{DAY_TYPE_NAME} == null ? "—" : $F{DAY_TYPE_NAME}]]></textFieldExpression>
 			</textField>
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-<<<<<<< Updated upstream
 				<reportElement style="AttendanceStatusStyle" stretchType="ContainerHeight" x="100" y="0" width="92" height="18" uuid="cc33dd44-0003-0001-0001-000000000003"/>
-=======
-				<reportElement stretchType="ContainerHeight" x="100" y="0" width="92" height="18" uuid="cc33dd44-0003-0001-0001-000000000003"/>
->>>>>>> Stashed changes
 				<box>
 					<pen lineWidth="0.5" lineColor="#CCCCCC"/>
 				</box>
