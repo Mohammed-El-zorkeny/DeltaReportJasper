@@ -1,0 +1,5 @@
+*.pdf
+*.log
+*.jar
+report_tmp/
+Thumbs.db
